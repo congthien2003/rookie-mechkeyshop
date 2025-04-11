@@ -12,6 +12,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
 builder.Services.AddApplication();
 
+
+// Config CORS
 builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
     policy =>
     {
@@ -19,6 +21,7 @@ builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
     }));
 
 
+// Config JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

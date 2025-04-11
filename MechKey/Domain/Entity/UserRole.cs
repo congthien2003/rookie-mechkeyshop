@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Common
+namespace Domain.Entity
 {
-    public class Role
+    public class UserRole
     {
         [Key]
         public int Id { get; set; }

@@ -1,13 +1,11 @@
 using Application.Comoon;
-using Microsoft.AspNetCore.Identity;
+using Domain.Entity;
 
 namespace Application.Interfaces.IServices
 {
     public interface IJwtManager
     {
-        string GenerateToken(IdentityUser user);
+        string GenerateToken(ApplicationUser user);
         Result ValidateToken(string token);
-        Result<string> GetUserIdFromToken(string token);
-        Result<string> GetUserRoleFromToken(string token);
     }
 }

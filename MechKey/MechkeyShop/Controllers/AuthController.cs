@@ -1,12 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Application.Interfaces.IServices;
+using Domain.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MechkeyShop.Controllers
 {
     public class AuthController : Controller
     {
-        // GET: AuthController
+        private readonly IJwtManager _jwtManager;
 
+        public AuthController(IJwtManager jwtManager)
+        {
+            _jwtManager = jwtManager;
+        }
+
+        // GET: AuthController
         public ActionResult Index()
         {
             return View();
@@ -24,6 +32,21 @@ namespace MechkeyShop.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                Email = "abc@example.com",
+            };
+
+            var token = _jwtManager.GenerateToken(user);
+
+            // Add Token into Cookies
+            Response.Cookies.Append("accessToken", token, new CookieOptions
+            {
+                HttpOnly = true,  // Prevent JavaScript access
+                Secure = true,    // Only send over HTTPS
+                Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
+            });
             return RedirectToAction("Index");
         }
 

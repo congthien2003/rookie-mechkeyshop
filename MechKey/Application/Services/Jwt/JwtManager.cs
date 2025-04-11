@@ -36,7 +36,7 @@ public class JwtManager : IJwtManager
         var token = new JwtSecurityToken(
             issuer: _configuration.GetSection("JwtSettings:Issuer").Value,
             audience: _configuration.GetSection("JwtSettings:Audience").Value,
-            expires: DateTime.Now.AddHours(2),
+            expires: DateTime.Now.AddHours(int.Parse(_configuration.GetSection("JwtSettings:ExpiredTime").Value!)),
             claims: claims,
             signingCredentials: signingCredentials);
 

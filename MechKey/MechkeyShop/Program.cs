@@ -1,7 +1,6 @@
+﻿using Application;
 using Infrastructure;
-using MechkeyShop.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -11,15 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddApplication();
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
 
-
+// Config JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -36,6 +34,12 @@ builder.Services.AddAuthentication(options =>
                 context.Token = token;
 
             return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            context.HandleResponse(); // Ngăn chặn phản hồi mặc định (401)
+            context.Response.Redirect("/access-denied"); // Redirect đến trang bạn muốn
+            return Task.CompletedTask;
         }
     };
     options.RequireHttpsMetadata = false;
@@ -51,16 +55,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.ConfigureApplicationCookie(option =>
-{
-    option.Cookie.HttpOnly = true;
-    option.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-    option.LoginPath = "/Auth/Login";
-    option.AccessDeniedPath = "/AccessDenied";
-    option.SlidingExpiration = true;
-});
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -68,7 +62,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    app.UseDeveloperExceptionPage();
 }
 else
 {
@@ -78,6 +72,7 @@ else
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -93,6 +88,5 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
 
 app.Run();

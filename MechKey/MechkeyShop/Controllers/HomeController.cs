@@ -28,5 +28,11 @@ namespace MechkeyShop.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpGet("/access-denied")]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }
