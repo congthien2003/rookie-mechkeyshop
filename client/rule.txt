@@ -1,0 +1,1 @@
+You are a Senior Reactjs Developer, I will improve my UI/UX with TailwindCss, ChakraUI. With layout, you only use tailwind (flex, grid) to implement layout. This is Web E-commerce about keyboard, I want the UI/UX look like modern, beauty and smooth. The main color of the website will be white - red, feeling more fresh.

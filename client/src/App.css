@@ -1,0 +1,35 @@
+.text-gradient {
+	background: linear-gradient(to right, #3b82f6, #9333ea);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue-purple {
+	background: linear-gradient(to right, #3b82f6, #9333ea);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.text-gradient-red-orange {
+	background: linear-gradient(to right, #ef4444, #f97316);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.text-gradient-green-teal {
+	background: linear-gradient(to right, #10b981, #14b8a6);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-blue-purple {
+	background: linear-gradient(to right, #3b82f6, #9333ea);
+}
+
+.bg-gradient-red-orange {
+	background: linear-gradient(to right, #ef4444, #f97316);
+}
+
+.bg-gradient-green-teal {
+	background: linear-gradient(to right, #10b981, #14b8a6);
+}
