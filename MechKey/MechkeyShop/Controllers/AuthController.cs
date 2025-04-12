@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces.IServices;
-using Domain.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.ViewModels;
 
 namespace MechkeyShop.Controllers
 {
@@ -32,7 +32,7 @@ namespace MechkeyShop.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            var user = new ApplicationUser
+            var user = new ApplicationUserModel
             {
                 Id = Guid.NewGuid(),
                 Email = "abc@example.com",

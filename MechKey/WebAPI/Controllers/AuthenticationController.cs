@@ -1,8 +1,9 @@
 using Application.Comoon;
+using Application.DTOs.Auth;
 using Application.Interfaces.IServices;
-using Domain.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.ViewModels;
 using Shared.ViewModels.Auth;
 namespace WebAPI.Controllers
 {
@@ -12,22 +13,22 @@ namespace WebAPI.Controllers
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IJwtManager _jwtManager;
-        private readonly IApplicaionUserService applicaionUserService;
+        private readonly IAuthenticationService _authenticationService;
 
         public AuthenticationController(IJwtManager jwtManager,
             ILogger<AuthenticationController> logger,
-            IApplicaionUserService applicaionUserService)
+            IAuthenticationService authenticationService)
         {
             _jwtManager = jwtManager;
             _logger = logger;
-            this.applicaionUserService = applicaionUserService;
+            _authenticationService = authenticationService;
         }
 
         [HttpGet]
         public Result<string> GetToken()
         {
             _logger.LogInformation("Get token");
-            var user = new ApplicationUser
+            var user = new ApplicationUserModel
             {
                 Id = Guid.NewGuid(),
                 Email = "abc@example.com",
@@ -63,16 +64,43 @@ namespace WebAPI.Controllers
             return Result.Success("Valid token");
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<Result> Register(RegisterModel model)
         {
             if (model is null)
             {
                 return Result.Failure("Model is null");
             }
-            await applicaionUserService.AddAsync(model);
+            return await _authenticationService.Register(model);
+        }
 
-            return Result.Success("Register Success");
+        [HttpPost("login")]
+        public async Task<ActionResult<Result>> Login(LoginModel model)
+        {
+            if (model is null)
+            {
+                throw new InvalidDataException("Missing login data");
+            }
+            var result = await _authenticationService.Login(model);
+
+            try
+            {
+                var token = _jwtManager.GenerateToken(result.Data);
+
+                // Add Token into Cookies
+                Response.Cookies.Append("accessToken", token, new CookieOptions
+                {
+                    HttpOnly = true,  // Prevent JavaScript access
+                    Secure = true,    // Only send over HTTPS
+                    Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
+                });
+                return Result.Success("Login Success");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(Result.Failure("Login Failed"));
+            }
         }
     }
 }
