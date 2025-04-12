@@ -16,7 +16,7 @@ namespace Domain.Entity
 
         [Required(ErrorMessage = "Password is required")]
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
-        [StringLength(100, ErrorMessage = "Password must be less than 100 characters")]
+        [StringLength(512, ErrorMessage = "Password must be less than 100 characters")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Salting is required")]

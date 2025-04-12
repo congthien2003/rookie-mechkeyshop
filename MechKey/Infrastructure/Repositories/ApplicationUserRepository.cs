@@ -1,6 +1,7 @@
 ﻿using Domain.Entity;
 using Domain.IRepositories;
 using MechkeyShop.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -27,6 +28,12 @@ namespace Infrastructure.Repositories
         public Task<IEnumerable<ApplicationUser>> GetAllAsync()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ApplicationUser?> GetByEmailAsync(string email)
+        {
+            var user = await context.ApplicationUsers.FirstOrDefaultAsync(x => x.Email == email);
+            return user;
         }
 
         public Task<ApplicationUser> GetByIdAsync(Guid id)

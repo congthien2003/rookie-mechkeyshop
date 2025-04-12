@@ -1,11 +1,11 @@
 using Application.Comoon;
-using Domain.Entity;
+using Shared.ViewModels;
 
 namespace Application.Interfaces.IServices
 {
     public interface IJwtManager
     {
-        string GenerateToken(ApplicationUser user);
+        string GenerateToken(ApplicationUserModel user);
         Result ValidateToken(string token);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IServices;
+using Application.Services.Common;
 using AutoMapper;
 using Domain.Entity;
 using Domain.IRepositories;
@@ -26,12 +27,17 @@ namespace Application.Services
             try
             {
                 var entity = mapper.Map<RegisterModel, ApplicationUser>(user);
+                entity.Password = Hashing.HashPasword(entity.Password, out var salt);
+                entity.Salting = Convert.ToBase64String(salt);
                 var newEntity = await applicationUserRepository.CreateAsync(entity);
-                return Result<ApplicationUserModel>.Success("Add success", mapper.Map<ApplicationUser, ApplicationUserModel>(newEntity));
+                return Result<ApplicationUserModel>.Success(
+                    "Add success",
+                    mapper.Map<ApplicationUser, ApplicationUserModel>(newEntity
+                    ));
             }
             catch (Exception ex)
             {
-                throw new InvalidDataException(ex.Message.ToString());
+                throw new Exception("Add failed");
             }
         }
 
@@ -49,5 +55,7 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

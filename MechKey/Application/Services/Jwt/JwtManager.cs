@@ -1,9 +1,9 @@
 using Application.Comoon;
 using Application.Interfaces.IServices;
-using Domain.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Shared.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -19,13 +19,14 @@ public class JwtManager : IJwtManager
         _configuration = configuration;
     }
 
-    public string GenerateToken(ApplicationUser user)
+    public string GenerateToken(ApplicationUserModel user)
     {
         // Create Claim
         var claims = new[]
         {
             new Claim("Id", user.Id.ToString()),
             new Claim("Email", user.Email),
+            new Claim("Role", user.RoleId.ToString())
         };
 
         // Algorithms
