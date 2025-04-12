@@ -27,6 +27,7 @@ namespace Domain.Entity
         [Required(ErrorMessage = "Phone number is required")]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be 10 digits")]
         public string Phones { get; set; } = string.Empty;
-        public UserRole UserRole { get; set; }
+        public int RoleId { get; set; }
+        public UserRole UserRoles { get; set; }
     }
 }

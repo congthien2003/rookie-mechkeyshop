@@ -59,16 +59,16 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Salting")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserRoleId");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("ApplicationUsers");
                 });
@@ -92,13 +92,18 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entity.ApplicationUser", b =>
                 {
-                    b.HasOne("Domain.Entity.UserRole", "UserRole")
-                        .WithMany()
-                        .HasForeignKey("UserRoleId")
+                    b.HasOne("Domain.Entity.UserRole", "UserRoles")
+                        .WithMany("ApplicationUsers")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserRole");
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Domain.Entity.UserRole", b =>
+                {
+                    b.Navigation("ApplicationUsers");
                 });
 #pragma warning restore 612, 618
         }

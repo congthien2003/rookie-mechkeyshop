@@ -1,6 +1,6 @@
 using Application.Comoon;
 using Application.Interfaces.IServices;
-using Microsoft.AspNetCore.Identity;
+using Domain.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -19,7 +19,7 @@ public class JwtManager : IJwtManager
         _configuration = configuration;
     }
 
-    public string GenerateToken(IdentityUser user)
+    public string GenerateToken(ApplicationUser user)
     {
         // Create Claim
         var claims = new[]

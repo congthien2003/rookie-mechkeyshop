@@ -1,4 +1,7 @@
-﻿using MechkeyShop.Data;
+﻿using Domain.Entity;
+using Domain.IRepositories;
+using Infrastructure.Repositories;
+using MechkeyShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +16,8 @@ namespace Infrastructure
             var connectionString = config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
+
+            services.AddScoped<IApplicationUserRepository<ApplicationUser>, ApplicationUserRepository>();
 
             return services;
         }
