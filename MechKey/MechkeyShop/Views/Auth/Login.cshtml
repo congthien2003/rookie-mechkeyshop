@@ -1,4 +1,4 @@
-﻿@using Application.DTOs.Auth
+﻿@model Shared.ViewModels.Auth.LoginModel
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,15 +11,15 @@
 
 <div class="">
     <h2>Login Page</h2>
-    <form asp-route="/Auth/Login" method="post">
+    <form asp-action="Login" asp-controller="Auth" method="post">
         <div class="form-group">
-            <label >Email</label>
-            <input type="email" class="form-control" value="nhoccuthien0538@gmail.com" />
+            <label asp-for="Email" >Email</label>
+            <input asp-for="Email" type="email" class="form-control" value="nhoccuthien0538@gmail.com" />
             <span class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" class="form-control" value="Thienvip123" />
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" class="form-control" value="thienvip123" />
             <span class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-primary">Login</button>

@@ -1,4 +1,4 @@
-﻿namespace Application.DTOs.Auth
+﻿namespace Shared.ViewModels.Auth
 {
     public class LoginModel
     {
