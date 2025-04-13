@@ -13,6 +13,7 @@ namespace Infrastructure.Repositories
         {
             this.context = context;
         }
+
         public async Task<ApplicationUser> CreateAsync(ApplicationUser entity)
         {
             var newUser = context.ApplicationUsers.Add(entity);
@@ -20,14 +21,15 @@ namespace Infrastructure.Repositories
             return newUser.Entity;
         }
 
-        public Task DeleteAsync(ApplicationUser entity)
+        public async Task DeleteAsync(ApplicationUser entity)
         {
-            throw new NotImplementedException();
+            context.ApplicationUsers.Remove(entity);
+            await context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<ApplicationUser>> GetAllAsync()
+        public async Task<IEnumerable<ApplicationUser>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await context.ApplicationUsers.ToListAsync();
         }
 
         public async Task<ApplicationUser?> GetByEmailAsync(string email)
@@ -36,14 +38,16 @@ namespace Infrastructure.Repositories
             return user;
         }
 
-        public Task<ApplicationUser> GetByIdAsync(Guid id)
+        public async Task<ApplicationUser?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await context.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Task<ApplicationUser> UpdateAsync(ApplicationUser entity)
+        public async Task<ApplicationUser> UpdateAsync(ApplicationUser entity)
         {
-            throw new NotImplementedException();
+            context.ApplicationUsers.Update(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
     }
 }
