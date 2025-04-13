@@ -26,7 +26,7 @@ public class JwtManager : IJwtManager
         {
             new Claim("Id", user.Id.ToString()),
             new Claim("Email", user.Email),
-            new Claim("Role", user.RoleId.ToString())
+            new Claim(ClaimTypes.Role, user.RoleId.ToString())
         };
 
         // Algorithms
