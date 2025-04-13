@@ -1,0 +1,99 @@
+﻿.header__logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.header__list {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.header__nav-link {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    position: relative;
+    color: black;
+}
+
+.header__nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #258cfb;
+    transition: width 0.3s;
+}
+
+.header__nav-link:hover::after {
+    width: 100%;
+}
+
+.hasSubmenu {
+    position: relative;
+}
+.hasSubmenu::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+}
+
+.sub-menu {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: -10%;
+    background-color: #f6f6f6;
+    border-radius: 12px;
+    transition: all 0.3s ease-in;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    margin-top: 4px;
+    overflow: hidden;
+    display: none;
+    z-index: 100;
+}
+.sub-menu ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: 0;
+}
+
+.sub-item {
+    min-width: 150px;
+}
+
+.sub-link {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+    .sub-link:hover {
+        background-color: #f0f0f0;
+        color: #007bff;
+    }
+
+/* Responsive cho mobile (tùy bạn muốn theo chiều ngang thì sửa flex-direction) */
+@media (max-width: 600px) {
+    .sub-menu ul {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.hasSubmenu:hover .sub-menu {
+    display: block;
+}

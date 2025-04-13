@@ -8,6 +8,18 @@ html {
   }
 }
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style: none;
+}
+
+ul, li, ol {
+    margin-bottom: 0;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -19,4 +31,11 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.btn {
+    border-radius: 4px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 14px;
+    font-weight: 500;
 }
