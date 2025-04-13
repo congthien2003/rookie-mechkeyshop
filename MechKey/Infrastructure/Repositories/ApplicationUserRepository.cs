@@ -23,13 +23,14 @@ namespace Infrastructure.Repositories
 
         public async Task DeleteAsync(ApplicationUser entity)
         {
-            context.ApplicationUsers.Remove(entity);
+            entity.IsDeleted = true;
+            context.ApplicationUsers.Update(entity);
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ApplicationUser>> GetAllAsync()
+        public async Task<IQueryable<ApplicationUser>> GetAllAsync()
         {
-            return await context.ApplicationUsers.ToListAsync();
+            return context.ApplicationUsers.AsQueryable();
         }
 
         public async Task<ApplicationUser?> GetByEmailAsync(string email)
