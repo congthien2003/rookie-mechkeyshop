@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces.IServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ViewModels.Auth;
 
@@ -63,10 +62,31 @@ namespace MechkeyShop.Controllers
 
         // Get Register Page
         [HttpGet]
-        [Authorize]
         public IActionResult Register()
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterAsync(RegisterModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Error = "Invalid Register Data";
+                return View(model);
+            }
+
+            var result = await _authenticationService.Register(model);
+            if (result.IsSuccess)
+            {
+                return View("Login");
+            }
+            else
+            {
+                ViewBag.Error = "Register failed";
+                return View("Register");
+            }
+        }
+
     }
 }

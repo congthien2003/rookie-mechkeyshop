@@ -2,21 +2,50 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    
 }
+@model Shared.ViewModels.Auth.RegisterModel
 
 <div class="">
     <h2>Register Page</h2>
-    <form>
+    <form asp-action="Register" asp-controller="Auth" method="post">
         <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" />
+            <label asp-for="Email" >Email</label>
+            <input asp-for="Email" class="form-control" />
             <span class="text-danger"></span>
         </div>
+
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" class="form-control" />
+            <label asp-for="Name">Name</label>
+            <input asp-for="Name" class="form-control" />
             <span class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+
+        <div class="form-group">
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ConfirmPassword">Confirm Password</label>
+            <input asp-for="ConfirmPassword" type="password" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phones">Phones</label>
+            <input asp-for="Phones" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address">Address</label>
+            <input asp-for="Address" class="form-control" />
+            <span class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a asp-controller="Auth" asp-action="Login">Login</a>
+        <span class="text-danger"> @ViewBag.Error </span>
     </form>
 </div>
