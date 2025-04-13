@@ -29,5 +29,6 @@ namespace Domain.Entity
         public string Phones { get; set; } = string.Empty;
         public int RoleId { get; set; }
         public UserRole UserRoles { get; set; }
+        public ICollection<Order> Orders { get; set; }
     }
 }

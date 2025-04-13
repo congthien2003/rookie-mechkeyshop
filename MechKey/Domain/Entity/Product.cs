@@ -9,7 +9,8 @@ namespace Domain.Entity
         public double Price { get; set; }
         public string ImageUrl { get; set; } = "";
         public Guid CategoryId { get; set; }
-        public Category category { get; set; }
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public Category Category { get; set; }
+        public ICollection<ProductRating> ProductRatings { get; set; } = new List<ProductRating>();
+
     }
 }

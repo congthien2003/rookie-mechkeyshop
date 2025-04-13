@@ -11,7 +11,7 @@ namespace Domain.Entity
         public string Comment { get; set; } = "";
         public DateTime RatedAt { get; set; } = DateTime.UtcNow;
         // Foreign key
-        public int ProductId { get; set; }
+        public Guid ProductId { get; set; }
         public Product Product { get; set; }
     }
 }
