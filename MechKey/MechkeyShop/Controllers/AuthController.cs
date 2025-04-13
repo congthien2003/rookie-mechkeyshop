@@ -1,17 +1,19 @@
 ﻿using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shared.ViewModels;
+using Shared.ViewModels.Auth;
 
 namespace MechkeyShop.Controllers
 {
     public class AuthController : Controller
     {
         private readonly IJwtManager _jwtManager;
+        private readonly IAuthenticationService _authenticationService;
 
-        public AuthController(IJwtManager jwtManager)
+        public AuthController(IJwtManager jwtManager, IAuthenticationService authenticationService)
         {
             _jwtManager = jwtManager;
+            _authenticationService = authenticationService;
         }
 
         // GET: AuthController
@@ -30,24 +32,33 @@ namespace MechkeyShop.Controllers
 
         // Post Login
         [HttpPost]
-        public IActionResult Login(string username, string password)
+        public async Task<IActionResult> LoginAsync(LoginModel model)
         {
-            var user = new ApplicationUserModel
-            {
-                Id = Guid.NewGuid(),
-                Email = "abc@example.com",
-            };
+            if (!ModelState.IsValid)
+                return View(model);
 
-            var token = _jwtManager.GenerateToken(user);
+            var result = await _authenticationService.Login(model);
 
-            // Add Token into Cookies
-            Response.Cookies.Append("accessToken", token, new CookieOptions
+            try
             {
-                HttpOnly = true,  // Prevent JavaScript access
-                Secure = true,    // Only send over HTTPS
-                Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
-            });
-            return RedirectToAction("Index");
+                var token = _jwtManager.GenerateToken(result.Data);
+
+                // Add Token into Cookies
+                Response.Cookies.Append("accessToken", token, new CookieOptions
+                {
+                    HttpOnly = true,  // Prevent JavaScript access
+                    Secure = true,    // Only send over HTTPS
+                    Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
+                });
+                return RedirectToAction("Index", "Home");
+
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex.Message);
+                return RedirectToAction("/access-denied");
+
+            }
         }
 
         // Get Register Page

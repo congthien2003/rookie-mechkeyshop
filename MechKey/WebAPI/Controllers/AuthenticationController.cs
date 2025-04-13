@@ -1,5 +1,4 @@
 using Application.Comoon;
-using Application.DTOs.Auth;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,14 +53,11 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("validate")]
+        [Authorize]
         public ActionResult<Result> ValidateToken()
         {
             _logger.LogInformation("Validate token");
-            var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ")[1];
-            if (string.IsNullOrEmpty(token))
-                return BadRequest(Result.Failure("Token is missing"));
-            var result = _jwtManager.ValidateToken(token);
-            return Result.Success("Valid token");
+            return Ok();
         }
 
         [HttpPost("register")]

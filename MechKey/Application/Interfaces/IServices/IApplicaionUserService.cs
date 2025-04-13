@@ -9,7 +9,7 @@ namespace Application.Interfaces.IServices
         Task<Result<ApplicationUserModel>> GetByIdAsync(Guid id);
         Task<Result<ApplicationUserModel>> AddAsync(RegisterModel model);
         Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user);
-        Task<Result<ApplicationUserModel>> DeleteAsync(Guid id);
+        Task<Result> DeleteAsync(Guid id);
 
     }
 }

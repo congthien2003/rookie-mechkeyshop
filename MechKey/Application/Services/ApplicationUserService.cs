@@ -41,21 +41,49 @@ namespace Application.Services
             }
         }
 
-        public Task<Result<ApplicationUserModel>> DeleteAsync(Guid id)
+        public async Task<Result> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = await applicationUserRepository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new Exception("Not found user to delete");
+            }
+
+            try
+            {
+                await applicationUserRepository.DeleteAsync(entity);
+                return Result.Success("Delete user success");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Delete user failed");
+            }
         }
 
-        public Task<Result<ApplicationUserModel>> GetByIdAsync(Guid id)
+        public async Task<Result<ApplicationUserModel>> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = await applicationUserRepository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new Exception("Not found user to delete");
+            }
+            return Result<ApplicationUserModel>.Success("Get user by id success",
+                mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
         }
 
-        public Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user)
+        public async Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entity = mapper.Map<ApplicationUserModel, ApplicationUser>(user);
+                var result = await applicationUserRepository.UpdateAsync(entity);
+                return Result<ApplicationUserModel>.Success("Update user success",
+                    mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update user failed");
+            }
         }
-
-
     }
 }
