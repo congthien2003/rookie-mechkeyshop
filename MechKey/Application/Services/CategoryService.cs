@@ -104,7 +104,6 @@ namespace Application.Services
                     throw new KeyNotFoundException("Category not found");
 
                 entity.Name = model.Name;
-                entity.Description = model.Description;
                 entity.LastUpdatedAt = DateTime.UtcNow;
 
                 var updatedEntity = await _repository.UpdateAsync(entity);

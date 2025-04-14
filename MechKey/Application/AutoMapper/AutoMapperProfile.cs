@@ -11,6 +11,8 @@ namespace Infrastructure.Helpers
         {
             CreateMap<ApplicationUser, ApplicationUserModel>().ReverseMap();
             CreateMap<ApplicationUser, RegisterModel>().ReverseMap();
+            CreateMap<Category, CategoryModel>().ReverseMap();
+            CreateMap<Product, ProductModel>().ReverseMap();
         }
     }
 }

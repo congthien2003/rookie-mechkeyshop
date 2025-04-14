@@ -18,6 +18,9 @@ namespace Infrastructure
                 options.UseSqlServer(connectionString));
 
             services.AddScoped<IApplicationUserRepository<ApplicationUser>, ApplicationUserRepository>();
+            services.AddScoped<IProductRepository<Product>, ProductRepository>();
+            services.AddScoped<ICategoryRepository<Category>, CategoryRepository>();
+
 
             return services;
         }
