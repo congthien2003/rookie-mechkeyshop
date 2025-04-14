@@ -1,0 +1,232 @@
+﻿@model Shared.ViewModels.ProductModel;
+
+@{
+    ViewBag.Title = "Product Detail";
+}
+
+<div class="container mt-4">
+    <h2 class="title-section">Product Details</h2>
+    <div class="detail--wrapper">
+        <!-- Left: Image -->
+        <div class="text-center detail-img bg-light">
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded shadow" style="max-height: 400px;" />
+        </div>
+
+        <!-- Right: Info -->
+        <div class="detail-info">
+            <p class="mb-1 name">@Model.Name</p>
+
+            <div class="mb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                    <span class="rating-number text-muted">(0 customer reviews)</span>
+                </div>
+            </div>
+
+            <p class="text-muted mb-2">@ViewBag.CategoryName</p>
+            <p class="price mb-2">Price: $@Model.Price</p>
+            <div class="d-flex gap-3 mt-4">
+
+                <button class="btn btn-gradient-blue-purple btn-add-to-cart"
+                        data-quantity=1
+                        data-product-id="@Model.Id"
+                        data-product-name="@Model.Name"
+                        data-product-price="@Model.Price"
+                        data-product-imageurl="@Model.ImageUrl">
+                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                </button>
+                <button class="btn btn-outline-danger">
+                    <i class="fa-solid fa-heart"></i> Favorite
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="detail--expand bg-light">
+    <div class="container reviews d-flex justify-content-between">
+        <div class="w-50 p-4">
+            <h3>Customer Reviews</h3>
+
+            <ul class="list-review">
+                <li class="review-items">
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <h4 class="review-name">Sabo</h4>
+                        <div class="review-star">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="review-description">
+                        Description Review
+                    </p>
+
+                </li>
+                <li class="review-items">
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <h4 class="review-name">Sabo</h4>
+                        <div class="review-star">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="review-description">
+                        Description Review
+                    </p>
+
+                </li>
+                <li class="review-items">
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <h4 class="review-name">Sabo</h4>
+                        <div class="review-star">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="review-description">
+                        Description Review
+                    </p>
+
+                </li>
+                <li class="review-items">
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <h4 class="review-name">Sabo</h4>
+                        <div class="review-star">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="review-description">
+                        Description Review
+                    </p>
+
+                </li>
+                <li class="review-items">
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <h4 class="review-name">Sabo</h4>
+                        <div class="review-star">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="review-description text-muted">
+                        Description Review
+                    </p>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="w-50 write-review p-4">
+            <h3>Write a review</h3>
+            <form class="mt-2">
+                <div class="mb-3">
+                    <label>Rating</label>
+                    <div class="d-flex align-items-center gap-4 mt-3">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="reviewDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="reviewDescription" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-gradient-blue-purple w-100">Submit</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .title-section {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .detail--expand {
+        margin-top: 40px;
+        padding: 2rem 4rem;
+    }
+
+    .reviews  {
+        gap: 80px;
+    }
+
+    .list-review {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        scrollbar-width: thin;
+    }
+
+        .reviews h3,
+        .write-review h3 {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+    .review-items {
+        padding: 0.5rem 1rem;
+        border: 1px solid #cecece;
+        border-radius: 12px;
+    }
+
+    .review-items:hover {
+
+        background-color: #f5f5f5;
+
+    }
+
+    .review-name {
+        font-size: 18px;
+    }
+
+    .review-description {
+        font-size: 16px;
+    }
+
+</style>

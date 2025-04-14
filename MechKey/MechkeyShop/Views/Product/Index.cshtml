@@ -1,0 +1,123 @@
+﻿@model ProductPageViewModel
+
+@{
+    ViewBag.Title = "Product List";
+
+    var listCategory = Model.Categories;
+    var listProduct = Model.Products;
+    var selectedCategoryId = Model.categoryId;
+
+    var hasPrev = Model.page > 1 ? "" : "d-none";
+    var hasNext = Model.page < Model.totalPages ? "" : "d-none";
+
+    var pageSizeArr = new int [10, 20, 30, 50];
+}
+
+<div class="container py-4">
+    <h2 class="text-center text-black mb-4">Product List</h2>
+
+    <!-- Filter and Search -->
+    <form method="get" action="@Url.Action("Index", "Product")">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select name="categoryId" asp-for="@Model.categoryId" class="form-control">
+                    <option value="">All Categories</option>
+                    @foreach (var category in listCategory)
+                    {
+                        <option value="@category.Id" selected="@(Model.categoryId == category.Id.ToString() ? "selected" : null)">@category.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search products..." asp-for="@Model.searchTerm" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Product List -->
+    @if (Model.Products.Count() > 0)
+    {
+        <div class="row">
+            @foreach (var item in Model.Products)
+            {
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="product-item">
+                        <div class="product-item__img">
+                            <img src="@item.ImageUrl" class="img-fluid" alt="@item.Name">
+                        </div>
+                        <div class="product-item__content">
+                            <h5 class="name">@item.Name</h5>
+                            <span class="price text-danger">$@item.Price</span>
+                        </div>
+                        <div class="product-item__footer">
+                            <a class="btn btn-sm btn-outline-info" href="/Product/Detail/@item.Id"><i class="fa fa-eye"></i></a>
+                            <button class="btn btn-sm btn-gradient-blue-purple btn-add-to-cart"
+                                    data-product-id="@item.Id"
+                                    data-quantity="1"
+                                    data-product-name="@item.Name"
+                                    data-product-price="@item.Price"
+                                    data-product-imageurl="@item.ImageUrl">
+                                Add to cart
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger"><i class="fa fa-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.totalPages > 0)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <a class="page-link @hasPrev" href="@Url.Action("Index", "Product", new {
+               page = Model.page - 1,
+               pageSize = Model.pageSize,
+               searchTerm = Model.searchTerm,
+               categoryId = Model.categoryId
+               })"> - </a>
+                    @for (int i = 1; i <= Model.totalPages; i++)
+                    {
+                        var isActive = Model.page == i ? "active" : "";
+                        <li class="page-item @isActive">
+                            <a class="page-link" href="@Url.Action("Index", "Product", new {
+                        page = i,
+                        pageSize = Model.pageSize,
+                        searchTerm = Model.searchTerm,
+                        categoryId = Model.categoryId
+                    })">@i</a>
+                        </li>
+                    }
+                    <a class="page-link @hasNext" href="@Url.Action("Index", "Product", new {
+               page = Model.page + 1,
+               pageSize = Model.pageSize,
+               searchTerm = Model.searchTerm,
+               categoryId = Model.categoryId
+               })"> + </a>
+                </ul>
+            </nav>
+
+            @* <div class="pageSize">
+                <span>Page size: @Model.pageSize</span>
+                <select name="pageSize" asp-for="@Model.pageSize" class="form-control">
+                    <option value="">10</option>
+                    @foreach (var ps in pageSizeArr)
+                    {
+                        <option value="@ps" selected="@(Model.pageSize == @ps ? "selected" : null)">@ps</option>
+                    }
+                </select>
+            </div> *@
+        }
+    
+    }
+    @if (Model.Products.Count() == 0)
+    {
+    <div class="alert alert-info text-center">
+        <strong>No products found.</strong>
+    </div>
+    }
+
+</div>
