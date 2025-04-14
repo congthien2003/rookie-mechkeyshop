@@ -111,6 +111,42 @@ html {
         border-radius: 16px;
         object-fit: cover;
     }
+
+@media (max-width: 768px) {
+    .banner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 24px;
+    }
+
+    .banner__content h2 {
+        font-size: 32px;
+    }
+
+    .banner__content .name-product {
+        font-size: 24px;
+    }
+
+    .banner__content p {
+        font-size: 16px;
+    }
+
+    .banner__img img {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .banner__content {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .banner__content button {
+        width: 100%;
+    }
+}
+
 /* Home Page Product */
 .list-product-hot {
     padding: 4rem 1rem;
@@ -191,6 +227,44 @@ html {
 
 .product-item:hover {
    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .list-product-hot .container {
+        padding: 1rem 0;
+    }
+
+    .product-item__content {
+        padding: 0.5rem;
+    }
+
+        .product-item__content .name {
+            font-size: 16px;
+            display: inline-block;
+        }
+
+        .product-item__content .price {
+            font-size: 14px;
+        }
+
+        .product-item__footer {
+            flex-direction: column;
+            gap: 8px;
+            padding: 0.5rem;
+        }
+
+    .fa-star {
+        font-size: 12px;
+    }
+
+    .rating-number {
+        font-weight: 500;
+        font-size: 12px;
+    }
+
+    .product-item__footer button {
+        width: 100%;
+    }
 }
 
 /* Home page list services*/

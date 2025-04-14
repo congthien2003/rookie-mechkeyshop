@@ -68,22 +68,23 @@
     display: flex;
     margin-top: 10px;
     border: 1px solid #aaa;
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
     background: #fff;
 }
 
     .subscribe-form input {
         flex: 1;
-        padding: 2px;
+        padding: 6px;
         border: none;
         outline: none;
     }
 
     .subscribe-form button {
-        padding: 8px 16px;
         border: none;
         cursor: pointer;
+        background: #3b82f6;
+        color: white;
     }
 
 .social-icons {

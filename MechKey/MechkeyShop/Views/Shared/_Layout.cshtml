@@ -42,15 +42,23 @@
                     </ul>
 
                     <!-- Authen right -->
-                    <div class="d-flex">
+                    <div class="d-flex gap-4">
+                        <a class="btn position-relative" href="/Cart/Index">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span class="badge bg-danger position-absolute top-0 left-100">0</span>
+                        </a>
+                        <a class="btn position-relative" href="/Cart/Index">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="badge bg-danger position-absolute top-0 left-100">0</span>
+                        </a>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <span class="me-2">Hi, @User.Identity.Name</span>
+                            <span>Hi, @User.Identity.Name</span>
                             <a class="btn btn-outline-danger btn-sm" href="/Auth/Logout">Logout</a>
                         }
                         else
                         {
-                            <a type="button" class="btn btn-sm me-2 btn-gradient-blue-purple" asp-controller="Auth" asp-action="Login">Login</a>
+                            <a type="button" class="btn btn-sm btn-gradient-blue-purple" asp-controller="Auth" asp-action="Login">Login</a>
                             <a class="btn btn-sm btn-outline" asp-controller="Auth" asp-action="Register">Register</a>
                         }
                     </div>
@@ -99,7 +107,7 @@
                 <p>Bạn muốn nhận khuyến mãi đặc biệt? Đăng ký ngay.</p>
                 <form class="subscribe-form">
                     <input type="email" placeholder="Địa chỉ Email" required />
-                    <button type="submit" class="btn btn-gradient-red-orange">Đăng ký</button>
+                    <button type="submit" class="btn">Đăng ký</button>
                 </form>
                 <div class="social-icons">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>

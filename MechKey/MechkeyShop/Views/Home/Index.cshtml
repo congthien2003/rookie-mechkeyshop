@@ -92,7 +92,34 @@
 
             @foreach (var items in Model)
             {
-                <div class="col-md-3">
+                <div class="col-md-3 col-6">
+                    <div class="product-item">
+                        <div class="product-item__img">
+                            <img src="@items.ImageUrl" alt="product-img">
+                        </div>
+                        <div class="product-item__content">
+                            <div class="product-rating">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                    <span class="rating-number">(5)</span>
+
+                                </div>
+                            </div>
+                            <h3 class="name">@items.Name</h3>
+                            <span class="price">$@items.Price</span>
+                        </div>
+                        <div class="product-item__footer">
+                            <button class="btn btn-outline"> <i class="fa-solid fa-eye"></i> </button>
+                            <button class="btn btn-gradient-blue-purple">Add to cart</button>
+                            <button class="btn btn-outline"><i class="fa-solid fa-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
                     <div class="product-item">
                         <div class="product-item__img">
                             <img src="@items.ImageUrl" alt="product-img">
