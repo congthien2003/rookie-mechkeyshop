@@ -113,36 +113,15 @@
                             <span class="price">$@items.Price</span>
                         </div>
                         <div class="product-item__footer">
-                            <button class="btn btn-outline"> <i class="fa-solid fa-eye"></i> </button>
-                            <button class="btn btn-gradient-blue-purple">Add to cart</button>
-                            <button class="btn btn-outline"><i class="fa-solid fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="product-item">
-                        <div class="product-item__img">
-                            <img src="@items.ImageUrl" alt="product-img">
-                        </div>
-                        <div class="product-item__content">
-                            <div class="product-rating">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <span class="rating-number">(5)</span>
-
-                                </div>
-                            </div>
-                            <h3 class="name">@items.Name</h3>
-                            <span class="price">$@items.Price</span>
-                        </div>
-                        <div class="product-item__footer">
-                            <button class="btn btn-outline"> <i class="fa-solid fa-eye"></i> </button>
-                            <button class="btn btn-gradient-blue-purple">Add to cart</button>
-                            <button class="btn btn-outline"><i class="fa-solid fa-heart"></i></button>
+                            <a class="btn btn-sm btn-outline-info" href="/Product/Detail/@items.Id"> <i class="fa-solid fa-eye"></i> </a>
+                            <button class="btn btn-gradient-blue-purple btn-add-to-cart" 
+                            data-product-id="@items.Id" 
+                            data-quantity=1
+                            data-product-name="@items.Name"
+                            data-product-price="@items.Price"
+                            data-product-imageurl="@items.ImageUrl"
+                            >Add to cart</button>
+                            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-heart"></i></button>
                         </div>
                     </div>
                 </div>
@@ -192,7 +171,7 @@
                         <span class="price">$@items.Price</span>
                     </div>
                     <div class="product-item__footer">
-                        <button class="btn btn-outline"> <i class="fa-solid fa-eye"></i> </button>
+                        <a class="btn btn-outline" href="/Product/Detail/@items.Id"> <i class="fa-solid fa-eye"></i> </a>
                         <button class="btn btn-gradient-blue-purple">Add to cart</button>
                         <button class="btn btn-outline"><i class="fa-solid fa-heart"></i></button>
                     </div>
@@ -203,7 +182,7 @@
     </div>
 
     <div class="d-flex align-items-center justify-content-center mt-4">
-        <button class="btn btn-gradient-red-orange">View More</button>
+        <button class="btn btn-outline">View More</button>
     </div>
 </section>
 

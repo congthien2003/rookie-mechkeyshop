@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <header class="">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow bg-white p-4">
             <div class="container d-flex align-items-center justify-content-between">
                 <a class="header__logo text-gradient-blue-purple" asp-controller="Home" asp-action="Index">MechkeyShop</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -28,10 +28,10 @@
                     <!-- Navbar center -->
                     <ul class="header__list">
                         <li class="header__nav-item">
-                            <a class="header__nav-link text-gradient-blue-purple" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="header__nav-item hasSubmenu">
-                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Shop</a>
+                        <li class="header__nav-item">
+                            <a class="header__nav-link" asp-controller="Product" asp-action="Index">Shop</a>
                         </li>
                         <li class="header__nav-item">
                             <a class="header__nav-link" asp-controller="Home" asp-action="Index">Policy</a>
@@ -43,14 +43,14 @@
 
                     <!-- Authen right -->
                     <div class="d-flex gap-4">
-                        <a class="btn position-relative" href="/Cart/Index">
+                        <a class="btn position-relative" asp-controller="Cart" asp-action="Index">
                             <i class="fa-solid fa-cart-shopping"></i>
                             <span class="badge bg-danger position-absolute top-0 left-100">0</span>
                         </a>
-                        <a class="btn position-relative" href="/Cart/Index">
-                            <i class="fa-solid fa-heart"></i>
-                            <span class="badge bg-danger position-absolute top-0 left-100">0</span>
-                        </a>
+                         @* <a class="btn position-relative" asp-controller="Home" asp-action="Index">
+                             <i class="fa-solid fa-heart"></i>
+                             <span class="badge bg-danger position-absolute top-0 left-100">0</span>
+                         </a> *@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <span>Hi, @User.Identity.Name</span>
@@ -68,7 +68,7 @@
     </header>
 
     <div class="">
-        <main role="main" class="pb-3 min-vh-100">
+        <main role="main" class="min-vh-100">
             @RenderBody()
         </main>
     </div>
