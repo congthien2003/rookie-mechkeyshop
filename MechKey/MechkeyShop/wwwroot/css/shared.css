@@ -274,3 +274,55 @@
 .bg-gradient-green-teal {
     background: linear-gradient(to right, #10b981, #14b8a6);
 }
+
+.btn-gradient-blue-purple {
+    background: linear-gradient(to right, #3b82f6, #9333ea);
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+    .btn-gradient-blue-purple:hover {
+        background: linear-gradient(to right, #9333ea, #3b82f6);
+        opacity: 0.85;
+    }
+
+.btn-gradient-blue-purple-outline {
+    border: 1px solid #3b82f6;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+    .btn-gradient-blue-purple-outline:hover {
+        background: linear-gradient(to right, #9333ea, #3b82f6);
+        color: white;
+        opacity: 0.85;
+    }
+
+    .btn-gradient-red-orange {
+        background: linear-gradient(to right, #ef4444, #f97316);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+.btn-gradient-green-teal {
+    background: linear-gradient(to right, #10b981, #14b8a6);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-outline {
+    border: 1px solid #cecece;
+}
+
+.btn-outline:hover {
+    background-color: #cecece;
+}

@@ -14,9 +14,20 @@ html {
     padding: 0;
     text-decoration: none;
     list-style: none;
+    font-family: "Poppins", sans-serif;
 }
 
 ul, li, ol {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+p {
     margin-bottom: 0;
 }
 
@@ -25,17 +36,241 @@ ul, li, ol {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
-}
 
 .btn {
-    border-radius: 4px !important;
+    border-radius: 8px !important;
     padding: 0.5rem 1rem !important;
     font-size: 14px;
     font-weight: 500;
+}
+
+.btn:hover {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+/* Slider */
+#slider {
+    max-height: 600px;
+    overflow: hidden;
+}
+
+    #slider img {
+        object-fit: cover;
+        width: 100%;
+        height: 600px;
+    }
+    /* Home Page Sales*/
+    .banner-sales {
+        padding: 4rem 1rem;
+    }
+
+.banner {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.banner__content h2 {
+    font-size: 60px;
+    font-weight: 600;
+}
+
+.banner__content .name-product {
+    font-size: 40px;
+    font-weight: 600;
+    color: #ff3838;
+    margin-bottom: 1rem;
+
+}
+
+.banner__content p {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.banner__content button {
+    display: block;
+    width: 200px;
+    padding: 1rem 0.5rem !important;
+}
+    .banner__content button:hover {
+        transform: scale(105%);
+    }
+
+    .banner__img img {
+        width: 400px;
+        border-radius: 16px;
+        object-fit: cover;
+    }
+/* Home Page Product */
+.list-product-hot {
+    padding: 4rem 1rem;
+}
+
+    .list-product-hot .container {
+        border-bottom: 1px solid #cecece;
+        padding: 2rem 0;
+    }
+
+.list-product-hot h2 {
+    font-size: 24px;
+}
+
+.product-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+.product-item__img img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-item__content {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.5rem 1rem;
+}
+
+.product-item__content .name {
+    font-size: 18px;
+    font-weight: 450;
+    margin-bottom: 0;
+}
+
+.product-item__content .description {
+    font-size: 14px;
+    color: #666;
+    margin-top: 0rem;
+    margin-bottom: 0;
+}
+
+.product-item__content .price {
+    font-size: 16px;
+    font-weight: 450;
+    color: #ff0000;
+}
+
+.product-rating {
+
+}
+
+.fa-star {
+    color: #ffa645;
+}
+
+.rating-number {
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.product-item__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.product-item:hover {
+   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Home page list services*/
+.list-services {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+}
+
+.services-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.services-item i {
+    font-size: 24px;
+    color: #258cfb;
+    display: block;
+
+}
+
+.services-content h3 {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.services-content p {
+    font-size: 15px;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+/* Home Category */
+.category {
+    padding: 2rem 1rem;
+}
+.tilte-section {
+    font-size: 20px;
+}
+.category p {
+    font-size: 16px;
+}
+.list-category {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.category-item {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease-in-out;
+    border-radius: 12px;
+    min-width: 100px;
+    border: 1px solid #ededed;
+}
+    .category-item:hover {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        color: white;
+        background-color: #ff3838;
+    }
+
+.category-item img {
+    width: 50px;
+}
+
+.category-item p {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Home Page File Support*/
+.files-support {
+    padding: 2rem 1rem;
 }

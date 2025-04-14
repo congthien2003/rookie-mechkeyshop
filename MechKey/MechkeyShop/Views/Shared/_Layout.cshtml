@@ -9,12 +9,16 @@
     <link rel="stylesheet" href="~/css/shared.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MechkeyShop.styles.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <header>
+    <header class="">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow">
             <div class="container d-flex align-items-center justify-content-between">
-                <a class="header__logo text-gradient-red-orange" asp-controller="Home" asp-action="Index">MechkeyShop</a>
+                <a class="header__logo text-gradient-blue-purple" asp-controller="Home" asp-action="Index">MechkeyShop</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -24,30 +28,16 @@
                     <!-- Navbar center -->
                     <ul class="header__list">
                         <li class="header__nav-item">
-                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="header__nav-link text-gradient-blue-purple" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="header__nav-item hasSubmenu">
-                            <span class="header__nav-link">Category</span>
-
-                            <div class="sub-menu">
-                                <ul>
-                                    <li class="sub-item">
-                                        <a class="sub-link">Kit</a>
-                                    </li>
-                                    <li class="sub-item">
-                                        <a class="sub-link">Switch</a>
-                                    </li>
-                                    <li class="sub-item">
-                                        <a class="sub-link">Stabilizer</a>
-                                    </li >
-                                    <li class="sub-item">
-                                        <a class="sub-link">Accessories</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Shop</a>
                         </li>
                         <li class="header__nav-item">
-                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Contact</a>
+                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Policy</a>
+                        </li>
+                        <li class="header__nav-item">
+                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Download</a>
                         </li>
                     </ul>
 
@@ -60,8 +50,8 @@
                         }
                         else
                         {
-                            <a class="btn btn-outline-primary btn-sm me-2 btn-gradient" href="/Auth/Login">Login</a>
-                            <a class="btn btn-primary btn-sm" href="/Auth/Register">Register</a>
+                            <a type="button" class="btn btn-sm me-2 btn-gradient-blue-purple" asp-controller="Auth" asp-action="Login">Login</a>
+                            <a class="btn btn-sm btn-outline" asp-controller="Auth" asp-action="Register">Register</a>
                         }
                     </div>
                 </div>
@@ -69,17 +59,60 @@
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="">
+        <main role="main" class="pb-3 min-vh-100">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer">
         <div class="container">
-            &copy; 2025 - MechkeyShop - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+
+            <div class="col-md-3 logo-contact">
+                <h4>MechKey Shop</h4>
+                    <p><i class="fa-solid fa-map-pin me-2"></i> 11/2 Street 3, Binh Hung Hoa, Binh Tan</p>
+                    <p><i class="fa-solid fa-phone me-2"></i> 0888115511</p>
+                    <p><i class="fa-solid fa-envelope me-2"></i> sales@mokbstore.com</p>
+                    <p><i class="fa-solid fa-copyright me-2"></i> Bản quyền <a href="#">MechKey Store</a> thuộc MechKey Store</p>
+            </div>
+
+            <div class="col-md-3">
+                <h4>Hướng dẫn</h4>
+                <ul>
+                    <li><a href="#">Hướng dẫn mua hàng và thanh toán</a></li>
+                    <li><a href="#">Hướng dẫn sử dụng</a></li>
+                    <li><a href="#">Kiểm tra đơn hàng</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-3">
+                <h4>Chính sách</h4>
+                <ul>
+                    <li><a href="#">Chính sách Group Buy</a></li>
+                    <li><a href="#">Chính sách bảo hành</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-3">
+                <h4>ĐĂNG KÝ NHẬN TIN</h4>
+                <p>Bạn muốn nhận khuyến mãi đặc biệt? Đăng ký ngay.</p>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Địa chỉ Email" required />
+                    <button type="submit" class="btn btn-gradient-red-orange">Đăng ký</button>
+                </form>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-discord"></i></a>
+                </div>
+            </div>
+            </div>
+        </div>
+
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
