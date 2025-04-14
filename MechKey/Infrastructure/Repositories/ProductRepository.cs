@@ -23,13 +23,14 @@ namespace Infrastructure.Repositories
 
         public async Task DeleteAsync(Product entity)
         {
-            context.Products.Remove(entity);
+            entity.IsDeleted = true;
+            context.Products.Update(entity);
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Product>> GetAllAsync()
+        public async Task<IQueryable<Product>> GetAllAsync()
         {
-            return await context.Products.ToListAsync();
+            return context.Products.AsQueryable();
         }
 
         public async Task<Product?> GetByIdAsync(Guid id)
