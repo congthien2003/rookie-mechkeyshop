@@ -1,37 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
+﻿ @section Scripts {
+     <script>
+         // gọi hàm từ site.js
+         console.log(getCart());
+        renderCart()
+     </script>
+ }
 <div class="container cart">
+    <h3>Your Cart</h3>
     <div class="row">
         <div class="col-md-8">
-            <h3>Your Cart</h3>
             <ul id="cart-items">
-                <!-- Cart items will be dynamically inserted here -->
                 
             </ul>
         </div>
         <div class="col-md-3">
-            <h3>Order Summary</h3>
             <div id="order-summary">
-                <!-- Order summary will be dynamically inserted here -->
-                <p>Total: <span id="total-price">0</span></p>
-                <button class="btn btn-primary" id="checkout-button">Checkout</button>
+                <p class="d-flex align-items-center justify-content-between order-total">Total: $ <span id="total-price">1440</span></p>
+                @{
+                    var isLoggedIn = !string.IsNullOrEmpty(Context.Request.Cookies["accessToken"]);
+
+                    if (isLoggedIn)
+                    {
+                        <a class="btn btn-gradient-blue-purple w-100 mt-2" asp-action="Checkout" asp-controller="Cart">Checkout</a>
+
+                    }
+                    else
+                    {
+                        <a class="btn btn-gradient-blue-purple w-100 mt-2"  asp-action="Login" asp-controller="Auth">Please login to checkout</a>
+                    }
+                }
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    const CART_KEY = "cartItems";
-
-    function getCart() {
-        const cart = localStorage.getItem(CART_KEY);
-        return cart ? JSON.parse(cart) : [];
-    }
-
-    console.log(getCart());
-
-</script>      
