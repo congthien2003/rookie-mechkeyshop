@@ -8,5 +8,6 @@
         public double Price { get; set; }
         public string ImageUrl { get; set; } = "";
         public Guid CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
     }
 }

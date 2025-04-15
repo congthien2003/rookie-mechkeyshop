@@ -11,6 +11,8 @@ namespace Domain.Entity
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public double TotalAmount { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }
