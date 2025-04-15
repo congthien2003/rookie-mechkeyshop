@@ -20,7 +20,7 @@ namespace Infrastructure
             services.AddScoped<IApplicationUserRepository<ApplicationUser>, ApplicationUserRepository>();
             services.AddScoped<IProductRepository<Product>, ProductRepository>();
             services.AddScoped<ICategoryRepository<Category>, CategoryRepository>();
-
+            services.AddScoped<IProductRatingRepository<ProductRating>, ProductRatingRepository>();
 
             return services;
         }

@@ -16,6 +16,7 @@ namespace MechkeyShop.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ProductRating> ProductRatings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

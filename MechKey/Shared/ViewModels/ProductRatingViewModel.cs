@@ -1,19 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Domain.Entity
+﻿namespace Shared.ViewModels
 {
-    public class ProductRating
+    public class ProductRatingViewModel
     {
         public int Id { get; set; }
-
-        [Range(1, 5)]
         public int Stars { get; set; }
         public string Comment { get; set; } = "";
         public DateTime RatedAt { get; set; } = DateTime.UtcNow;
         // Foreign key
         public Guid ProductId { get; set; }
-        public Product Product { get; set; }
-
         public Guid UserId { get; set; }
+        public string Name { get; set; } = string.Empty;
+
     }
 }
