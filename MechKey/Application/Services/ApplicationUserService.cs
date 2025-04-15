@@ -67,7 +67,7 @@ namespace Application.Services
         {
             try
             {
-                var query = await applicationUserRepository.GetAllAsync();
+                var query = applicationUserRepository.GetAllAsync();
 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {

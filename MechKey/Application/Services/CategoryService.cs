@@ -3,6 +3,7 @@ using Application.Interfaces.IServices;
 using AutoMapper;
 using Domain.Entity;
 using Domain.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using Shared.Common;
 using Shared.ViewModels;
 
@@ -56,7 +57,7 @@ namespace Application.Services
         {
             try
             {
-                var query = await _repository.GetAllAsync();
+                var query = _repository.GetAllAsync();
 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
@@ -64,11 +65,11 @@ namespace Application.Services
                 }
 
                 var totalCount = query.Count();
-                var items = query
+                var items = await query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
-                    .ToList();
+                    .ToListAsync();
 
                 return Result<PagedResult<CategoryModel>>.Success("Get category list success", new PagedResult<CategoryModel>
                 {

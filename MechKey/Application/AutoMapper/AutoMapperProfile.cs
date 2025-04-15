@@ -12,7 +12,11 @@ namespace Infrastructure.Helpers
             CreateMap<ApplicationUser, ApplicationUserModel>().ReverseMap();
             CreateMap<ApplicationUser, RegisterModel>().ReverseMap();
             CreateMap<Category, CategoryModel>().ReverseMap();
-            CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<Product, ProductModel>()
+                .ForMember(p => p.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ReverseMap();
+
+            CreateMap<ProductRating, ProductRatingViewModel>().ReverseMap();
         }
     }
 }

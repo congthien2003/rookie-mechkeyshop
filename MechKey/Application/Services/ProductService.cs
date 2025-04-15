@@ -61,7 +61,7 @@ namespace Application.Services
         {
             try
             {
-                var query = await _repository.GetAllAsync();
+                var query = _repository.GetAllAsync();
 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
@@ -94,6 +94,7 @@ namespace Application.Services
                 var items = await query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
+                    .Include(p => p.Category)
                     .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
                     .ToListAsync();
 
@@ -115,10 +116,11 @@ namespace Application.Services
         {
             try
             {
-                var query = await _repository.GetAllAsync();
+                var query = _repository.GetAllAsync();
                 var items = await query
                     .OrderBy(p => p.CreatedAt)
                     .Take(4)
+                    .Include(p => p.Category)
                     .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
                     .ToListAsync();
 
