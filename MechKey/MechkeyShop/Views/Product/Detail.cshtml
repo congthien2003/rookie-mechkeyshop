@@ -4,6 +4,40 @@
     ViewBag.Title = "Product Detail";
 }
 
+@section Scripts {
+    <script>
+        document.getElementById("btnSubmitReview").addEventListener("click", function (e) {
+            const token = getCookie("access_token");
+            console.log("Hehe");
+            if (!token) {
+                // Hiển thị modal yêu cầu đăng nhập
+                showLoginModal();
+            } else {
+                // Tiếp tục xử lý submit review (hoặc mở form)
+                openReviewForm();
+            }
+        });
+    </script>
+}
+
+<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginRequiredModal">Can't write review now !</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Please Login to write review
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a class="btn btn-primary" asp-action="Login" asp-controller="Auth" >Login now!</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-4">
     <h2 class="title-section">Product Details</h2>
     <div class="detail--wrapper">
@@ -48,7 +82,13 @@
 
     </div>
 </div>
-<div class="detail--expand bg-light">
+<div class="detail--expand">
+    <div class="container description--wrapper">
+        <h3>Description</h3>
+        <p class="description">
+            @Model.Description
+        </p>
+    </div>
     <div class="container reviews d-flex justify-content-between">
         <div class="w-50 p-4">
             <h3>Customer Reviews</h3>
@@ -174,11 +214,14 @@
                     <label for="reviewDescription" class="form-label">Description</label>
                     <textarea class="form-control" id="reviewDescription" rows="3"></textarea>
                 </div>
-                <button type="submit" class="btn btn-gradient-blue-purple w-100">Submit</button>
+                <button id="btnSubmitReview" type="button" class="btn btn-gradient-blue-purple w-100">Submit</button>
             </form>
         </div>
 
     </div>
+
+    
+
 </div>
 
 <style>
@@ -187,9 +230,20 @@
         font-weight: bold;
     }
 
+    .description--wrapper {
+        padding: 3rem 2rem;
+        border-bottom: 1px solid #cecece;
+    }
+
+    .description--wrapper h3 {
+            font-size: 18px;
+            font-weight: bold;
+    }
+
     .detail--expand {
         margin-top: 40px;
         padding: 2rem 4rem;
+        background-color: #efefef;
     }
 
     .reviews  {

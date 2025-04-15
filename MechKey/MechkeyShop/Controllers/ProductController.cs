@@ -17,13 +17,20 @@ namespace MechkeyShop.Controllers
 
         public async Task<IActionResult> IndexAsync(ProductPageViewModel model)
         {
-            var resultListProduct = await productService.GetAllAsync(model.page, 4, model.searchTerm);
+            var ascOrder = model.ascendingOrder == 1 ? true : false;
+            var resultListProduct = await productService.GetAllAsync(model.page, model.pageSize, model.searchTerm, model.sortCol, ascOrder);
             var resultListCategory = await categoryService.GetAllAsync(model.page, 10, "");
             var totalPages = (int)Math.Ceiling(resultListProduct.Data.TotalItems / (double)resultListProduct.Data.PageSize);
             if (resultListProduct.IsSuccess && resultListCategory.IsSuccess)
             {
-                model.Products = resultListProduct.Data.Items;
-                model.Categories = resultListCategory.Data.Items;
+
+                if (model.categoryId is not null)
+                {
+                    ViewBag.Title = resultListCategory.Data.Items.FirstOrDefault(c => c.Id.ToString() == model.categoryId)?.Name ?? "Product List";
+                }
+
+                model.products = resultListProduct.Data.Items;
+                model.categories = resultListCategory.Data.Items;
                 model.page = resultListProduct.Data.Page;
                 model.pageSize = resultListProduct.Data.PageSize;
                 model.totalPages = totalPages;
