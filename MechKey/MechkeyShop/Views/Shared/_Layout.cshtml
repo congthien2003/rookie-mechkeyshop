@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MechkeyShop</title>
+    <title>MechkeyShop</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/shared.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MechkeyShop.styles.css" asp-append-version="true" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -34,10 +35,10 @@
                             <a class="header__nav-link" asp-controller="Product" asp-action="Index">Shop</a>
                         </li>
                         <li class="header__nav-item">
-                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Policy</a>
+                            <a class="header__nav-link" asp-controller="Home" asp-action="Policy">Policy</a>
                         </li>
                         <li class="header__nav-item">
-                            <a class="header__nav-link" asp-controller="Home" asp-action="Index">Download</a>
+                            <a class="header__nav-link" asp-controller="Home" asp-action="Download">Download</a>
                         </li>
                     </ul>
 
@@ -45,13 +46,13 @@
                     <div class="d-flex gap-4">
                         <a class="btn position-relative" asp-controller="Cart" asp-action="Index">
                             <i class="fa-solid fa-cart-shopping"></i>
-                            <span class="badge bg-danger position-absolute top-0 left-100">0</span>
+                            <span id="counting-cart" class="badge bg-danger position-absolute top-0 left-100">0</span>
                         </a>
                          @* <a class="btn position-relative" asp-controller="Home" asp-action="Index">
                              <i class="fa-solid fa-heart"></i>
                              <span class="badge bg-danger position-absolute top-0 left-100">0</span>
                          </a> *@
-                        @if (User.Identity.IsAuthenticated)
+                        @* @if (Request.Cookies["access_token"] != null)
                         {
                             <span>Hi, @User.Identity.Name</span>
                             <a class="btn btn-outline-danger btn-sm" href="/Auth/Logout">Logout</a>
@@ -60,6 +61,25 @@
                         {
                             <a type="button" class="btn btn-sm btn-gradient-blue-purple" asp-controller="Auth" asp-action="Login">Login</a>
                             <a class="btn btn-sm btn-outline" asp-controller="Auth" asp-action="Register">Register</a>
+                        } *@
+
+                        @{
+                            var username = Context.Request.Cookies["username"];
+                            var isLoggedIn = !string.IsNullOrEmpty(Context.Request.Cookies["accessToken"]);
+
+                            if (isLoggedIn)
+                            {
+                                <div class="d-flex gap-4 align-items-center">
+
+                                <span>Hi, @username</span>
+                                <a class="btn btn-outline-danger btn-sm" href="/Auth/Logout">Logout</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <a type="button" class="btn btn-sm btn-gradient-blue-purple" asp-controller="Auth" asp-action="Login">Login</a>
+                                <a class="btn btn-sm btn-outline" asp-controller="Auth" asp-action="Register">Register</a>
+                            }
                         }
                     </div>
                 </div>
@@ -70,6 +90,19 @@
     <div class="">
         <main role="main" class="min-vh-100">
             @RenderBody()
+
+
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header success">
+                        <strong class="me-auto">Notification</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        Add to cart success
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -124,6 +157,9 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/cartService.js" asp-append-version="true"></script>
+
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

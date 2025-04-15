@@ -22,12 +22,14 @@ namespace MechkeyShop.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var result = await productService.GetAllAsync(1, 10, "");
+            var resultListProduct = await productService.GetAllAsync(1, 10, "");
             var resultListCategory = await categoryService.GetAllAsync(1, 10, "");
-            if (result.IsSuccess)
+            var resultListBestSeller = await productService.GetBestSellerAsync();
+            if (resultListProduct.IsSuccess)
             {
                 ViewBag.listCategory = resultListCategory.Data.Items;
-                return View(result.Data.Items);
+                ViewBag.listBestSeller = resultListBestSeller.Data;
+                return View(resultListProduct.Data.Items);
             }
             return View();
         }

@@ -1,6 +1,9 @@
 ﻿@{
+    @using Shared.ViewModels;
     ViewData["Title"] = "Home Page";
     IEnumerable<Shared.ViewModels.CategoryModel> listCategory = ViewBag.listCategory;
+    IEnumerable<ProductModel> listBestSeller = ViewBag.listBestSeller;
+
 }
 @model IEnumerable<Shared.ViewModels.ProductModel>
 <section id="slider">
@@ -72,7 +75,7 @@
                 <p>
                     Best 60% budget from Neo Studio
                 </p>
-                <button class="btn btn-gradient-blue-purple btn-shop-now">Shop Now</button>
+                <a class="btn btn-gradient-blue-purple btn-shop-now" asp-action="Index" asp-controller="Product">Shop Now</a>
             </div>
              <div class="banner__img">
                  <img src="https://bizweb.dktcdn.net/thumb/1024x1024/100/484/752/products/is-case-1741345843760.png?v=1743766263623" alt="">
@@ -85,12 +88,12 @@
 
 <div class="list-product-hot">
     <h2 class="text-center text-black">
-        Hot Products <i class="fa-solid fa-fire"></i>
+        Hot Products <i class="fa-solid fa-fire text-gradient-red-orange"></i>
     </h2>
     <div class="container">
         <div class="row mt-4 py-2">
 
-            @foreach (var items in Model)
+            @foreach (var items in listBestSeller)
             {
                 <div class="col-md-3 col-6">
                     <div class="product-item">
@@ -114,7 +117,7 @@
                         </div>
                         <div class="product-item__footer">
                             <a class="btn btn-sm btn-outline-info" href="/Product/Detail/@items.Id"> <i class="fa-solid fa-eye"></i> </a>
-                            <button class="btn btn-gradient-blue-purple btn-add-to-cart" 
+                            <button class="btn btn-gradient-red-orange btn-add-to-cart" 
                             data-product-id="@items.Id" 
                             data-quantity=1
                             data-product-name="@items.Name"
@@ -182,7 +185,7 @@
     </div>
 
     <div class="d-flex align-items-center justify-content-center mt-4">
-        <button class="btn btn-outline">View More</button>
+        <a class="btn btn-outline" asp-action="Index" asp-controller="Product">View More</a>
     </div>
 </section>
 

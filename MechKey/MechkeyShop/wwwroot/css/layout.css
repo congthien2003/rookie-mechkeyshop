@@ -99,3 +99,38 @@
         width: 28px;
         height: 28px;
     }
+
+
+
+
+.toast-header.success {
+    background-color: #4caf50;
+    color: white;
+}
+
+.toast-header.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.toast-header.warning {
+    background-color: #ff9800;
+    color: white;
+}
+
+.toast-header.info {
+    background-color: #2196f3;
+    color: white;
+}
+
+    .toast-header {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        font-weight: 500;
+    }
+
+    .toast-body {
+        padding: 10px;
+        color: black;
+    }
