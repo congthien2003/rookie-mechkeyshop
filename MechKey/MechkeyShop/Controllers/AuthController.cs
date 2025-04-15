@@ -49,6 +49,12 @@ namespace MechkeyShop.Controllers
                     Secure = true,    // Only send over HTTPS
                     Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
                 });
+                Response.Cookies.Append("username", result.Data.Name.ToString(), new CookieOptions
+                {
+                    HttpOnly = true,  // Prevent JavaScript access
+                    Secure = true,    // Only send over HTTPS
+                    Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
+                });
                 return RedirectToAction("Index", "Home");
 
             }
@@ -86,6 +92,16 @@ namespace MechkeyShop.Controllers
                 ViewBag.Error = "Register failed";
                 return View("Register");
             }
+        }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("username");
+            Response.Cookies.Delete("accessToken");
+
+            return RedirectToAction("Index", "Home");
+
         }
 
     }
