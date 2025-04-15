@@ -111,6 +111,25 @@ namespace Application.Services
             }
         }
 
+        public async Task<Result<IEnumerable<ProductModel>>> GetBestSellerAsync()
+        {
+            try
+            {
+                var query = await _repository.GetAllAsync();
+                var items = await query
+                    .OrderBy(p => p.CreatedAt)
+                    .Take(4)
+                    .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
+                    .ToListAsync();
+
+                return Result<IEnumerable<ProductModel>>.Success("Get Best seller", items);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Get Best Seller Error");
+            }
+        }
+
         public async Task<Result<ProductModel>> GetByIdAsync(Guid id)
         {
             var entity = await _repository.GetByIdAsync(id);
