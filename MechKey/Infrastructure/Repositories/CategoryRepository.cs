@@ -28,7 +28,7 @@ namespace Infrastructure.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<IQueryable<Category>> GetAllAsync()
+        public IQueryable<Category> GetAllAsync()
         {
             return context.Categories.AsQueryable();
         }

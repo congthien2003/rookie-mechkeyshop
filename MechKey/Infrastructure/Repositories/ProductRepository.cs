@@ -28,14 +28,14 @@ namespace Infrastructure.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<IQueryable<Product>> GetAllAsync()
+        public IQueryable<Product> GetAllAsync()
         {
             return context.Products.AsQueryable();
         }
 
         public async Task<Product?> GetByIdAsync(Guid id)
         {
-            return await context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            return await context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Product> UpdateAsync(Product entity)
