@@ -53,7 +53,11 @@ namespace Application.Services
             }
         }
 
-        public async Task<Result<PagedResult<ProductModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "")
+        public async Task<Result<PagedResult<ProductModel>>> GetAllAsync(int page = 1,
+            int pageSize = 10,
+            string searchTerm = "",
+            string sortCol = "",
+            bool ascOrder = false)
         {
             try
             {
@@ -62,6 +66,28 @@ namespace Application.Services
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
                     query = query.Where(u => u.Name.Contains(searchTerm));
+                }
+
+                if (!string.IsNullOrEmpty(sortCol))
+                {
+                    switch (sortCol)
+                    {
+                        case "price":
+                            {
+                                query = ascOrder ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+                                break;
+                            }
+                        case "createdAt":
+                            {
+                                query = ascOrder ? query.OrderBy(p => p.CreatedAt) : query.OrderByDescending(p => p.CreatedAt);
+                                break;
+                            }
+                        default:
+                            {
+                                break;
+                            }
+                    }
+
                 }
 
                 var totalCount = query.Count();

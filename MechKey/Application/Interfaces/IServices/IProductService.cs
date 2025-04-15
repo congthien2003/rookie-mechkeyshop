@@ -10,6 +10,6 @@ namespace Application.Interfaces.IServices
         Task<Result<ProductModel>> AddAsync(ProductModel model);
         Task<Result<ProductModel>> UpdateAsync(ProductModel user);
         Task<Result> DeleteAsync(Guid id);
-        Task<Result<PagedResult<ProductModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "");
+        Task<Result<PagedResult<ProductModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "", string sortCol = "", bool ascOrder = true);
     }
 }
