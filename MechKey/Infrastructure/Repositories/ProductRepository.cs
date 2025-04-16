@@ -30,12 +30,15 @@ namespace Infrastructure.Repositories
 
         public IQueryable<Product> GetAllAsync()
         {
-            return context.Products.AsQueryable();
+            return context.Products.Include(p => p.Category).AsQueryable();
         }
 
         public async Task<Product?> GetByIdAsync(Guid id)
         {
-            return await context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            return await context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductRatings)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Product> UpdateAsync(Product entity)

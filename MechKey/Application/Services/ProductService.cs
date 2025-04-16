@@ -3,8 +3,10 @@ using Application.Interfaces.IServices;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.Entity;
+using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels;
 
@@ -14,10 +16,14 @@ namespace Application.Services
     {
         private readonly IProductRepository<Product> _repository;
         private readonly IMapper mapper;
-        public ProductService(IProductRepository<Product> repository, IMapper mapper)
+        private readonly ILogger<ProductService> logger;
+        public ProductService(IProductRepository<Product> repository,
+            IMapper mapper,
+            ILogger<ProductService> logger)
         {
             _repository = repository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         public async Task<Result<ProductModel>> AddAsync(ProductModel model)
@@ -30,7 +36,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Add Product failed");
+                logger.LogError(ex, ex.Message);
+                throw new ProductHandleFailedException("Add Product failed");
             }
         }
 
@@ -39,7 +46,7 @@ namespace Application.Services
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new Exception("Not found product to delete");
+                throw new ProductNotFoundException();
             }
 
             try
@@ -49,12 +56,15 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Delete product failed");
+                logger.LogError(ex, ex.Message);
+
+                throw new ProductHandleFailedException("Delete product failed");
             }
         }
 
         public async Task<Result<PagedResult<ProductModel>>> GetAllAsync(int page = 1,
             int pageSize = 10,
+            string categoryId = "",
             string searchTerm = "",
             string sortCol = "",
             bool ascOrder = false)
@@ -62,6 +72,11 @@ namespace Application.Services
             try
             {
                 var query = _repository.GetAllAsync();
+
+                if (!string.IsNullOrEmpty(categoryId))
+                {
+                    query = query.Where(q => q.Category.Id.ToString() == categoryId);
+                }
 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
@@ -95,6 +110,7 @@ namespace Application.Services
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .Include(p => p.Category)
+                    .Include(p => p.ProductRatings)
                     .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
                     .ToListAsync();
 
@@ -103,12 +119,15 @@ namespace Application.Services
                     Items = items,
                     TotalItems = totalCount,
                     Page = page,
-                    PageSize = pageSize
+                    PageSize = pageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
                 });
             }
             catch (Exception ex)
             {
-                throw new Exception("Get list failed");
+                logger.LogError(ex, ex.Message);
+
+                throw new ProductNotFoundException("Get list failed");
             }
         }
 
@@ -128,7 +147,9 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Get Best Seller Error");
+                logger.LogError(ex, ex.Message);
+
+                throw new ProductNotFoundException("Get best seller failed");
             }
         }
 
@@ -137,8 +158,9 @@ namespace Application.Services
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new Exception("Not found product ");
+                throw new ProductNotFoundException();
             }
+
             return Result<ProductModel>.Success("Get product by id success",
                 mapper.Map<ProductModel>(entity));
         }
@@ -149,7 +171,7 @@ namespace Application.Services
             {
                 var entity = await _repository.GetByIdAsync(model.Id);
                 if (entity == null)
-                    throw new KeyNotFoundException("Not found product by id");
+                    throw new ProductNotFoundException();
 
                 entity.Name = model.Name;
                 entity.Description = model.Description;
@@ -163,7 +185,9 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Update product failed");
+                logger.LogError(ex, ex.Message);
+
+                throw new ProductHandleFailedException();
             }
         }
     }

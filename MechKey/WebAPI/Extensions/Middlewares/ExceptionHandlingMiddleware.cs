@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Application.Comoon;
+using System.Net;
 
 namespace WebAPI.Extensions.Middlewares
 {

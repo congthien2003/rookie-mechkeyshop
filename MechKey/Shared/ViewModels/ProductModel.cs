@@ -9,5 +9,8 @@
         public string ImageUrl { get; set; } = "";
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public IEnumerable<ProductRatingViewModel> Rating { get; set; } = Enumerable.Empty<ProductRatingViewModel>();
+        public double TotalRating { get; set; } = 0;
+
     }
 }

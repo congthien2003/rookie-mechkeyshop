@@ -76,7 +76,8 @@ namespace Application.Services
                     Items = items,
                     TotalItems = totalCount,
                     Page = page,
-                    PageSize = pageSize
+                    PageSize = pageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
                 });
             }
             catch (Exception ex)
