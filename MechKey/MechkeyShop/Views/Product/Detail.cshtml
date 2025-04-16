@@ -1,26 +1,47 @@
 ﻿@model Shared.ViewModels.ProductModel;
-
+@using Markdig
 @{
     ViewBag.Title = "Product Detail";
+    var description = Markdown.ToHtml(Model.Description);
 }
 
 @section Scripts {
     <script>
-        document.getElementById("btnSubmitReview").addEventListener("click", function (e) {
-            const token = getCookie("access_token");
-            console.log("Hehe");
-            if (!token) {
-                // Hiển thị modal yêu cầu đăng nhập
-                showLoginModal();
-            } else {
-                // Tiếp tục xử lý submit review (hoặc mở form)
-                openReviewForm();
+        // document.getElementById("btnSubmitReview").addEventListener("click", function (e) {
+        //     showLoginModal();
+        // });
+
+
+
+        const rating = document.querySelectorAll(".star-rating");
+        console.log(rating);
+        const inputRating = document.getElementById("inputRating");
+        console.log({ inputRating });
+
+        function updateUIStar(score) {
+            rating.forEach((s) => {
+                s.classList.remove("fa-solid");
+                s.classList.add("fa-regular");
+            });
+            for (let i = 0; i < score; i++) {
+                rating[i].classList.remove("fa-regular");
+                rating[i].classList.add("fa-solid");
             }
-        });
+        }
+
+        rating.forEach((s) => {
+            s.addEventListener('click', (event) => {
+                console.log(event.target.dataset['score']);
+                const score = Number.parseInt(event.target.dataset['score']);
+                updateUIStar(score);
+                inputRating.value = score;
+
+            })
+        })
     </script>
 }
 
-<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModal" aria-hidden="true">
+<div class="modal fade" id="loginRequiredModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -32,7 +53,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a class="btn btn-primary" asp-action="Login" asp-controller="Auth" >Login now!</a>
+                <a class="btn btn-primary" asp-action="Login" asp-controller="Auth">Login now!</a>
             </div>
         </div>
     </div>
@@ -49,19 +70,25 @@
         <!-- Right: Info -->
         <div class="detail-info">
             <p class="mb-1 name">@Model.Name</p>
-
+            <p class="mb-1 text-muted">@Model.CategoryName</p>
             <div class="mb-2">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <span class="rating-number text-muted">(0 customer reviews)</span>
+
+                    @for (var star = 1; star <= Math.Ceiling(Model.TotalRating); star++)
+                    {
+                        <i class="fa-solid fa-star"></i>
+                    }
+
+                    @{
+                        var emptyStar = 5 - Math.Ceiling(Model.TotalRating);
+                        @for (var star = 1; star <= emptyStar; star++)
+                        {
+                            <i class="fa-regular fa-star"></i>
+                        }
+                    }
+                    <span class="rating-number text-muted"> (@Model.Rating.Count() customer reviews)</span>
                 </div>
             </div>
-
-            <p class="text-muted mb-2">@ViewBag.CategoryName</p>
             <p class="price mb-2">Price: $@Model.Price</p>
             <div class="d-flex gap-3 mt-4">
 
@@ -85,142 +112,90 @@
 <div class="detail--expand">
     <div class="container description--wrapper">
         <h3>Description</h3>
-        <p class="description">
-            @Model.Description
-        </p>
+        <div class="description">
+            @Html.Raw(description)
+        </div>
     </div>
     <div class="container reviews d-flex justify-content-between">
         <div class="w-50 p-4">
             <h3>Customer Reviews</h3>
 
             <ul class="list-review">
-                <li class="review-items">
-                    <div class="d-flex align-items-center justify-content-between">
+                @foreach (var rating in Model.Rating)
+                {
+                    <li class="review-items">
+                        <div class="d-flex align-items-center justify-content-between">
 
-                        <h4 class="review-name">Sabo</h4>
-                        <div class="review-star">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
+                            <h4 class="review-name">@rating.Name</h4>
+                            <div class="review-star">
+                                <div class="d-flex align-items-center gap-2">
+                                    @for (var star = 1; star <= rating.Stars; star++)
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
+
+                                    @{
+                                        int emptyStarItems = 5 - rating.Stars;
+                                        @for (var star = 1; star <= emptyStarItems; star++)
+                                        {
+                                            <i class="fa-regular fa-star"></i>
+                                        }
+                                    }
+
+                                </div>
+                                
                             </div>
+
                         </div>
-                    </div>
 
-                    <p class="review-description">
-                        Description Review
-                    </p>
+                        <p class="review-description">
+                            @rating.Comment
+                        </p>
+                        <p class="text-muted mt-1"> @rating.RatedAt.ToLocalTime() </p>
 
-                </li>
-                <li class="review-items">
-                    <div class="d-flex align-items-center justify-content-between">
-
-                        <h4 class="review-name">Sabo</h4>
-                        <div class="review-star">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="review-description">
-                        Description Review
-                    </p>
-
-                </li>
-                <li class="review-items">
-                    <div class="d-flex align-items-center justify-content-between">
-
-                        <h4 class="review-name">Sabo</h4>
-                        <div class="review-star">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="review-description">
-                        Description Review
-                    </p>
-
-                </li>
-                <li class="review-items">
-                    <div class="d-flex align-items-center justify-content-between">
-
-                        <h4 class="review-name">Sabo</h4>
-                        <div class="review-star">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="review-description">
-                        Description Review
-                    </p>
-
-                </li>
-                <li class="review-items">
-                    <div class="d-flex align-items-center justify-content-between">
-
-                        <h4 class="review-name">Sabo</h4>
-                        <div class="review-star">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="review-description text-muted">
-                        Description Review
-                    </p>
-
-                </li>
+                    </li>
+                }
             </ul>
         </div>
 
         <div class="w-50 write-review p-4">
             <h3>Write a review</h3>
-            <form class="mt-2">
+            <form class="mt-2" method="post" asp-action="SubmitRating" asp-controller="Product" asp-route-id=@Model.Id>
+                <input for="id" type="text" value=@Model.Id hidden />
+                <input for="score" name="score" id="inputRating" type="number" min="1" max="5" hidden />
                 <div class="mb-3">
                     <label>Rating</label>
                     <div class="d-flex align-items-center gap-4 mt-3">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-regular fa-star"></i>
-                        <i class="fa-regular fa-star"></i>
-                        <i class="fa-regular fa-star"></i>
-                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star star-rating" data-score=1></i>
+                        <i class="fa-regular fa-star star-rating" data-score=2></i>
+                        <i class="fa-regular fa-star star-rating" data-score=3></i>
+                        <i class="fa-regular fa-star star-rating" data-score=4></i>
+                        <i class="fa-regular fa-star star-rating" data-score=5></i>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="reviewDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="reviewDescription" rows="3"></textarea>
+                    <label for="comment" class="form-label">Description</label>
+                    <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
                 </div>
-                <button id="btnSubmitReview" type="button" class="btn btn-gradient-blue-purple w-100">Submit</button>
+
+                @{
+                    var isLoggedIn = !string.IsNullOrEmpty(Context.Request.Cookies["accessToken"]);
+                    @if (isLoggedIn)
+                    {
+                        <button type="submit" class="btn btn-gradient-blue-purple w-100">Submit</button>
+                    }
+                    else
+                    {
+                        <button id="btnSubmitReview" type="button" class="btn btn-gradient-blue-purple w-100" data-bs-toggle="modal" data-bs-target="#loginRequiredModal">Submit</button>
+                    }
+                }
+
             </form>
         </div>
 
     </div>
 
-    
+
 
 </div>
 
@@ -228,6 +203,8 @@
     .title-section {
         font-size: 28px;
         font-weight: bold;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #efefef;
     }
 
     .description--wrapper {
@@ -235,10 +212,10 @@
         border-bottom: 1px solid #cecece;
     }
 
-    .description--wrapper h3 {
+        .description--wrapper h3 {
             font-size: 18px;
             font-weight: bold;
-    }
+        }
 
     .detail--expand {
         margin-top: 40px;
@@ -246,7 +223,7 @@
         background-color: #efefef;
     }
 
-    .reviews  {
+    .reviews {
         gap: 80px;
     }
 
@@ -257,11 +234,11 @@
         scrollbar-width: thin;
     }
 
-        .reviews h3,
-        .write-review h3 {
-            font-size: 18px;
-            font-weight: bold;
-        }
+    .reviews h3,
+    .write-review h3 {
+        font-size: 18px;
+        font-weight: bold;
+    }
 
     .review-items {
         padding: 0.5rem 1rem;
@@ -269,11 +246,9 @@
         border-radius: 12px;
     }
 
-    .review-items:hover {
-
-        background-color: #f5f5f5;
-
-    }
+        .review-items:hover {
+            background-color: #f5f5f5;
+        }
 
     .review-name {
         font-size: 18px;
@@ -281,6 +256,14 @@
 
     .review-description {
         font-size: 16px;
+    }
+
+    .star-rating:hover {
+        transform: scale(110%);
+    }
+
+    .star-rating {
+        transition: all 0.2s ease-in;
     }
 
 </style>

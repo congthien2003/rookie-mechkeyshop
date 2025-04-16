@@ -4,15 +4,15 @@ namespace MechkeyShop.Models
 {
     public class ProductPageViewModel
     {
-        public IEnumerable<CategoryModel> categories { get; set; }
-        public IEnumerable<ProductModel> products { get; set; }
-        public string categoryId { get; set; } = string.Empty;
-        public string searchTerm { get; set; } = string.Empty;
-        public string sortCol { get; set; } = "";
-        public int ascendingOrder { get; set; } = 1;
-        public int page { get; set; } = 1;
-        public int pageSize { get; set; } = 10;
-        public int totalCount { get; set; } = 0;
-        public int totalPages { get; set; } = 0;
+        public IEnumerable<CategoryModel> Categories { get; set; }
+        public IEnumerable<ProductModel> Products { get; set; }
+        public string CategoryId { get; set; } = string.Empty;
+        public string SearchTerm { get; set; } = string.Empty;
+        public string SortCol { get; set; } = "";
+        public int AscendingOrder { get; set; } = 1;
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int TotalCount { get; set; } = 0;
+        public int TotalPages { get; set; } = 0;
     }
 }
