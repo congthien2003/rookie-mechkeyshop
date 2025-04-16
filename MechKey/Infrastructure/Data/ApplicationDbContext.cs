@@ -39,6 +39,12 @@ namespace MechkeyShop.Data
                 .HasForeignKey(pr => pr.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<ProductRating>()
+                .HasOne(pr => pr.User)
+                .WithMany()
+                .HasForeignKey(pr => pr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)

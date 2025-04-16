@@ -43,5 +43,10 @@ namespace Infrastructure.Repositories
             // Không await vì IQueryable là deferred execution
             return _context.ProductRatings.AsQueryable();
         }
+
+        public IQueryable<ProductRating> GetListByProdut(Guid idProduct)
+        {
+            return _context.ProductRatings.Where(pr => pr.ProductId == idProduct).AsQueryable();
+        }
     }
 }
