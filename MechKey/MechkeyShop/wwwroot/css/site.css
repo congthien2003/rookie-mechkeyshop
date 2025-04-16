@@ -1,6 +1,7 @@
 :root {
     --text-black: #1c274c;
     --price-color: #c70000;
+    --primary-color: #3b82f6;
 }
 html {
   font-size: 14px;
@@ -224,9 +225,11 @@ header {
 }
 
 .product-item__content .name {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 450;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
+    height: 2rem;
+
 }
 
 .product-item__content .description {
@@ -251,8 +254,8 @@ header {
 }
 
 .rating-number {
-    font-weight: 500;
-    font-size: 18px;
+    font-weight: 450;
+    font-size: 14px;
 }
 
 .product-item__footer {
@@ -366,16 +369,19 @@ header {
     border-radius: 12px;
     min-width: 100px;
     border: 1px solid #ededed;
+    position: relative;
 }
     .category-item:hover {
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
         color: white;
-        background-color: #ff3838;
+        background-color: var(--primary-color);
     }
-.category-item.active {
-    color: white;
-    background-color: #ff3838;
-}
+
+
+    .category-item.active {
+        color: white;
+        background-color: var(--primary-color);
+    }
 .category-item img {
     width: 50px;
 }
@@ -432,4 +438,14 @@ header {
 
 .description {
     margin-top: 24px;
+}
+
+/* Paging */
+
+.page-link {
+    height: 30px;
+    width: 30px;
+    font-size: 12px;
+    text-align: center;
+    border-radius: 16px;
 }

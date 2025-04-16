@@ -1,10 +1,10 @@
 ﻿@model ProductPageViewModel
 
 @{
-    var listProduct = Model.products;
+    var listProduct = Model.Products;
 
-    var hasPrev = Model.page > 1 ? "" : "d-none";
-    var hasNext = Model.page < Model.totalPages ? "" : "d-none";
+    var hasPrev = Model.Page > 1 ? "" : "d-none";
+    var hasNext = Model.Page < Model.TotalPages ? "" : "d-none";
 
     var pageSizeArr = new int[10, 20, 30, 50];
 }
@@ -13,13 +13,13 @@
     <div class="row">
         <div class="col-md-12">
             <h2 class="tilte-section"> <i class="fa-solid fa-tag"></i> Categories</h2>
-            <div class="category-radio-list mt-2">
+            <div class="category-radio-list mt-4">
                 <a class="category-item btn me-2" asp-controller="Product" asp-action="Index">
                     <p>All</p>
                 </a>
-                @foreach (var item in Model.categories)
+                @foreach (var item in Model.Categories)
                 {
-                    var selected = Model.categoryId == item.Id.ToString() ? "active" : "";
+                    var selected = Model.CategoryId == item.Id.ToString() ? "active" : "";
                     <a class="category-item btn @selected me-2" asp-controller="Product" asp-action="Index" asp-route-categoryId="@item.Id">
                         <p>@item.Name</p>
                     </a>
@@ -31,9 +31,9 @@
             <form method="get" action="@Url.Action("Index", "Product")">
                 <div class="row mb-3">
                     <div class="col-md-9">
-                        <input type="text" asp-for="@Model.categoryId" hidden="true" />
-                        <input type="text" asp-for="@Model.sortCol" hidden="true" />
-                        <input type="text" name="searchTerm" class="form-control" placeholder="Search products..." asp-for="@Model.searchTerm" />
+                        <input type="text" asp-for="@Model.CategoryId" hidden="true" />
+                        <input type="text" asp-for="@Model.SortCol" hidden="true" />
+                        <input type="text" name="searchTerm" class="form-control" placeholder="Search products..." asp-for="@Model.SearchTerm" />
                     </div>
                     <div class="col-md-1 d-flex justify-content-end">
                         <div class="dropdown">
@@ -43,21 +43,21 @@
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <li>
                                     <a class="dropdown-item"
-                                       asp-route-categoryId="@Model.categoryId"
-                                       asp-route-searchTerm="@Model.searchTerm"
+                                       asp-route-categoryId="@Model.CategoryId"
+                                       asp-route-searchTerm="@Model.SearchTerm"
                                        asp-route-sortCol="price"
                                        asp-route-ascendingOrder=1>Price: Low to High</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" 
-                                    asp-route-categoryId="@Model.categoryId"
-                                       asp-route-searchTerm="@Model.searchTerm"
+                                    asp-route-categoryId="@Model.CategoryId"
+                                       asp-route-searchTerm="@Model.SearchTerm"
                                        asp-route-sortCol="price"
                                        asp-route-ascendingOrder=0>Price: High to Low</a>
                                 </li>
                                 <li><a class="dropdown-item"
-                                       asp-route-categoryId="@Model.categoryId"
-                                       asp-route-searchTerm="@Model.searchTerm"
+                                       asp-route-categoryId="@Model.CategoryId"
+                                       asp-route-searchTerm="@Model.SearchTerm"
                                        asp-route-sortCol="createdAt"
                                        asp-route-ascendingOrder=0>Newest Arrivals</a>
                                 </li>
@@ -71,33 +71,40 @@
 
             </form>
             <!-- Product List -->
-            @if (Model.products.Count() > 0)
+            @if (Model.Products.Count() > 0)
             {
                 <div class="row">
-                    @foreach (var item in Model.products)
+                    @foreach (var item in Model.Products)
                     {
                         <div class="col-md-3 col-6 mb-4">
-                            <div class="product-item">
-                                <div class="product-item__img">
+                            <div class="product-item" >
+                                <a class="product-item__img">
                                     <img src="@item.ImageUrl" class="img-fluid" alt="@item.Name">
-                                </div>
+                                </a>
                                 <div class="product-item__content">
                                     <h5 class="name">@item.Name</h5>
                                     <div class="product-rating">
                                         <div class="d-flex align-items-center gap-2">
-                                            <i class="fa-solid fa-star"></i>
-                                            <i class="fa-regular fa-star"></i>
-                                            <i class="fa-regular fa-star"></i>
-                                            <i class="fa-regular fa-star"></i>
-                                            <i class="fa-regular fa-star"></i>
-                                            <span class="rating-number">(5)</span>
 
+                                            @for (var star = 1; star <= Math.Ceiling(item.TotalRating); star++)
+                                            {
+                                                <i class="fa-solid fa-star"></i>
+                                            }
+
+                                            @{
+                                                var emptyStar = 5 - Math.Ceiling(item.TotalRating);
+                                                @for (var star = 1; star <= emptyStar; star++)
+                                                {
+                                                    <i class="fa-regular fa-star"></i>
+                                                }
+                                            }
+                                            <span class="rating-number text-muted"> (@item.Rating.Count() reviews)</span>
                                         </div>
                                     </div>
                                     <span class="price text-danger">$@item.Price</span>
                                 </div>
                                 <div class="product-item__footer">
-                                    <a class="btn btn-sm btn-outline-info" href="/Product/Detail/@item.Id"><i class="fa fa-eye"></i></a>
+                                    <a class="btn btn-sm btn-outline-info" href="Product/Detail/@item.Id"><i class="fa fa-eye"></i></a>
                                     <button class="btn btn-sm btn-gradient-blue-purple btn-add-to-cart"
                                             data-product-id="@item.Id"
                                             data-quantity="1"
@@ -113,33 +120,33 @@
                     }
                 </div>
 
-                @if (Model.totalPages > 0)
+                @if (Model.TotalPages > 0)
                 {
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center">
                             <a class="page-link @hasPrev" href="@Url.Action("Index", "Product", new {
-               page = Model.page - 1,
-               pageSize = Model.pageSize,
-               searchTerm = Model.searchTerm,
-               categoryId = Model.categoryId
+               page = Model.Page - 1,
+               pageSize = Model.PageSize,
+               searchTerm = Model.SearchTerm,
+               categoryId = Model.CategoryId
                })"> - </a>
-                            @for (int i = 1; i <= Model.totalPages; i++)
+                            @for (int i = 1; i <= Model.TotalPages; i++)
                             {
-                                var isActive = Model.page == i ? "active" : "";
+                                var isActive = Model.Page == i ? "active" : "";
                                 <li class="page-item @isActive">
                                     <a class="page-link" href="@Url.Action("Index", "Product", new {
                         page = i,
-                        pageSize = Model.pageSize,
-                        searchTerm = Model.searchTerm,
-                        categoryId = Model.categoryId
+                        pageSize = Model.PageSize,
+                        searchTerm = Model.SearchTerm,
+                        categoryId = Model.CategoryId
                     })">@i</a>
                                 </li>
                             }
                             <a class="page-link @hasNext" href="@Url.Action("Index", "Product", new {
-               page = Model.page + 1,
-               pageSize = Model.pageSize,
-               searchTerm = Model.searchTerm,
-               categoryId = Model.categoryId
+               page = Model.Page + 1,
+               pageSize = Model.PageSize,
+               searchTerm = Model.SearchTerm,
+               categoryId = Model.CategoryId
                })"> + </a>
                         </ul>
                     </nav>
@@ -157,7 +164,7 @@
                 }
 
             }
-            @if (Model.products.Count() == 0)
+            @if (Model.Products.Count() == 0)
             {
                 <div class="alert alert-info text-center">
                     <strong>No products found.</strong>
@@ -169,6 +176,7 @@
 
 
 <style>
-    .category-item {
+    .pagination {
+        margin-top: 2rem;
     }
 </style>

@@ -79,6 +79,18 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseStatusCodePages(async context =>
+{
+    var response = context.HttpContext.Response;
+
+    if (response.StatusCode == 404)
+    {
+        response.Redirect("/Error/NotFound");
+    }
+});
+
+app.UseExceptionHandler("/Error");
+
 app.MapControllerRoute(
     name: "Auth",
     pattern: "{area:exists}/{controller=Auth}/{action=Index}/{id?}");

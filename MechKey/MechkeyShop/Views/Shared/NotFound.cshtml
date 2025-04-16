@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Not found";
+}
+
+<div class="container not-found-page">
+    <div class="d-flex align-items-center flex-column">
+        <h1 class="display-4 fw-bold">404</h1>
+        <p class="lead">Not Found Page</p>
+        <a class="btn btn-gradient-blue-purple mt-4 btn-back-to-home" href="/">
+            <i class="fa-solid fa-arrow-left"></i> Back to Home Page
+            </a>
+    </div>
+</div>
+
+<style>
+    .not-found-page {
+        padding-top: 10rem;
+    }
+
+    .btn-back-to-home:hover {
+        transform: scale(110%);
+    }
+
+    .btn-back-to-home .fa-arrow-left {
+        transition: all 0.2s ease-in;
+    }
+        .btn-back-to-home:hover .fa-arrow-left {
+        transform: translateX(-3px);
+    }
+
+</style>

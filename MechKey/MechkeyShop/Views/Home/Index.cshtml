@@ -6,65 +6,68 @@
 
 }
 @model IEnumerable<Shared.ViewModels.ProductModel>
-<section id="slider">
-    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
+<div class="bg-light">
+    <section id="slider" class="container">
+        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
+                </div>
             </div>
-            <div class="carousel-item">
-                <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="..." style="object-fit: contain;">
-            </div>
-            <div class="carousel-item">
-                <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
-            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
-</section>
-<section id="services">
-    <div class="container">
-        <div class="list-services">
-            <div class="services-item">
-                <i class="fa-solid fa-truck-fast"></i>
-                <div class="services-content">
-                    <h3>Fast Shipping</h3>
-                    <p>Fast shipping on all orders</p>
+    </section>
+    <section id="services">
+        <div class="container">
+            <div class="list-services">
+                <div class="services-item">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <div class="services-content">
+                        <h3>Fast Shipping</h3>
+                        <p>Fast shipping on all orders</p>
+                    </div>
                 </div>
-            </div>
-            <div class="services-item">
-                <i class="fa-solid fa-headset"></i>
-                <div class="services-content">
-                    <h3>24/7 Support</h3>
-                    <p>Support 24/7</p>
+                <div class="services-item">
+                    <i class="fa-solid fa-headset"></i>
+                    <div class="services-content">
+                        <h3>24/7 Support</h3>
+                        <p>Support 24/7</p>
+                    </div>
                 </div>
-            </div>
-            <div class="services-item">
-                <i class="fa-solid fa-money-bill-1-wave"></i>
-                <div class="services-content">
-                    <h3>Hot Update</h3>
-                    <p>Always update new product</p>
+                <div class="services-item">
+                    <i class="fa-solid fa-money-bill-1-wave"></i>
+                    <div class="services-content">
+                        <h3>Hot Update</h3>
+                        <p>Always update new product</p>
+                    </div>
                 </div>
-            </div>
-            <div class="services-item">
-                <i class="fa-solid fa-money-bill-1-wave"></i>
-                <div class="services-content">
-                    <h3>100% Secure Payments</h3>
-                    <p>Gurantee secure payments</p>
-                </div>
+                <div class="services-item">
+                    <i class="fa-solid fa-money-bill-1-wave"></i>
+                    <div class="services-content">
+                        <h3>100% Secure Payments</h3>
+                        <p>Gurantee secure payments</p>
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
-    
-</section>
+
+    </section>
+</div>
+
 
 <section class="banner-sales bg-gradient-blue-purple">
     <div class="container">
@@ -95,7 +98,7 @@
 
             @foreach (var items in listBestSeller)
             {
-                <div class="col-md-3 col-6">
+                <div class="col-md-3 col-6 position-relative">
                     <div class="product-item">
                         <div class="product-item__img">
                             <img src="@items.ImageUrl" alt="product-img">
@@ -127,6 +130,8 @@
                             <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-heart"></i></button>
                         </div>
                     </div>
+                    <div class="bg"></div>
+                    <div class="blob"></div>
                 </div>
             }
         </div>
@@ -139,7 +144,7 @@
     <p>Browse by Category</p>
 
     <div class="list-category">
-        <a class="category-item btn" asp-controller="Product" asp-action="Index">
+        <a class="category-item btn active" asp-controller="Product" asp-action="Index">
             <p>All</p>
         </a>
         @foreach (var item in listCategory)
@@ -185,7 +190,7 @@
     </div>
 
     <div class="d-flex align-items-center justify-content-center mt-4">
-        <a class="btn btn-outline" asp-action="Index" asp-controller="Product">View More</a>
+        <a class="btn btn-outline-primary" asp-action="Index" asp-controller="Product">View More</a>
     </div>
 </section>
 

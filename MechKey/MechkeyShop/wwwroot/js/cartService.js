@@ -89,7 +89,7 @@ var renderCart = function () {
                                 <input class="form-control" type="number" value=${item.quantity} min="1" onchange="updateQuantity(event, '${item.productId}')" />
                                 </div>
                             <div class="item--total">
-                                $ ${item.price * item.quantity}
+                                $ ${(item.price * item.quantity).toLocaleString("vi-VN")}
                             </div>
                             <button class="btn btn-sm" onclick="removeFromCart('${item.productId}')">
                                 <i class="fa-solid fa-trash"></i>
