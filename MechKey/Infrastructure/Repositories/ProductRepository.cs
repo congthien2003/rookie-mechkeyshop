@@ -30,7 +30,10 @@ namespace Infrastructure.Repositories
 
         public IQueryable<Product> GetAllAsync()
         {
-            return context.Products.Include(p => p.Category).AsQueryable();
+            return context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductRatings)
+                .AsQueryable();
         }
 
         public async Task<Product?> GetByIdAsync(Guid id)
@@ -38,6 +41,7 @@ namespace Infrastructure.Repositories
             return await context.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductRatings)
+                .ThenInclude(pr => pr.User)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

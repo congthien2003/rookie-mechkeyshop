@@ -1,6 +1,6 @@
 ﻿namespace Shared.ViewModels
 {
-    public class ProductRatingViewModel
+    public class ProductRatingModel
     {
         public int Id { get; set; }
         public int Stars { get; set; }
