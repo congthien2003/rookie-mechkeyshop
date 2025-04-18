@@ -11,7 +11,7 @@
         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
+                    <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_1.jpg?1744854083865" class="d-block w-100" alt="...">
                 </div>
                 <div class="carousel-item">
                     <img src="https://bizweb.dktcdn.net/100/484/752/themes/920128/assets/slider_3.jpg?1741096398057" class="d-block w-100" alt="...">
@@ -117,21 +117,34 @@
                             </div>
                             <h3 class="name">@items.Name</h3>
                             <span class="price">$@items.Price</span>
+                            @* @if (items.Variants is not null)
+                            {
+                                <span class="rounded">@items.Variants.Count</span>
+                            } *@
                         </div>
                         <div class="product-item__footer">
                             <a class="btn btn-sm btn-outline-info" href="/Product/Detail/@items.Id"> <i class="fa-solid fa-eye"></i> </a>
-                            <button class="btn btn-gradient-red-orange btn-add-to-cart" 
-                            data-product-id="@items.Id" 
-                            data-quantity=1
-                            data-product-name="@items.Name"
-                            data-product-price="@items.Price"
-                            data-product-imageurl="@items.ImageUrl"
-                            >Add to cart</button>
+
+                            @if (items.Variants is not null)
+                            {
+                                <a class="btn btn-gradient-red-orange" asp-action="Detail" asp-controller="Product" asp-route-id="@items.Id">
+                                    Choose variant
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-gradient-red-orange btn-add-to-cart"
+                                        data-product-id="@items.Id"
+                                        data-quantity=1
+                                        data-product-name="@items.Name"
+                                        data-product-price="@items.Price"
+                                        data-product-imageurl="@items.ImageUrl">
+                                    Add to cart
+                                </button>
+                            }
                             <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-heart"></i></button>
                         </div>
                     </div>
-                    <div class="bg"></div>
-                    <div class="blob"></div>
                 </div>
             }
         </div>
@@ -179,9 +192,25 @@
                         <span class="price">$@items.Price</span>
                     </div>
                     <div class="product-item__footer">
-                        <a class="btn btn-outline" href="/Product/Detail/@items.Id"> <i class="fa-solid fa-eye"></i> </a>
-                        <button class="btn btn-gradient-blue-purple">Add to cart</button>
-                        <button class="btn btn-outline"><i class="fa-solid fa-heart"></i></button>
+                        <a class="btn btn-sm btn-outline-info" href="/Product/Detail/@items.Id"> <i class="fa-solid fa-eye"></i> </a>
+                        @if (items.Variants is not null)
+                        {
+                            <a class="btn btn-gradient-red-orange" asp-action="Detail" asp-controller="Product" asp-route-id="@items.Id">
+                                Choose variant
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-gradient-red-orange btn-add-to-cart"
+                                    data-product-id="@items.Id"
+                                    data-quantity=1
+                                    data-product-name="@items.Name"
+                                    data-product-price="@items.Price"
+                                    data-product-imageurl="@items.ImageUrl">
+                                Add to cart
+                            </button>
+                        }
+                        <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-heart"></i></button>
                     </div>
                 </div>
             </div>

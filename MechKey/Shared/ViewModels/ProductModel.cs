@@ -1,4 +1,5 @@
-﻿namespace Shared.ViewModels
+﻿
+namespace Shared.ViewModels
 {
     public class ProductModel
     {
@@ -9,8 +10,8 @@
         public string ImageUrl { get; set; } = "";
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
-        public IEnumerable<ProductRatingViewModel> Rating { get; set; } = Enumerable.Empty<ProductRatingViewModel>();
+        public IEnumerable<ProductRatingModel> Rating { get; set; } = Enumerable.Empty<ProductRatingModel>();
         public double TotalRating { get; set; } = 0;
-
+        public List<VariantAttribute> Variants { get; set; } = new List<VariantAttribute>();
     }
 }

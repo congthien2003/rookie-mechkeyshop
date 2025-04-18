@@ -105,14 +105,23 @@
                                 </div>
                                 <div class="product-item__footer">
                                     <a class="btn btn-sm btn-outline-info" href="Product/Detail/@item.Id"><i class="fa fa-eye"></i></a>
-                                    <button class="btn btn-sm btn-gradient-blue-purple btn-add-to-cart"
-                                            data-product-id="@item.Id"
-                                            data-quantity="1"
-                                            data-product-name="@item.Name"
-                                            data-product-price="@item.Price"
-                                            data-product-imageurl="@item.ImageUrl">
-                                        Add to cart
-                                    </button>
+                                    @if (item.Variants is not null)
+                                    {
+                                        <a class="btn btn-gradient-red-orange" asp-action="Detail" asp-controller="Product" asp-route-id="@item.Id">
+                                            Choose variant
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-gradient-red-orange btn-add-to-cart"
+                                                data-product-id="@item.Id"
+                                                data-quantity=1
+                                                data-product-name="@item.Name"
+                                                data-product-price="@item.Price"
+                                                data-product-imageurl="@item.ImageUrl">
+                                            Add to cart
+                                        </button>
+                                    }
                                     <button class="btn btn-sm btn-outline-danger"><i class="fa fa-heart"></i></button>
                                 </div>
                             </div>

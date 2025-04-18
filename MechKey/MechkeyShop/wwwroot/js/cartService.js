@@ -28,7 +28,16 @@ const saveCart = function (cart) {
 
 const addToCart = function (item) {
     let cart = getCart();
-    const existing = cart.find(p => p.productId === item.productId);
+    console.log(item);
+
+    let existing;
+    if (item.option) {
+        existing = cart.find(p => p.productId === item.productId && p.option.id === item.option.id && p.option.value === item.option.value);
+    }
+    else {
+        existing = cart.find(p => p.productId === item.productId);
+    }
+
     if (existing) {
         existing.quantity += item.quantity;
     } else {
@@ -79,7 +88,7 @@ var renderCart = function () {
                             </div>
                             <div class="item--info">
                                 <p class="info-name">${item.productName}</p>
-                                <p class="info-category">Kit</p>
+                                <p class="info-category">${item.option ? `${item.option.id} : ${item.option.value}` : "None"} </p>
                             </div>
                             <div class="item--price">
                                $ ${item.price}

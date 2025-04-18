@@ -1,5 +1,6 @@
 ﻿@model Shared.ViewModels.ProductModel;
 @using Markdig
+@using Newtonsoft.Json
 @{
     ViewBag.Title = "Product Detail";
     var description = Markdown.ToHtml(Model.Description);
@@ -38,6 +39,36 @@
 
             })
         })
+
+        var option = undefined;
+
+        const chooseOption = function (event) {
+            console.log(event.target);
+            const btnOptions = document.querySelectorAll('.btn-options');
+            btnOptions.forEach((btn) => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            option = {
+               id: event.target.getAttribute('data-variant-id'),
+               value: event.target.getAttribute('data-variant-value')
+            }
+
+        }
+
+        const btnAddToCartDetail = document.getElementById('btn-add-to-cart-detail');
+        btnAddToCartDetail.addEventListener('click', function (event) {
+            event.preventDefault();
+            const productId = this.getAttribute('data-product-id');
+            const quantity = Number.parseInt(this.getAttribute('data-quantity'));
+            const imageUrl = this.getAttribute('data-product-imageurl');
+            const price = this.getAttribute('data-product-price');
+            const productName = this.getAttribute('data-product-name');
+            const data = { productId, productName, quantity, price, option, imageUrl };
+            addToCart(data);
+            console.log(data);
+        });
+
     </script>
 }
 
@@ -64,7 +95,7 @@
     <div class="detail--wrapper">
         <!-- Left: Image -->
         <div class="text-center detail-img bg-light">
-            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded shadow" style="max-height: 400px;" />
+            <img id="product-img" src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded shadow" style="max-height: 400px;" />
         </div>
 
         <!-- Right: Info -->
@@ -81,23 +112,52 @@
 
                     @{
                         var emptyStar = 5 - Math.Ceiling(Model.TotalRating);
-                        @for (var star = 1; star <= emptyStar; star++)
+                                        @for (var star = 1; star <= emptyStar; star++)
                         {
-                            <i class="fa-regular fa-star"></i>
+                                            <i class="fa-regular fa-star"></i>
                         }
                     }
                     <span class="rating-number text-muted"> (@Model.Rating.Count() customer reviews)</span>
                 </div>
             </div>
-            <p class="price mb-2">Price: $@Model.Price</p>
+
+            <p id="product-price" class="price mb-2">Price: $@Model.Price</p>
+
+            <div id="variant-options">
+                @if (Model.Variants != null)
+                {
+                    var grouped = Model.Variants
+                    .GroupBy(attr => attr.Name)
+                    .ToDictionary(g => g.Key, g => g.Select(x => x.Value).Distinct().ToList());
+                    foreach (var group in grouped)
+                    {
+                        <span>
+                            <label class="variants">@group.Key</label>
+                        </span>
+                        foreach (var value in group.Value)
+                        {
+                            <button 
+                                class="btn-options me-2"
+                                onclick="chooseOption(event)"
+                                data-variant-id="@group.Key"
+                                data-variant-value="@value"
+                            >
+                                    @value
+                            </button>
+                        }
+                    }
+                }
+            </div>
             <div class="d-flex gap-3 mt-4">
 
-                <button class="btn btn-gradient-blue-purple btn-add-to-cart"
+                <button id="btn-add-to-cart-detail"
+                        class="btn btn-gradient-blue-purple"
                         data-quantity=1
                         data-product-id="@Model.Id"
                         data-product-name="@Model.Name"
+                        data-product-imageurl="@Model.ImageUrl"
                         data-product-price="@Model.Price"
-                        data-product-imageurl="@Model.ImageUrl">
+                        >
                     <i class="fa-solid fa-cart-plus"></i> Add to Cart
                 </button>
                 <button class="btn btn-outline-danger">
@@ -136,9 +196,9 @@
 
                                     @{
                                         int emptyStarItems = 5 - rating.Stars;
-                                        @for (var star = 1; star <= emptyStarItems; star++)
+                                                        @for (var star = 1; star <= emptyStarItems; star++)
                                         {
-                                            <i class="fa-regular fa-star"></i>
+                                                            <i class="fa-regular fa-star"></i>
                                         }
                                     }
 
@@ -180,13 +240,13 @@
 
                 @{
                     var isLoggedIn = !string.IsNullOrEmpty(Context.Request.Cookies["accessToken"]);
-                    @if (isLoggedIn)
+                                    @if (isLoggedIn)
                     {
-                        <button type="submit" class="btn btn-gradient-blue-purple w-100">Submit</button>
+                                        <button type="submit" class="btn btn-gradient-blue-purple w-100">Submit</button>
                     }
                     else
                     {
-                        <button id="btnSubmitReview" type="button" class="btn btn-gradient-blue-purple w-100" data-bs-toggle="modal" data-bs-target="#loginRequiredModal">Submit</button>
+                                        <button id="btnSubmitReview" type="button" class="btn btn-gradient-blue-purple w-100" data-bs-toggle="modal" data-bs-target="#loginRequiredModal">Submit</button>
                     }
                 }
 
@@ -266,4 +326,39 @@
         transition: all 0.2s ease-in;
     }
 
+    .variants {
+        display: flex;
+        align-items: center;
+        margin: 12px 0px;
+        gap: 12px;
+    }
+
+    .variants label {
+        font-weight: 500;
+        font-size: 16px;
+    }
+
+    .btn-options {
+        padding: 4px 6px;
+        border-radius: 4px;
+        font-size: 14px;
+        opacity: 0.8;
+        border: 2px solid #cecece;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-options:hover {
+            background-color: cornflowerblue;
+            color: white;
+            border-color: cornflowerblue;
+            opacity: 1;
+        }
+
+    .btn-options.active {
+        background-color: cornflowerblue;
+        color: white;
+        border-color: cornflowerblue;
+        opacity: 1;
+        outline: none;
+    }
 </style>

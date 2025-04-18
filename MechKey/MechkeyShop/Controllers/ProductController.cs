@@ -54,16 +54,7 @@ namespace MechkeyShop.Controllers
         public async Task<IActionResult> Detail(Guid id)
         {
             var result = await productService.GetByIdAsync(id);
-
             var category = await categoryService.GetByIdAsync(result.Data.CategoryId);
-
-            var productRating = await ratingService.GetAllByIdProductAsync(id, 4, false);
-
-            if (productRating.IsSuccess && productRating.Data.Items.Count() > 0)
-            {
-                result.Data.Rating = productRating.Data.Items;
-                result.Data.TotalRating = productRating.Data.Items.Average(p => p.Stars);
-            }
             return View(result.Data);
         }
 
@@ -78,7 +69,7 @@ namespace MechkeyShop.Controllers
 
                 var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(userId));
 
-                var model = new ProductRatingViewModel
+                var model = new ProductRatingModel
                 {
                     Stars = score,
                     Comment = comment ?? "",
