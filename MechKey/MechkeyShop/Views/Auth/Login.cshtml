@@ -1,27 +1,56 @@
 ﻿@model Shared.ViewModels.Auth.LoginModel
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-
-*@
 @{
     ViewData["Title"] = "Login";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="">
-    <h2>Login Page</h2>
-    <form asp-action="Login" asp-controller="Auth" method="post">
-        <div class="form-group">
-            <label asp-for="Email" >Email</label>
-            <input asp-for="Email" type="email" class="form-control" value="nhoccuthien0538@gmail.com" />
-            <span class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" class="form-control" value="thienvip123" />
-            <span class="text-danger"></span>
-        </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+<div class="container">
+    <div class="form-auth--wrapper">
+
+        <form asp-action="Login" asp-controller="Auth" method="post">
+            <h2 class="text-center">Login Page</h2>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" class="form-control" value="nhoccuthien0538@gmail.com" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" type="password" class="form-control" value="thienvip123" />
+                <p class="text-danger text-bold text-center mt-4">@ViewBag.Error</p>
+            </div>
+
+            <div class="form-action">
+                <button type="submit" class="btn btn-gradient-blue-purple">Login</button>
+                <a class="btn btn-gradient-blue-purple-outline" href="/Auth/Register">Register Now</a>
+            </div>
+        </form>
+    </div>
 </div>
+
+<style>
+
+    .form-auth--wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 5rem;
+    }
+
+        .form-auth--wrapper form {
+            width: 35rem;
+            background-color: #efefef;
+            padding: 4rem;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        .form-action {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+</style>

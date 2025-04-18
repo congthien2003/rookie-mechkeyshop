@@ -148,6 +148,13 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/cartService.js" asp-append-version="true"></script>
 
+    @if (TempData["ToastHeader"] != null && TempData["Type"] != null && TempData["ToastMessage"] != null)
+    {
+        <script>
+            showNoti("@TempData["Type"]", "@TempData["ToastHeader"]", "@TempData["ToastMessage"]");
+        </script>
+    }
+
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>

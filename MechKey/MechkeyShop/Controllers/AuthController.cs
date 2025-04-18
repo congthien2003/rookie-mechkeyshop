@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.IServices;
+using MechkeyShop.Constant;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ViewModels.Auth;
 
@@ -35,11 +36,10 @@ namespace MechkeyShop.Controllers
         {
             if (!ModelState.IsValid)
                 return View(model);
-
-            var result = await _authenticationService.Login(model);
-
             try
             {
+                var result = await _authenticationService.Login(model);
+
                 var token = _jwtManager.GenerateToken(result.Data);
 
                 // Add Token into Cookies
@@ -55,13 +55,20 @@ namespace MechkeyShop.Controllers
                     Secure = true,    // Only send over HTTPS
                     Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
                 });
+                TempData[Toast.KEY] = "Login success";
+                TempData[Toast.MESSAGE] = "Shopping now!";
+                TempData[Toast.TYPE] = Toast.SUCCESS_TYPE;
                 return RedirectToAction("Index", "Home");
 
             }
             catch (Exception ex)
             {
                 //_logger.LogError(ex.Message);
-                return RedirectToAction("/access-denied");
+                ViewBag.Error = ex.Message;
+                TempData[Toast.KEY] = "Login failed";
+                TempData[Toast.MESSAGE] = ex.Message;
+                TempData[Toast.TYPE] = Toast.ERROR_TYPE;
+                return View(model);
 
             }
         }

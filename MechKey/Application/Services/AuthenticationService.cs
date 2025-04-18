@@ -51,7 +51,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new InvalidDataException("Login failed");
+                throw new InvalidDataException("Invalid email or password");
             }
         }
 

@@ -106,13 +106,20 @@
                         <div class="product-item__content">
                             <div class="product-rating">
                                 <div class="d-flex align-items-center gap-2">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
-                                    <span class="rating-number">(5)</span>
 
+                                    @for (var star = 1; star <= Math.Ceiling(items.TotalRating); star++)
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
+
+                                    @{
+                                        var emptyStar = 5 - Math.Ceiling(items.TotalRating);
+                                        @for (var star = 1; star <= emptyStar; star++)
+                                        {
+                                            <i class="fa-regular fa-star"></i>
+                                        }
+                                    }
+                                    <span class="rating-number text-muted"> (@items.Rating.Count() reviews)</span>
                                 </div>
                             </div>
                             <h3 class="name">@items.Name</h3>
@@ -179,13 +186,20 @@
                     <div class="product-item__content">
                         <div class="product-rating">
                             <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <span class="rating-number">(5)</span>
 
+                                @for (var star = 1; star <= Math.Ceiling(items.TotalRating); star++)
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+
+                                @{
+                                    var emptyStar = 5 - Math.Ceiling(items.TotalRating);
+                                    @for (var star = 1; star <= emptyStar; star++)
+                                    {
+                                        <i class="fa-regular fa-star"></i>
+                                    }
+                                }
+                                <span class="rating-number text-muted"> (@items.Rating.Count() reviews)</span>
                             </div>
                         </div>
                         <h3 class="name">@items.Name</h3>

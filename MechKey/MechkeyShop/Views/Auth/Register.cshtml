@@ -1,51 +1,85 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Shared.ViewModels.Auth.RegisterModel
 @{
-    
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@model Shared.ViewModels.Auth.RegisterModel
+<div class="container">
+    <div class="form-auth--wrapper">
 
-<div class="">
-    <h2>Register Page</h2>
-    <form asp-action="Register" asp-controller="Auth" method="post">
-        <div class="form-group">
-            <label asp-for="Email" >Email</label>
-            <input asp-for="Email" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
+        <form asp-action="Register" asp-controller="Auth" method="post">
+            <h2 class="text-center">Register Page</h2>
+            <div class="form-group w-100">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
+            <div class="d-flex align-items-center gap-4">
+                
 
-        <div class="form-group">
-            <label asp-for="Name">Name</label>
-            <input asp-for="Name" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
+                <div class="form-group w-100">
+                    <label asp-for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+                <div class="form-group w-100">
+                    <label asp-for="Phones">Phones</label>
+                    <input asp-for="Phones" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            
 
-        <div class="form-group">
-            <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="ConfirmPassword">Confirm Password</label>
-            <input asp-for="ConfirmPassword" type="password" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirm Password</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="Phones">Phones</label>
-            <input asp-for="Phones" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
+           
 
-        <div class="form-group">
-            <label asp-for="Address">Address</label>
-            <input asp-for="Address" class="form-control" />
-            <span class="text-danger"></span>
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-        <a asp-controller="Auth" asp-action="Login">Login</a>
-        <span class="text-danger"> @ViewBag.Error </span>
-    </form>
+            <div class="form-group">
+                <label asp-for="Address">Address</label>
+                <input asp-for="Address" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
+
+            <div class="form-action">
+                <button type="submit" class="btn btn-gradient-blue-purple">Submit</button>
+                <a class="btn btn-gradient-blue-purple-outline" href="/Auth/Login">Back to login now</a>
+            </div>
+        </form>
+    </div>
 </div>
+
+<style>
+
+    .form-auth--wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 5rem;
+    }
+
+        .form-auth--wrapper form {
+            width: 45rem;
+            background-color: #efefef;
+            padding: 4rem;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+    .form-action {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+</style>
