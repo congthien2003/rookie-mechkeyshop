@@ -10,7 +10,7 @@ const updateCartCount = function () {
 const updateTotalPrice = function (cart) {
     const totalPrice = document.getElementById('total-price');
     const total = cart.reduce((total, item) => total + item.quantity * item.price, 0);
-    totalPrice.innerText = total;
+    totalPrice.innerText = total.toLocaleString("en-US");
 }
 
 const getCart = function () {
@@ -98,7 +98,7 @@ var renderCart = function () {
                                 <input class="form-control" type="number" value=${item.quantity} min="1" onchange="updateQuantity(event, '${item.productId}')" />
                                 </div>
                             <div class="item--total">
-                                $ ${(item.price * item.quantity).toLocaleString("vi-VN")}
+                                $ ${(item.price * item.quantity).toLocaleString("en-US")}
                             </div>
                             <button class="btn btn-sm" onclick="removeFromCart('${item.productId}')">
                                 <i class="fa-solid fa-trash"></i>
