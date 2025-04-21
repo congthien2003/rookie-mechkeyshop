@@ -1,8 +1,13 @@
 ﻿ @section Scripts {
      <script>
          // gọi hàm từ site.js
-         console.log(getCart());
-        renderCart()
+         renderCart();
+         const btnCheckout = document.getElementById("btnCheckout");
+         if (getCart().length == 0) {
+            btnCheckout.innerHTML = "Cart is empty";
+            btnCheckout.classList.add("disabled");
+
+         }
      </script>
  }
 
@@ -10,7 +15,7 @@
     ViewData["Title"] = "Cart";
     }
 
-<div class="container cart">
+<div class="container cart fade-in">
     <h3>Your Cart</h3>
     <div class="row">
         <div class="col-md-8">
@@ -26,12 +31,12 @@
 
                     if (isLoggedIn)
                     {
-                        <a class="btn btn-gradient-blue-purple w-100 mt-2" asp-action="Checkout" asp-controller="Cart">Checkout</a>
+                                    <a class="btn btn-gradient-blue-purple w-100 mt-2" id="btnCheckout" asp-action="Checkout" asp-controller="Cart">Checkout</a>
 
                     }
                     else
                     {
-                        <a class="btn btn-gradient-blue-purple w-100 mt-2"  asp-action="Login" asp-controller="Auth">Please login to checkout</a>
+                                    <a class="btn btn-gradient-blue-purple w-100 mt-2"  asp-action="Login" asp-controller="Auth">Please login to checkout</a>
                     }
                 }
             </div>

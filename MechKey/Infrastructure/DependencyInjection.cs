@@ -1,6 +1,8 @@
-﻿using Domain.Entity;
+﻿using Application.Interfaces.IUnitOfWork;
+using Domain.Entity;
 using Domain.IRepositories;
 using Infrastructure.Repositories;
+using Infrastructure.UnitOfWork;
 using MechkeyShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +23,9 @@ namespace Infrastructure
             services.AddScoped<IProductRepository<Product>, ProductRepository>();
             services.AddScoped<ICategoryRepository<Category>, CategoryRepository>();
             services.AddScoped<IProductRatingRepository<ProductRating>, ProductRatingRepository>();
-
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
+            services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
             return services;
         }
     }

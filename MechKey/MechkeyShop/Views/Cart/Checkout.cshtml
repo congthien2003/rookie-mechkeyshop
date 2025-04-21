@@ -1,14 +1,62 @@
-﻿@model CheckoutViewModel
+﻿@model CheckoutViewModel;
 
 @section Scripts {
     <script>
         console.log(getCart());
         renderCart();
+
+
+        const btnSubmitOrder = document.getElementById("submitOrder");
+
+        btnSubmitOrder.addEventListener("click", function () {
+            const cart = getCart();
+            const total = cart.reduce((total, item) => total + item.quantity * item.price, 0);
+            const fullnameInput = document.getElementById('fullnameInput');
+            const phoneInput = document.getElementById('phoneInput');
+            const emailInput = document.getElementById('emailInput');
+            const addressInput = document.getElementById('addressInput');
+
+            const order = {
+                userId: "@Model.User.Id",
+                orderDate: new Date(),
+                phone: phoneInput.value,
+                address: addressInput.value,
+                totalAmount: total,
+                orderItems: cart.map(value => ({ 
+                    productId: value.productId, 
+                    quantity: value.quantity,
+                    totalAmount: value.quantity * value.price,
+                    option: JSON.stringify(value.option ?? "")
+                })),
+            };
+            console.log(order);
+            // Send the order to the server
+            fetch('/api/Order/createOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(order)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                showNoti('success', 'Success', 'Create order success');
+                    clearCart();
+                window.location.href = '/Order/Index';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                showNoti('error', 'Error', 'Create order failed. Please retry !!');
+
+            });
+        });
+
+
     </script>
 }
 @{
     ViewBag.Title = "Checkout";
-    var total = Model.CartItems.Sum(item => item.Price * item.Quantity);
 }
 
 <div class="container py-5">
@@ -20,19 +68,19 @@
             <h4>Customer Information</h4>
             <div class="mb-3">
                 <label class="form-label">Full Name:</label>
-                <input type="text" class="form-control" value="@Model.User.Name" readonly />
+                <input id="fullnameInput" type="text" class="form-control" value="@Model.User.Name" readonly />
             </div>
             <div class="mb-3">
                 <label class="form-label">Email:</label>
-                <input type="email" class="form-control" value="@Model.User.Email" readonly />
+                <input id="emailInput" type="email" class="form-control" value="@Model.User.Email" readonly />
             </div>
             <div class="mb-3">
                 <label class="form-label">Phone:</label>
-                <input type="text" class="form-control" value="@Model.User.Phone" readonly />
+                <input id="phoneInput" type="text" class="form-control" value="@Model.User.Phone" />
             </div>
             <div class="mb-3">
                 <label class="form-label">Address:</label>
-                <textarea class="form-control" rows="3" readonly>@Model.User.Address</textarea>
+                <textarea id="addressInput" class="form-control" rows="3" >@Model.User.Address</textarea>
             </div>
         </div>
 
@@ -42,9 +90,9 @@
             <ul id="cart-items">
             </ul>
             <p class="mt-2 d-flex align-items-center justify-content-between order-total">Total: $ <span id="total-price">1440</span></p>
-            <form method="post" action="/Checkout/Submit">
-                <button type="submit" class="btn btn-gradient-blue-purple w-100 mt-3">Place Order</button>
-            </form>
+            
+            <button type="button" id="submitOrder" class="btn btn-gradient-blue-purple w-100 mt-3">Place Order</button>
+            
         </div>
     </div>
 </div>

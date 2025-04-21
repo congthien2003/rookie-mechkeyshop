@@ -15,9 +15,24 @@ namespace Domain.Entity
         public string Address { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-        private void ChangeStatus(OrderStatus status)
+        public void ChangeStatus(string status)
         {
-            Status = status;
+            switch (status)
+            {
+                case "Pending":
+                    Status = OrderStatus.Pending;
+                    break;
+                case "Accepted":
+                    Status = OrderStatus.Accepted;
+                    break;
+                case "Canceled":
+                    Status = OrderStatus.Cancelled;
+                    break;
+                case "Completed":
+                    Status = OrderStatus.Completed;
+                    break;
+                default: return;
+            }
         }
     }
 }

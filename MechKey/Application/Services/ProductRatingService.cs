@@ -34,9 +34,9 @@ namespace Application.Services
             try
             {
 
-                var entity = mapper.Map<ProductRating>(model);
+                ProductRating entity = mapper.Map<ProductRating>(model);
 
-                var product = await productRepository.GetByIdAsync(entity.ProductId);
+                Product product = await productRepository.GetByIdAsync(entity.ProductId);
                 product.AddRating(entity);
 
                 await productRepository.UpdateAsync(product);

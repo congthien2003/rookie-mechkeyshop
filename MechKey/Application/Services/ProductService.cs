@@ -37,7 +37,7 @@ namespace Application.Services
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
-                throw new ProductHandleFailedException("Add Product failed");
+                throw new ProductHandleFailedException();
             }
         }
 
@@ -57,15 +57,13 @@ namespace Application.Services
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
-
-                throw new ProductHandleFailedException("Delete product failed");
+                throw new ProductHandleFailedException();
             }
         }
 
-        public async Task<Result<PagedResult<ProductModel>>> GetAllAsync(int page = 1,
-            int pageSize = 10,
+        public async Task<Result<PagedResult<ProductModel>>> GetAllAsync(
+            PaginationReqModel pagiModel,
             string categoryId = "",
-            string searchTerm = "",
             string sortCol = "",
             bool ascOrder = false)
         {
@@ -78,9 +76,9 @@ namespace Application.Services
                     query = query.Where(q => q.Category.Id.ToString() == categoryId);
                 }
 
-                if (!string.IsNullOrEmpty(searchTerm))
+                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
                 {
-                    query = query.Where(u => u.Name.Contains(searchTerm));
+                    query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm));
                 }
 
                 if (!string.IsNullOrEmpty(sortCol))
@@ -107,8 +105,8 @@ namespace Application.Services
 
                 var totalCount = query.Count();
                 var items = await query
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
+                    .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
+                    .Take(pagiModel.PageSize)
                     .Include(p => p.Category)
                     .Include(p => p.ProductRatings)
                     .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
@@ -118,16 +116,15 @@ namespace Application.Services
                 {
                     Items = items,
                     TotalItems = totalCount,
-                    Page = page,
-                    PageSize = pageSize,
-                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                    Page = pagiModel.Page,
+                    PageSize = pagiModel.PageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
                 });
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
-
-                throw new ProductNotFoundException("Get list failed");
+                throw new ProductNotFoundException();
             }
         }
 
@@ -148,8 +145,7 @@ namespace Application.Services
             catch (Exception ex)
             {
                 logger.LogError(ex, ex.Message);
-
-                throw new ProductNotFoundException("Get best seller failed");
+                throw new ProductNotFoundException();
             }
         }
 

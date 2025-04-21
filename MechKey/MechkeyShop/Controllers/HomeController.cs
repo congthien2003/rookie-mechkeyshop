@@ -1,6 +1,7 @@
 using Application.Interfaces.IServices;
 using MechkeyShop.Models;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Common;
 using System.Diagnostics;
 
 namespace MechkeyShop.Controllers
@@ -22,8 +23,14 @@ namespace MechkeyShop.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var resultListProduct = await productService.GetAllAsync(1, 10, "");
-            var resultListCategory = await categoryService.GetAllAsync(1, 10, "");
+            PaginationReqModel model = new PaginationReqModel()
+            {
+                Page = 1,
+                PageSize = 10,
+                SearchTerm = string.Empty
+            };
+            var resultListProduct = await productService.GetAllAsync(model);
+            var resultListCategory = await categoryService.GetAllAsync(model);
             var resultListBestSeller = await productService.GetBestSellerAsync();
             if (resultListProduct.IsSuccess)
             {

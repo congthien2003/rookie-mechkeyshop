@@ -1,6 +1,6 @@
 ﻿namespace Shared.Common
 {
-    public abstract class PaginationReqModel
+    public class PaginationReqModel
     {
         public int Page { get; set; }
         public int PageSize { get; set; }

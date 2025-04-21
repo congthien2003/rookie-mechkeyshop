@@ -2,6 +2,7 @@
 using MechkeyShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.ViewModels;
 
 namespace MechkeyShop.Controllers
 {
@@ -18,39 +19,40 @@ namespace MechkeyShop.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "2")]
         public async Task<IActionResult> Checkout()
         {
-            try
+            var user = HttpContext.User;
+            var id = user.FindFirst("Id")?.Value;
+
+            var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(id));
+
+            var model = new CheckoutViewModel
             {
-                var user = HttpContext.User;
-                var id = user.FindFirst("Id")?.Value;
-
-                var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(id));
-
-                var model = new CheckoutViewModel
+                User = new UserModel
                 {
-                    User = new UserModel
-                    {
-                        Name = infoUser.Data.Name,
-                        Email = infoUser.Data.Email,
-                        Phone = infoUser.Data.Phones,
-                        Address = infoUser.Data.Address
-                    },
-                    CartItems = new List<CartItemModel>
-            {
-                new CartItemModel { ProductName = "Keycap Set", Quantity = 2, Price = 350000 },
-                new CartItemModel { ProductName = "Switch Gateron", Quantity = 1, Price = 250000 }
-            }
-                };
+                    Id = infoUser.Data.Id,
+                    Name = infoUser.Data.Name,
+                    Email = infoUser.Data.Email,
+                    Phone = infoUser.Data.Phones,
+                    Address = infoUser.Data.Address
+                }
+            };
 
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                return RedirectToAction("Error", "Home");
-            }
+            return View(model);
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "2")]
+        public async Task<IActionResult> SubmitOrder(CreateOrderModel model)
+        {
+            var user = HttpContext.User;
+            var id = user.FindFirst("Id")?.Value;
+            var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(id));
+
+            model.UserId = Guid.Parse(id);
+
+            return Ok();
+        }
     }
 }

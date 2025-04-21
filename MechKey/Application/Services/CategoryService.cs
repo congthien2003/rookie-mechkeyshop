@@ -53,21 +53,21 @@ namespace Application.Services
             }
         }
 
-        public async Task<Result<PagedResult<CategoryModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "")
+        public async Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel)
         {
             try
             {
                 var query = _repository.GetAllAsync();
 
-                if (!string.IsNullOrEmpty(searchTerm))
+                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
                 {
-                    query = query.Where(c => c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+                    query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm, StringComparison.OrdinalIgnoreCase));
                 }
 
                 var totalCount = query.Count();
                 var items = await query
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
+                    .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
+                    .Take(pagiModel.PageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
                     .ToListAsync();
 
@@ -75,9 +75,9 @@ namespace Application.Services
                 {
                     Items = items,
                     TotalItems = totalCount,
-                    Page = page,
-                    PageSize = pageSize,
-                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+                    Page = pagiModel.Page,
+                    PageSize = pagiModel.PageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize)
                 });
             }
             catch (Exception ex)

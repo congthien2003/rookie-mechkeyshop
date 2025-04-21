@@ -1,4 +1,5 @@
 using Application.Comoon;
+using Domain.Common;
 using System.Net;
 
 namespace WebAPI.Extensions.Middlewares
@@ -18,10 +19,18 @@ namespace WebAPI.Extensions.Middlewares
             {
                 await _next(context);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
                 _logger.LogError(ex, ex.Message);
+                context.Response.StatusCode = (int)ex.Type;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(Result.Failure(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = 500;
                 await HandleExceptionAsync(context, ex);
+
             }
         }
 

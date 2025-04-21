@@ -2,6 +2,7 @@
 using MechkeyShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Common;
 using Shared.ViewModels;
 
 namespace MechkeyShop.Controllers
@@ -26,13 +27,22 @@ namespace MechkeyShop.Controllers
 
         public async Task<IActionResult> IndexAsync(ProductPageViewModel model)
         {
-            var ascOrder = model.AscendingOrder == 1 ? true : false;
-            var resultListProduct = await productService.GetAllAsync(model.Page, model.PageSize, model.CategoryId, model.SearchTerm, model.SortCol, ascOrder);
-            var resultListCategory = await categoryService.GetAllAsync(model.Page, 10, "");
-            var totalPages = (int)Math.Ceiling(resultListProduct.Data.TotalItems / (double)resultListProduct.Data.PageSize);
+            bool ascOrder = model.AscendingOrder == 1 ? true : false;
+
+            var resultListProduct = await productService.GetAllAsync(
+                new PaginationReqModel
+                { Page = model.Page, PageSize = model.PageSize, SearchTerm = model.SearchTerm },
+            model.CategoryId, model.SortCol, ascOrder);
+
+            var resultListCategory = await categoryService.GetAllAsync(new PaginationReqModel
+            { Page = 1, PageSize = 10, SearchTerm = "" });
+
+            int totalPages = (int)Math.Ceiling(resultListProduct.Data.TotalItems / (double)resultListProduct.Data.PageSize);
+
+            // Check if the result is successful and contains data
             if (resultListProduct.IsSuccess && resultListCategory.IsSuccess)
             {
-
+                // Set the title based on the selected category or default to "Product List"
                 if (model.CategoryId is not null)
                 {
                     ViewBag.Title = resultListCategory.Data.Items.FirstOrDefault(c => c.Id.ToString() == model.CategoryId)?.Name ?? "Product List";
@@ -62,30 +72,24 @@ namespace MechkeyShop.Controllers
         [Authorize(Roles = "2")]
         public async Task<IActionResult> SubmitRating(Guid id, int score, string comment)
         {
-            try
+
+            var user = HttpContext.User;
+            var userId = user.FindFirst("Id")?.Value;
+
+            var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(userId));
+
+            var model = new ProductRatingModel
             {
-                var user = HttpContext.User;
-                var userId = user.FindFirst("Id")?.Value;
+                Stars = score,
+                Comment = comment ?? "",
+                UserId = Guid.Parse(userId),
+                ProductId = id,
+                RatedAt = DateTime.UtcNow,
+            };
 
-                var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(userId));
+            var result = await ratingService.AddAsync(model);
 
-                var model = new ProductRatingModel
-                {
-                    Stars = score,
-                    Comment = comment ?? "",
-                    UserId = Guid.Parse(userId),
-                    ProductId = id,
-                    RatedAt = DateTime.UtcNow,
-                };
-
-                var result = await ratingService.AddAsync(model);
-
-                return Redirect($"/Product/Detail/{id}");
-            }
-            catch (Exception ex)
-            {
-                return RedirectToAction("Detail", "Product", id);
-            }
+            return Redirect($"/Product/Detail/{id}");
         }
     }
 }

@@ -1,4 +1,3 @@
-
 using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Entity
@@ -10,9 +9,9 @@ namespace Domain.Entity
         public Order Order { get; set; } = null!;
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
-        [AllowNull]
-        public string Options = null;
         public int Quantity { get; set; } = 1;
         public double TotalAmount { get; set; }
+        [AllowNull]
+        public string Option { get; set; } = string.Empty;
     }
 }
