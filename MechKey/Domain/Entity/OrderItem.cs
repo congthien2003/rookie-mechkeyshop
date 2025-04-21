@@ -1,4 +1,6 @@
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Domain.Entity
 {
     public class OrderItem
@@ -8,6 +10,8 @@ namespace Domain.Entity
         public Order Order { get; set; } = null!;
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
+        [AllowNull]
+        public string Options = null;
         public int Quantity { get; set; } = 1;
         public double TotalAmount { get; set; }
     }

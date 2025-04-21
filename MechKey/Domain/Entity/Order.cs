@@ -13,6 +13,11 @@ namespace Domain.Entity
         public double TotalAmount { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+        private void ChangeStatus(OrderStatus status)
+        {
+            Status = status;
+        }
     }
 }
