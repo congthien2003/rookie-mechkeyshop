@@ -1,6 +1,6 @@
 ﻿using Application.Comoon;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Product;
 
 namespace Application.Interfaces.IServices
 {

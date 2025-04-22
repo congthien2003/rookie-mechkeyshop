@@ -55,5 +55,12 @@ namespace WebAPI.Controllers
             var entity = await categoryService.UpdateAsync(model);
             return Ok(entity);
         }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await categoryService.DeleteAsync(id);
+            return Ok(result);
+        }
     }
 }

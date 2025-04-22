@@ -1,4 +1,6 @@
-﻿namespace Shared.ViewModels
+﻿using Shared.ViewModels.Product;
+
+namespace Shared.ViewModels.Order
 {
     public class OrderItemModel
     {

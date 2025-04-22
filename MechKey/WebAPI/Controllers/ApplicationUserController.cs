@@ -4,7 +4,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Auth;
 
 namespace WebAPI.Controllers
 {

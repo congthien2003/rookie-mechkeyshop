@@ -1,6 +1,6 @@
-﻿@model Shared.ViewModels.ProductModel;
-@using Markdig
-@using Newtonsoft.Json
+﻿@model ProductModel;
+@    using Markdig
+@    using Newtonsoft.Json
 @{
     ViewBag.Title = "Product Detail";
     var description = Markdown.ToHtml(Model.Description);

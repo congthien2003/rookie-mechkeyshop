@@ -6,7 +6,7 @@ using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Product;
 
 namespace Application.Services
 {

@@ -7,8 +7,9 @@ using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Product;
 
 namespace Application.Services
 {
@@ -26,7 +27,7 @@ namespace Application.Services
             this.logger = logger;
         }
 
-        public async Task<Result<ProductModel>> AddAsync(ProductModel model)
+        public async Task<Result<ProductModel>> AddAsync(CreateProductModel model)
         {
             try
             {
@@ -162,7 +163,7 @@ namespace Application.Services
         }
 
 
-        public async Task<Result<ProductModel>> UpdateAsync(ProductModel model)
+        public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model)
         {
             try
             {
@@ -175,6 +176,7 @@ namespace Application.Services
                 entity.Price = model.Price;
                 entity.ImageUrl = model.ImageUrl.ToString();
                 entity.LastUpdatedAt = DateTime.UtcNow;
+                entity.Variants = JsonConvert.SerializeObject(model.Variants);
 
                 var result = await _repository.UpdateAsync(entity);
                 return Result<ProductModel>.Success("Update product success",

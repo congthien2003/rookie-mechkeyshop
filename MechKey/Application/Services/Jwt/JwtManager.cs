@@ -3,7 +3,7 @@ using Application.Interfaces.IServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Shared.ViewModels;
+using Shared.ViewModels.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

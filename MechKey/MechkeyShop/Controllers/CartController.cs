@@ -2,7 +2,7 @@
 using MechkeyShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shared.ViewModels;
+using Shared.ViewModels.Order;
 
 namespace MechkeyShop.Controllers
 {

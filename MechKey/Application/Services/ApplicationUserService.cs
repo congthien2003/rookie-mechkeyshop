@@ -7,7 +7,6 @@ using Domain.Entity;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Shared.Common;
-using Shared.ViewModels;
 using Shared.ViewModels.Auth;
 
 namespace Application.Services

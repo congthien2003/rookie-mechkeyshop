@@ -4,7 +4,6 @@ using Application.Services.Common;
 using AutoMapper;
 using Domain.Entity;
 using Domain.IRepositories;
-using Shared.ViewModels;
 using Shared.ViewModels.Auth;
 
 namespace Application.Services

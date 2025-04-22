@@ -1,6 +1,6 @@
 ﻿using Application.Comoon;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Order;
 
 namespace Application.Interfaces.IServices
 {

@@ -1,6 +1,5 @@
 ﻿using Application.Comoon;
 using Shared.Common;
-using Shared.ViewModels;
 using Shared.ViewModels.Auth;
 
 namespace Application.Interfaces.IServices

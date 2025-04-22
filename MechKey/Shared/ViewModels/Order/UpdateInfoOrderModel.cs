@@ -1,4 +1,4 @@
-﻿namespace Shared.ViewModels
+﻿namespace Shared.ViewModels.Order
 {
     public class UpdateInfoOrderModel
     {

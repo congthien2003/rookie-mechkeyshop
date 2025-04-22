@@ -1,5 +1,5 @@
-﻿using Shared.ViewModels;
-using Shared.ViewModels.Category;
+﻿using Shared.ViewModels.Category;
+using Shared.ViewModels.Product;
 
 namespace MechkeyShop.Models
 {

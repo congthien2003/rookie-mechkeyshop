@@ -2,9 +2,10 @@ using AutoMapper;
 using Domain.Entity;
 using Domain.Enum;
 using Newtonsoft.Json;
-using Shared.ViewModels;
 using Shared.ViewModels.Auth;
 using Shared.ViewModels.Category;
+using Shared.ViewModels.Order;
+using Shared.ViewModels.Product;
 
 namespace Infrastructure.Helpers
 {
@@ -23,6 +24,10 @@ namespace Infrastructure.Helpers
                 opt => opt.MapFrom(src => src.ProductRatings.Count() > 0 ? src.ProductRatings.Average(pr => pr.Stars) : 0))
                 .ForMember(p => p.Variants, opt => opt.MapFrom(src => JsonConvert.DeserializeObject<List<VariantAttribute>>(src.Variants)))
                 .ReverseMap();
+
+            CreateMap<CreateProductModel, Product>()
+                .ForMember(p => p.Variants, opt => opt.MapFrom(src => JsonConvert.SerializeObject(src.Variants)));
+
 
             // Map VM to Entity to insert
             CreateMap<ProductRatingModel, ProductRating>()

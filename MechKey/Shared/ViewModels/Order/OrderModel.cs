@@ -1,6 +1,6 @@
 ﻿using Domain.Enum;
 
-namespace Shared.ViewModels
+namespace Shared.ViewModels.Order
 {
     public class OrderModel
     {
