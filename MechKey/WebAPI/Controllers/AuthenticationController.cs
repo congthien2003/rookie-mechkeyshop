@@ -1,13 +1,14 @@
 using Application.Comoon;
 using Application.Interfaces.IServices;
-using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Shared.ViewModels;
 using Shared.ViewModels.Auth;
 namespace WebAPI.Controllers
 {
+    [ApiVersion(1)]
+    [Route("api/v{v:apiVersion}/auth")]
     [ApiController]
-    [Route("api/[controller]")]
+
     public class AuthenticationController : ControllerBase
     {
         private readonly ILogger<AuthenticationController> _logger;
@@ -22,43 +23,43 @@ namespace WebAPI.Controllers
             _logger = logger;
             _authenticationService = authenticationService;
         }
+        /*
+                [HttpGet]
+                public Result<string> GetToken()
+                {
+                    _logger.LogInformation("Get token");
+                    var user = new ApplicationUserModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Email = "abc@example.com",
+                    };
 
-        [HttpGet]
-        public Result<string> GetToken()
-        {
-            _logger.LogInformation("Get token");
-            var user = new ApplicationUserModel
-            {
-                Id = Guid.NewGuid(),
-                Email = "abc@example.com",
-            };
+                    var token = _jwtManager.GenerateToken(user);
 
-            var token = _jwtManager.GenerateToken(user);
+                    // Add Token into Cookies
+                    Response.Cookies.Append("accessToken", token, new CookieOptions
+                    {
+                        HttpOnly = true,  // Prevent JavaScript access
+                        Secure = true,    // Only send over HTTPS
+                        Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
+                    });
+                    return Result<string>.Success("Get Token Success", token);
+                }
 
-            // Add Token into Cookies
-            Response.Cookies.Append("accessToken", token, new CookieOptions
-            {
-                HttpOnly = true,  // Prevent JavaScript access
-                Secure = true,    // Only send over HTTPS
-                Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
-            });
-            return Result<string>.Success("Get Token Success", token);
-        }
+                [HttpGet("/test-api")]
+                [Authorize]
+                public IActionResult TestAPI()
+                {
+                    return Ok();
+                }
 
-        [HttpGet("/test-api")]
-        [Authorize]
-        public IActionResult TestAPI()
-        {
-            return Ok();
-        }
-
-        [HttpPost("validate")]
-        [Authorize]
-        public ActionResult<Result> ValidateToken()
-        {
-            _logger.LogInformation("Validate token");
-            return Ok();
-        }
+                [HttpPost("validate")]
+                [Authorize]
+                public ActionResult<Result> ValidateToken()
+                {
+                    _logger.LogInformation("Validate token");
+                    return Ok();
+                }*/
 
         [HttpPost("register")]
         public async Task<Result> Register(RegisterModel model)

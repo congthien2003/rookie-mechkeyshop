@@ -1,5 +1,6 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IServices;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
@@ -7,7 +8,8 @@ using Shared.ViewModels;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion(1)]
+    [Route("api/v{v:apiVersion}/users")]
     [ApiController]
     public class ApplicationUserController : ControllerBase
     {
