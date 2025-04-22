@@ -12,6 +12,7 @@ namespace Shared.ViewModels
         public string CategoryName { get; set; } = string.Empty;
         public IEnumerable<ProductRatingModel> Rating { get; set; } = Enumerable.Empty<ProductRatingModel>();
         public double TotalRating { get; set; } = 0;
+        public long SellCount { get; set; } = 0;
         public List<VariantAttribute> Variants { get; set; } = new List<VariantAttribute>();
     }
 }

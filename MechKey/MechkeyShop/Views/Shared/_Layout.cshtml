@@ -58,11 +58,14 @@
 
                             if (isLoggedIn)
                             {
-                                <div class="d-flex gap-4 align-items-center">
-
-                                <span>Hi, @username</span>
-                                    <a class="btn" href="/Order">History Order</a>
-                                <a class="btn btn-outline-danger btn-sm" href="/Auth/Logout">Logout</a>
+                                <div class="dropdown">
+                                    <button class="btn dropdown-toggle" type="button" id="dropdownMenu3" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-regular fa-user"></i> Hi, @username
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                        <a class="dropdown-item" href="/Order"><i class="fa-solid fa-clipboard me-2"></i> History Order</a>
+                                        <a class="dropdown-item" href="/Auth/Logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a>
+                                    </ul>
                                 </div>
                             }
                             else

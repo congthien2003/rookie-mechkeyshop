@@ -13,6 +13,7 @@ namespace Application
             service.AddScoped<IApplicaionUserService, ApplicationUserService>();
             service.AddScoped<IAuthenticationService, AuthenticationService>();
             service.AddScoped<IProductService, ProductService>();
+            service.AddScoped<IProductSalesTracker, ProductSalesTracker>();
             service.AddScoped<IProductRatingService, ProductRatingService>();
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IJwtManager, JwtManager>();

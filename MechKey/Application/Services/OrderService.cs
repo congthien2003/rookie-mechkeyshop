@@ -3,8 +3,10 @@ using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
 using AutoMapper;
 using Domain.Entity;
+using Domain.Enum;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels;
@@ -17,16 +19,19 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
         private readonly IOrderUnitOfWork _unitOfWork;
+        private readonly IProductSalesTracker _productSalesTracker;
         public OrderService(
             IOrderUnitOfWork unitOfWork,
             IOrderRepository orderRepository,
             IMapper mapper,
-            ILogger<OrderService> logger)
+            ILogger<OrderService> logger,
+            IProductSalesTracker productSalesTracker)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _productSalesTracker = productSalesTracker;
         }
 
         public async Task<Result<OrderModel>> CreateOrder(CreateOrderModel model)
@@ -58,6 +63,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
+                _unitOfWork.Dispose();
                 _logger.LogError(ex, ex.Message);
                 throw new OrderHandleFailedException();
             }
@@ -89,7 +95,7 @@ namespace Application.Services
                 }
 
                 query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
-                var list = await Task.FromResult(query.ToList());
+                var list = await query.ToListAsync();
 
                 return list.Select(order => _mapper.Map<OrderModel>(order));
             }
@@ -102,34 +108,38 @@ namespace Application.Services
 
         public async Task<OrderModel> GetOrdersById(Guid orderId)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
-            if (order == null)
-                throw new OrderNotFoundException();
+            var order = await _orderRepository.GetByIdAsync(orderId)
+                ?? throw new OrderNotFoundException();
 
             return _mapper.Map<OrderModel>(order);
         }
 
         public async Task<OrderModel> UpdateOrder(UpdateInfoOrderModel model)
         {
+            var order = await _orderRepository.GetByIdAsync(model.Id)
+                ?? throw new OrderNotFoundException();
+
+            order.ChangeStatus(model.Status);
+            order.LastUpdatedAt = DateTime.UtcNow;
+
+            if (order.Status != Enum.Parse<OrderStatus>(model.Status)
+    && Enum.Parse<OrderStatus>(model.Status) == OrderStatus.Accepted)
+            {
+                await _productSalesTracker.ProductIncreaseSellCount(order.OrderItems);
+            }
+
             try
             {
-                var order = await _orderRepository.GetByIdAsync(model.Id);
-                if (order == null)
-                    throw new OrderNotFoundException();
-
-                // Update basic properties
-                order.ChangeStatus(model.Status);
-                order.LastUpdatedAt = DateTime.UtcNow;
-
-                var updated = await _orderRepository.UpdateAsync(order);
-                return _mapper.Map<OrderModel>(updated);
+                var updatedOrder = await _orderRepository.UpdateAsync(order);
+                return _mapper.Map<OrderModel>(updatedOrder);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "Failed to update order with ID {OrderId}", model.Id);
                 throw new OrderHandleFailedException();
             }
         }
+
 
         public async Task<bool> DeleteOrder(Guid orderId)
         {

@@ -12,6 +12,5 @@ namespace Application.Interfaces.IServices
         Task<Result> DeleteAsync(Guid id);
         Task<Result<IEnumerable<ProductModel>>> GetBestSellerAsync();
         Task<Result<PagedResult<ProductModel>>> GetAllAsync(PaginationReqModel pagiModel, string categoryId = "", string sortCol = "", bool ascOrder = true);
-
     }
 }

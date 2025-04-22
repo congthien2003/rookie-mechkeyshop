@@ -62,6 +62,17 @@ header {
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
+.dropdown-menu {
+    padding: 0;
+}
+
+.dropdown-menu .dropdown-item {
+    padding: 0.8rem 1rem;
+    font-size: 13px;
+    font-weight: 500;
+    color: #000;
+}
+
 .dropdown-category {
     padding: 0;
     margin-top: 10px !important;

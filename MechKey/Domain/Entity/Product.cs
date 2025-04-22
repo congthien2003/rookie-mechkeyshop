@@ -18,6 +18,7 @@ namespace Domain.Entity
         public Category Category { get; set; }
         public ICollection<ProductRating> ProductRatings { get; set; } = new List<ProductRating>();
         public string Variants { get; set; } = string.Empty;
+        public long SellCount { get; set; } = 0;
 
         /// <summary>
         /// Add rating to the product, you can add duplicate check here
@@ -39,5 +40,10 @@ namespace Domain.Entity
         public double AverageRating => ProductRatings.Any()
             ? Math.Round(ProductRatings.Average(r => r.Stars), 2)
             : 0;
+
+        public void IncreaseSellCount(int quantity)
+        {
+            SellCount += quantity;
+        }
     }
 }

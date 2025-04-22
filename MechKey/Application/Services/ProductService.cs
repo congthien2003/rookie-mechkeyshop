@@ -36,7 +36,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message.ToString());
                 throw new ProductHandleFailedException();
             }
         }
@@ -56,7 +56,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message.ToString());
                 throw new ProductHandleFailedException();
             }
         }
@@ -76,9 +76,9 @@ namespace Application.Services
                     query = query.Where(q => q.Category.Id.ToString() == categoryId);
                 }
 
-                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
+                if (!string.IsNullOrEmpty(pagiModel.SearchTerm.ToString()))
                 {
-                    query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm));
+                    query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm.ToString()));
                 }
 
                 if (!string.IsNullOrEmpty(sortCol))
@@ -87,12 +87,12 @@ namespace Application.Services
                     {
                         case "price":
                             {
-                                query = ascOrder ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+                                query = ascOrder ? query.OrderBy(p => p.Price.ToString()) : query.OrderByDescending(p => p.Price.ToString());
                                 break;
                             }
                         case "createdAt":
                             {
-                                query = ascOrder ? query.OrderBy(p => p.CreatedAt) : query.OrderByDescending(p => p.CreatedAt);
+                                query = ascOrder ? query.OrderBy(p => p.CreatedAt.ToString()) : query.OrderByDescending(p => p.CreatedAt.ToString());
                                 break;
                             }
                         default:
@@ -123,7 +123,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message.ToString());
                 throw new ProductNotFoundException();
             }
         }
@@ -134,7 +134,7 @@ namespace Application.Services
             {
                 var query = _repository.GetAllAsync();
                 var items = await query
-                    .OrderBy(p => p.CreatedAt)
+                    .OrderByDescending(p => p.SellCount)
                     .Take(4)
                     .Include(p => p.Category)
                     .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
@@ -144,7 +144,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message.ToString());
                 throw new ProductNotFoundException();
             }
         }
@@ -161,6 +161,7 @@ namespace Application.Services
                 mapper.Map<ProductModel>(entity));
         }
 
+
         public async Task<Result<ProductModel>> UpdateAsync(ProductModel model)
         {
             try
@@ -169,10 +170,10 @@ namespace Application.Services
                 if (entity == null)
                     throw new ProductNotFoundException();
 
-                entity.Name = model.Name;
-                entity.Description = model.Description;
+                entity.Name = model.Name.ToString();
+                entity.Description = model.Description.ToString();
                 entity.Price = model.Price;
-                entity.ImageUrl = model.ImageUrl;
+                entity.ImageUrl = model.ImageUrl.ToString();
                 entity.LastUpdatedAt = DateTime.UtcNow;
 
                 var result = await _repository.UpdateAsync(entity);
@@ -181,7 +182,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message.ToString());
 
                 throw new ProductHandleFailedException();
             }
