@@ -1,7 +1,8 @@
 ﻿@{
-    @using Shared.ViewModels;
+    @    using Shared.ViewModels;
+    using Shared.ViewModels.Category;
     ViewData["Title"] = "Home Page";
-    IEnumerable<Shared.ViewModels.CategoryModel> listCategory = ViewBag.listCategory;
+    IEnumerable<CategoryModel> listCategory = ViewBag.listCategory;
     IEnumerable<ProductModel> listBestSeller = ViewBag.listBestSeller;
 
 }

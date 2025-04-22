@@ -5,7 +5,7 @@ using Domain.Entity;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Category;
 
 namespace Application.Services
 {
@@ -20,11 +20,15 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public async Task<Result<CategoryModel>> AddAsync(CategoryModel model)
+        public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model)
         {
             try
             {
-                var entity = _mapper.Map<Category>(model);
+                var entity = new Category()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = model.Name,
+                };
                 var newEntity = await _repository.CreateAsync(entity);
                 return Result<CategoryModel>.Success("Add category success", _mapper.Map<CategoryModel>(newEntity));
             }
@@ -61,16 +65,16 @@ namespace Application.Services
 
                 if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
                 {
-                    query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm, StringComparison.OrdinalIgnoreCase));
+                    query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
                 }
 
-                var totalCount = query.Count();
+
                 var items = await query
                     .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                     .Take(pagiModel.PageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
                     .ToListAsync();
-
+                int totalCount = items.Count;
                 return Result<PagedResult<CategoryModel>>.Success("Get category list success", new PagedResult<CategoryModel>
                 {
                     Items = items,

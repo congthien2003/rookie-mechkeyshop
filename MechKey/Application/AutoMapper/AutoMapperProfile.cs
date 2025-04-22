@@ -4,6 +4,7 @@ using Domain.Enum;
 using Newtonsoft.Json;
 using Shared.ViewModels;
 using Shared.ViewModels.Auth;
+using Shared.ViewModels.Category;
 
 namespace Infrastructure.Helpers
 {
