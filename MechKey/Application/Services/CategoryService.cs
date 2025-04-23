@@ -68,13 +68,13 @@ namespace Application.Services
                     query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
                 }
 
+                int totalCount = query.ToList().Count;
 
                 var items = await query
                     .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                     .Take(pagiModel.PageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
                     .ToListAsync();
-                int totalCount = items.Count;
                 return Result<PagedResult<CategoryModel>>.Success("Get category list success", new PagedResult<CategoryModel>
                 {
                     Items = items,

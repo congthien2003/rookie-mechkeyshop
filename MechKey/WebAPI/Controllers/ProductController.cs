@@ -19,7 +19,8 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> Get(int page = 1,
+        public async Task<IActionResult> Get(
+            int page = 1,
             int pageSize = 10,
             string searchTerm = "",
             string categoryId = "",
@@ -45,10 +46,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateProductModel model)
+        public async Task<IActionResult> Create([FromForm] CreateProductModel model)
         {
-            var result = await productService.AddAsync(model);
-            return Ok(result);
+            var file = model.Image;
+            return Ok(file);
+            //var result = await productService.AddAsync(model);
+            //return Ok(result);
         }
 
         [HttpPut]

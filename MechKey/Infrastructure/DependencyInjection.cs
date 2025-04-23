@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
+using Infrastructure.ApiClient;
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;
 using MechkeyShop.Data;
@@ -26,6 +27,8 @@ namespace Infrastructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
             services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
+
+            services.AddScoped<ISupabaseService, SupabaseService>();
             return services;
         }
     }

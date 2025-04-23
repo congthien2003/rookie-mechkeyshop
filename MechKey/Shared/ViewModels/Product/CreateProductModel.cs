@@ -1,4 +1,6 @@
-﻿namespace Shared.ViewModels.Product
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Shared.ViewModels.Product
 {
     public class CreateProductModel
     {
@@ -8,6 +10,7 @@
         public string ImageUrl { get; set; }
         public Guid CategoryId { get; set; }
         public List<VariantAttribute> Variants { get; set; } = new List<VariantAttribute>();
+        public IFormFile Image { get; set; }
 
     }
 }
