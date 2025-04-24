@@ -1,0 +1,51 @@
+﻿@using Shared.ViewModels.Category
+@model IEnumerable<CategoryModel>
+
+<li class="header__nav-item position-relative btn-category">
+    <a class="header__nav-link" href="#" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+        Instock
+    </a>
+
+    <ul class="dropdown-menu dropdown-category" aria-labelledby="dropdownMenu2">
+        @foreach (var category in Model)
+        {
+            <li>
+                <a class="dropdown-item" asp-controller="Product" asp-action="Index" asp-route-categoryId="@category.Id">
+                    @category.Name
+                </a>
+            </li>
+        }
+    </ul>
+</li>
+
+
+<style>
+
+    .btn-category:hover .dropdown-category {
+        display: block;
+    }
+
+    .dropdown-category {
+        position: absolute;
+        content: "";
+        top: 90%;
+        left: 0;
+        border-radius: 10px;
+        display: none;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+    // JS để hiện dropdown khi hover
+    const dropdown = document.querySelector('.header__nav-item.dropdown');
+    dropdown.addEventListener('mouseenter', () => {
+        const menu = dropdown.querySelector('.dropdown-menu');
+        new bootstrap.Dropdown(dropdown.querySelector('[data-bs-toggle="dropdown"]')).show();
+    });
+    dropdown.addEventListener('mouseleave', () => {
+        const menu = dropdown.querySelector('.dropdown-menu');
+        new bootstrap.Dropdown(dropdown.querySelector('[data-bs-toggle="dropdown"]')).hide();
+    });
+
+</script>
