@@ -3,7 +3,7 @@ using MechkeyShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
-using Shared.ViewModels;
+using Shared.ViewModels.Product;
 
 namespace MechkeyShop.Controllers
 {

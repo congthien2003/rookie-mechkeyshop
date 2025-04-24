@@ -1,5 +1,6 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IServices;
+using Application.Interfaces.IUnitOfWork;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.Entity;
@@ -18,21 +19,58 @@ namespace Application.Services
         private readonly IProductRepository<Product> _repository;
         private readonly IMapper mapper;
         private readonly ILogger<ProductService> logger;
+        private readonly IProductUnitOfWork unitOfWork;
+        private readonly ISupabaseService supabaseService;
         public ProductService(IProductRepository<Product> repository,
             IMapper mapper,
-            ILogger<ProductService> logger)
+            ILogger<ProductService> logger,
+            IProductUnitOfWork unitOfWork,
+            ISupabaseService supabaseService)
         {
             _repository = repository;
             this.mapper = mapper;
             this.logger = logger;
+            this.unitOfWork = unitOfWork;
+            this.supabaseService = supabaseService;
         }
 
         public async Task<Result<ProductModel>> AddAsync(CreateProductModel model)
         {
             try
             {
+                var img = model.Base64String.Split("data:image/png;base64,");
+                byte[] imageBytes = Convert.FromBase64String(img[1]);
+
+                var uploadImageResponse = await supabaseService.UploadImage(imageBytes);
+
                 var entity = mapper.Map<Product>(model);
-                var newEntity = await _repository.CreateAsync(entity);
+
+                if (uploadImageResponse.IsSuccess)
+                {
+
+                    ProductImage productImage = new ProductImage()
+                    {
+                        FilePath = uploadImageResponse.Data.FilePath,
+                        Url = uploadImageResponse.Data.PublicUrl,
+                        ProductId = entity.Id,
+                        IsDeleted = false,
+                        CreatedAt = DateTime.UtcNow,
+                        LastUpdatedAt = DateTime.UtcNow,
+                    };
+
+                    await unitOfWork.ProductImageRepository.CreateAsync(productImage);
+                }
+                else
+                {
+                    throw new ProductImageHandleFailedException();
+                }
+
+                entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
+
+                var newEntity = await unitOfWork.ProductRepository.CreateAsync(entity);
+
+                await unitOfWork.SaveChangesAsync();
+
                 return Result<ProductModel>.Success("Add product success", mapper.Map<ProductModel>(newEntity));
             }
             catch (Exception ex)

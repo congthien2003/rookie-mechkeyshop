@@ -4,6 +4,7 @@ using Domain.Enum;
 using Newtonsoft.Json;
 using Shared.ViewModels.Auth;
 using Shared.ViewModels.Category;
+using Shared.ViewModels.ImageUpload;
 using Shared.ViewModels.Order;
 using Shared.ViewModels.Product;
 
@@ -58,6 +59,8 @@ namespace Infrastructure.Helpers
                 .ForMember(dest => dest.Option, opt =>
                 opt.MapFrom(src => JsonConvert.DeserializeObject<VariantAttribute>(src.Option)))
                 .ReverseMap();
+
+            CreateMap<ProductImage, ProductImageModel>().ReverseMap();
 
         }
     }

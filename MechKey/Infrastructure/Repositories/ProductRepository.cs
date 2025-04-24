@@ -17,7 +17,6 @@ namespace Infrastructure.Repositories
         public async Task<Product> CreateAsync(Product entity)
         {
             var result = await context.Products.AddAsync(entity);
-            await context.SaveChangesAsync();
             return result.Entity;
         }
 

@@ -15,6 +15,7 @@ namespace Application
             service.AddScoped<IProductService, ProductService>();
             service.AddScoped<IProductSalesTracker, ProductSalesTracker>();
             service.AddScoped<IProductRatingService, ProductRatingService>();
+            service.AddScoped<IProductImageService, ProductImageService>();
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IJwtManager, JwtManager>();
             service.AddScoped<IOrderService, OrderService>();

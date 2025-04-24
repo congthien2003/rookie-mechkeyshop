@@ -36,5 +36,14 @@ namespace Domain.Exceptions
 
     }
 
+    public class ProductImageHandleFailedException : ProductException
+    {
+        public ProductImageHandleFailedException()
+        {
+            Type = Enum.ExceptionType.HANDLED_FAILED;
+            Message = "Product Image handle failed";
+        }
+    }
+
 
 }

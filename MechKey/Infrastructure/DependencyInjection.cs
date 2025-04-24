@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.IUnitOfWork;
+﻿using Application.Interfaces.IServices;
+using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
 using Infrastructure.ApiClient;
@@ -27,7 +28,8 @@ namespace Infrastructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
             services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
-
+            services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
+            services.AddScoped<IProductImageRepository, ProductImageRepository>();
             services.AddScoped<ISupabaseService, SupabaseService>();
             return services;
         }

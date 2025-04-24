@@ -48,10 +48,8 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CreateProductModel model)
         {
-            var file = model.Image;
-            return Ok(file);
-            //var result = await productService.AddAsync(model);
-            //return Ok(result);
+            var result = await productService.AddAsync(model);
+            return Ok(result);
         }
 
         [HttpPut]
