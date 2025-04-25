@@ -1,13 +1,14 @@
-import { configureStore } from "@reduxjs/toolkit";
-import loadingReducer from "./loadingSlice";
-import authReducer from "./authSlice";
+// store.ts
+import { create } from "zustand";
 
-export const store = configureStore({
-	reducer: {
-		loading: loadingReducer,
-		auth: authReducer,
-	},
-});
+interface LoadingState {
+	isLoading: boolean;
+	showLoading: () => void;
+	hideLoading: () => void;
+}
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export const useLoadingStore = create<LoadingState>((set) => ({
+	isLoading: false,
+	showLoading: () => set({ isLoading: true }),
+	hideLoading: () => set({ isLoading: false }),
+}));

@@ -15,3 +15,12 @@ export interface Product {
 	variants: Variant[];
 	isDeleted: boolean;
 }
+
+export interface CreateProduct {
+	name: string;
+	description: string;
+	price: number;
+	categoryId: string;
+	variants: Variant[];
+	base64string: string;
+}

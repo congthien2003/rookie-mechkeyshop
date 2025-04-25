@@ -1,11 +1,7 @@
+import { useLoadingStore } from "@/store/store";
 import "./loader.css";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 const Loader = () => {
-	const isLoading = useSelector(
-		(state: RootState) => state.loading.isLoading
-	);
-
+	const isLoading = useLoadingStore((state) => state.isLoading);
 	if (!isLoading) return null;
 
 	return (

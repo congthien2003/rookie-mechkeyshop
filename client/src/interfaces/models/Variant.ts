@@ -1,4 +1,4 @@
 export interface Variant {
 	name: string;
-	value: string;
+	value: string[];
 }
