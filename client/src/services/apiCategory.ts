@@ -16,10 +16,10 @@ const getList = async (
 		const response = await api.get(
 			`/category/list?page=${page}&pageSize=${pageSize}&searchTerm=${searchTerm}&asc=${asc}`
 		);
-		return response.data;
+		return response.data as ResultPagination<Category>;
 	} catch (error) {
 		console.error(error);
-		return [];
+		throw new Error("Fetch Failed");
 	}
 };
 
