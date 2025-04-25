@@ -1,7 +1,6 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IServices;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
 using Shared.ViewModels.Auth;
@@ -22,7 +21,7 @@ namespace WebAPI.Controllers
 
 
         [HttpGet("list")]
-        [Authorize(Roles = "1")]
+        /*[Authorize(Roles = "1")]*/
         public async Task<Result<PagedResult<ApplicationUserModel>>> GetListUser(int page = 1, int pageSize = 10, string searchTerm = "", bool isDeleted = false)
         {
             var result = await applicationUserService.GetAllAsync(page, pageSize, searchTerm);

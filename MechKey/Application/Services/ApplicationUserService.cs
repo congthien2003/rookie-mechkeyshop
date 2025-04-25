@@ -70,7 +70,7 @@ namespace Application.Services
 
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    query = query.Where(u => u.Name.Contains(searchTerm));
+                    query = query.Where(u => u.Name.Contains(searchTerm) || u.Email.Contains(searchTerm));
                 }
 
                 var totalCount = query.Count();
