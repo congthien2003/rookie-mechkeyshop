@@ -36,8 +36,8 @@ export function AppSidebar() {
 
 	return (
 		<div className="flex h-[100vh] m-w-64 w-64 flex-col border-r bg-background">
-			<div className="flex h-14 items-center border-b px-4">
-				<h1 className="text-lg font-semibold">Admin Panel</h1>
+			<div className="flex h-16 items-center border-b px-4">
+				<h1 className="text-lg font-bold">Admin - MechkeyShop</h1>
 			</div>
 			<nav className="flex-1 space-y-1 p-2">
 				{items.map((item) => {

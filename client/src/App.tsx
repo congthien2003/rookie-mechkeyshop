@@ -3,18 +3,23 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage.tsx";
 import AdminLayout from "./layout/AdminLayout.tsx";
 import AuthLayout from "./layout/AuthLayout.tsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
-import AdminOrder from "./pages/admin/AdminOrder.tsx";
+import AdminDashboard from "./pages/admin/dashboard/AdminDashboard.tsx";
+import AdminOrder from "./pages/admin/order/AdminOrder.tsx";
 import RegisterPage from "./pages/auth/RegisterPage.tsx";
-import AdminProduct from "./pages/admin/AdminProduct.tsx";
-import AdminCategory from "./pages/admin/AdminCategory.tsx";
-import AdminUser from "./pages/admin/AdminUser.tsx";
+import AdminProduct from "./pages/admin/product/AdminProduct.tsx";
+import AdminCategory from "./pages/admin/category/AdminCategory.tsx";
+import AdminUser from "./pages/admin/user/AdminUser.tsx";
 import { Toaster } from "react-hot-toast";
+import PageTest from "./pages/admin/PageTest.tsx";
+import Loader from "./components/loader/loader.tsx";
 function App() {
 	return (
 		<>
+			<Loader />
+
 			<BrowserRouter>
 				<Routes>
+					<Route path="/" element={<PageTest />} />
 					{/* Layout Admin */}
 					<Route path="/admin" element={<AdminLayout />}>
 						<Route index element={<AdminDashboard />} />

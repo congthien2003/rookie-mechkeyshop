@@ -1,4 +1,3 @@
-import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 
 interface CustomTableProps<T> {
@@ -28,7 +27,7 @@ function CustomTable<T>({ data, columns, onRowClick }: CustomTableProps<T>) {
 						data.map((row, rowIndex) => (
 							<tr
 								key={rowIndex}
-								className={`hover:bg-gray-50 cursor-pointer transition-colors ${
+								className={`hover:bg-gray-50 cursor-pointer transition-colors h-[100px] ${
 									onRowClick ? "cursor-pointer" : ""
 								}`}
 								onClick={() => onRowClick && onRowClick(row)}>
