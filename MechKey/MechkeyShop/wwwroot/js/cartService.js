@@ -88,7 +88,7 @@ var renderCart = function () {
                             </div>
                             <div class="item--info">
                                 <p class="info-name">${item.productName}</p>
-                                <p class="info-category">${item.option ? `${item.option.id} : ${item.option.value}` : "None"} </p>
+                                <p class="info-category">${item.option ? `${item.option.name} : ${item.option.value}` : "None"} </p>
                             </div>
                             <div class="item--price">
                                $ ${item.price}

@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateProductModel model)
+        public async Task<IActionResult> Create(CreateProductModel model)
         {
             var result = await productService.AddAsync(model);
             return Ok(result);

@@ -127,20 +127,17 @@
             <div id="variant-options">
                 @if (Model.Variants != null)
                 {
-                    var grouped = Model.Variants
-                    .GroupBy(attr => attr.Name)
-                    .ToDictionary(g => g.Key, g => g.Select(x => x.Value).Distinct().ToList());
-                    foreach (var group in grouped)
+                    foreach (var group in Model.Variants)
                     {
                         <span>
-                            <label class="variants">@group.Key</label>
+                            <label class="variants">@group.Name</label>
                         </span>
                         foreach (var value in group.Value)
                         {
                             <button 
                                 class="btn-options me-2"
                                 onclick="chooseOption(event)"
-                                data-variant-id="@group.Key"
+                                data-variant-id="@group.Name"
                                 data-variant-value="@value"
                             >
                                     @value

@@ -151,7 +151,7 @@ namespace Application.Services
                     .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
                     .ToListAsync();
 
-                return Result<PagedResult<ProductModel>>.Success("Get List user success", new PagedResult<ProductModel>
+                return Result<PagedResult<ProductModel>>.Success("Get list product success", new PagedResult<ProductModel>
                 {
                     Items = items,
                     TotalItems = totalCount,
