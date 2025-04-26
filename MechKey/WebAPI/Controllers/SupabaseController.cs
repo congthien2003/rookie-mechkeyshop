@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.IServices;
+﻿using Application.Interfaces.IApiClient.Supabase;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers

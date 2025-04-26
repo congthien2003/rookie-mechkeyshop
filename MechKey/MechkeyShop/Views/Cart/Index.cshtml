@@ -36,7 +36,7 @@
                     }
                     else
                     {
-                                    <a class="btn btn-gradient-blue-purple w-100 mt-2"  asp-action="Login" asp-controller="Auth">Please login to checkout</a>
+                        <a class="btn btn-gradient-blue-purple w-100 mt-2" href="@Url.Action("Login", "Auth", new { returnUrl = "/cart/checkout" })">Please login to checkout</a>
                     }
                 }
             </div>

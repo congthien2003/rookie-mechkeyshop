@@ -1,7 +1,7 @@
 ﻿using Application.Comoon;
 using Shared.ViewModels.ImageUpload;
 
-namespace Application.Interfaces.IServices
+namespace Application.Interfaces.IApiClient.Supabase
 {
     public interface ISupabaseService
     {

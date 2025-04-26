@@ -1,4 +1,6 @@
 ﻿using Application.Comoon;
+using Application.Events;
+using Application.Interfaces.IApiClient.MassTransit;
 using Application.Interfaces.IServices;
 using Application.Services.Common;
 using AutoMapper;
@@ -12,12 +14,15 @@ namespace Application.Services
     {
         private readonly IApplicationUserRepository<ApplicationUser> applicationUserRepository;
         private readonly IMapper mapper;
+        private readonly IEventBus eventBus;
 
         public AuthenticationService(IApplicationUserRepository<ApplicationUser> _applicationUserRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IEventBus eventBus)
         {
             applicationUserRepository = _applicationUserRepository;
             this.mapper = mapper;
+            this.eventBus = eventBus;
         }
 
         public async Task<Result<ApplicationUserModel>> Login(LoginModel model)
@@ -62,6 +67,14 @@ namespace Application.Services
                 entity.Password = Hashing.HashPasword(entity.Password, out var salt);
                 entity.Salting = Convert.ToBase64String(salt);
                 var newEntity = await applicationUserRepository.CreateAsync(entity);
+
+                Console.WriteLine("Publish Event Register Success !!!");
+                await eventBus.PublishAsync(new RegisterSuccessEvent
+                {
+                    UserId = newEntity.Id,
+                    Email = newEntity.Email,
+                });
+
                 return Result.Success("Register success");
             }
             catch (Exception ex)

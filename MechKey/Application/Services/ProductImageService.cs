@@ -1,4 +1,5 @@
 ﻿using Application.Comoon;
+using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IServices;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;

@@ -31,5 +31,11 @@ namespace Domain.Entity
         public int RoleId { get; set; }
         public UserRole UserRoles { get; set; }
         public ICollection<Order> Orders { get; set; }
+
+
+        public void ChangeEmailConfirm(bool status)
+        {
+            IsEmailConfirmed = status;
+        }
     }
 }

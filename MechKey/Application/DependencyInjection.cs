@@ -19,6 +19,9 @@ namespace Application
             service.AddScoped<ICategoryService, CategoryService>();
             service.AddScoped<IJwtManager, JwtManager>();
             service.AddScoped<IOrderService, OrderService>();
+
+
+
             return service;
         }
     }

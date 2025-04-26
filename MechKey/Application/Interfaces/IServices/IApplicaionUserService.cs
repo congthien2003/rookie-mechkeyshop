@@ -11,6 +11,8 @@ namespace Application.Interfaces.IServices
         Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user);
         Task<Result> DeleteAsync(Guid id);
         Task<Result<PagedResult<ApplicationUserModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "");
+        Task<Result<ApplicationUserModel>> UpdateEmailConfirmAsync(Guid id);
+
 
     }
 }

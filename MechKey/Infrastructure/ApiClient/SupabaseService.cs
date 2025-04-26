@@ -1,5 +1,5 @@
 ﻿using Application.Comoon;
-using Application.Interfaces.IServices;
+using Application.Interfaces.IApiClient.Supabase;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Shared.ViewModels.ImageUpload;

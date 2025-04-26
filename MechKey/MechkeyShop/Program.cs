@@ -1,5 +1,7 @@
 ﻿using Application;
 using Infrastructure;
+using Infrastructure.ApiClient.Consumer;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -52,6 +54,33 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JwtSettings:Key").Value!))
     };
 });
+
+builder.Services.AddMassTransit(busConfigurator =>
+{
+    busConfigurator.SetKebabCaseEndpointNameFormatter();
+
+    busConfigurator.AddConsumer<RequestEmailConsumer>();
+
+    busConfigurator.UsingRabbitMq((context, config) =>
+    {
+
+        config.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        config.ConfigureEndpoints(context);
+
+        config.ReceiveEndpoint("email", e =>
+        {
+            e.ConfigureConsumer<RequestEmailConsumer>(context);
+        });
+
+
+    });
+
+});
+
 
 builder.Services.AddAuthorization();
 

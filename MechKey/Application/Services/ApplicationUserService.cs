@@ -4,6 +4,7 @@ using Application.Services.Common;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.Entity;
+using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Shared.Common;
@@ -48,7 +49,7 @@ namespace Application.Services
             var entity = await applicationUserRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new Exception("Not found user to delete");
+                throw new UserNotFoundException();
             }
 
             try
@@ -99,7 +100,7 @@ namespace Application.Services
             var entity = await applicationUserRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new Exception("Not found user ");
+                throw new UserNotFoundException();
             }
             return Result<ApplicationUserModel>.Success("Get user by id success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
@@ -111,7 +112,7 @@ namespace Application.Services
             {
                 var entity = await applicationUserRepository.GetByIdAsync(user.Id);
                 if (entity == null)
-                    throw new KeyNotFoundException("Not found user by id");
+                    throw new UserNotFoundException();
 
                 entity.Name = user.Name;
                 entity.Email = user.Email;
@@ -127,6 +128,16 @@ namespace Application.Services
             {
                 throw new Exception("Update user failed");
             }
+        }
+
+        public async Task<Result<ApplicationUserModel>> UpdateEmailConfirmAsync(Guid id)
+        {
+            var user = await applicationUserRepository.GetByIdAsync(id) ?? throw new UserNotFoundException();
+            user.ChangeEmailConfirm(true);
+
+            var result = await applicationUserRepository.UpdateAsync(user);
+            return Result<ApplicationUserModel>.Success("Update user success",
+                   mapper.Map<ApplicationUser, ApplicationUserModel>(result));
         }
     }
 }

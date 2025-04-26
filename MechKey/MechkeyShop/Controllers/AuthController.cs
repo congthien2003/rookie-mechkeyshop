@@ -9,11 +9,13 @@ namespace MechkeyShop.Controllers
     {
         private readonly IJwtManager _jwtManager;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IApplicaionUserService _applicaionUserService;
 
-        public AuthController(IJwtManager jwtManager, IAuthenticationService authenticationService)
+        public AuthController(IJwtManager jwtManager, IAuthenticationService authenticationService, IApplicaionUserService applicaionUserService)
         {
             _jwtManager = jwtManager;
             _authenticationService = authenticationService;
+            _applicaionUserService = applicaionUserService;
         }
 
         // GET: AuthController
@@ -25,17 +27,21 @@ namespace MechkeyShop.Controllers
         // Get Login Page
         // Auth/Login
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl)
         {
+            ViewBag.returnUrl = returnUrl;
             return View();
         }
 
         // Post Login
         [HttpPost]
-        public async Task<IActionResult> LoginAsync(LoginModel model)
+        public async Task<IActionResult> LoginAsync(LoginModel model, string returnUrl)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.returnUrl = returnUrl;
                 return View(model);
+            }
             try
             {
                 var result = await _authenticationService.Login(model);
@@ -49,15 +55,17 @@ namespace MechkeyShop.Controllers
                     Secure = true,    // Only send over HTTPS
                     Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
                 });
-                Response.Cookies.Append("username", result.Data.Name.ToString(), new CookieOptions
-                {
-                    HttpOnly = true,  // Prevent JavaScript access
-                    Secure = true,    // Only send over HTTPS
-                    Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
-                });
+
+                // show toast
                 TempData[Toast.KEY] = "Login success";
                 TempData[Toast.MESSAGE] = "Shopping now!";
                 TempData[Toast.TYPE] = Toast.SUCCESS_TYPE;
+
+                if (returnUrl != null)
+                {
+                    return Redirect(returnUrl);
+                }
+
                 return RedirectToAction("Index", "Home");
 
             }
@@ -68,6 +76,7 @@ namespace MechkeyShop.Controllers
                 TempData[Toast.KEY] = "Login failed";
                 TempData[Toast.MESSAGE] = ex.Message;
                 TempData[Toast.TYPE] = Toast.ERROR_TYPE;
+                ViewBag.returnUrl = returnUrl;
                 return View(model);
 
             }
@@ -109,6 +118,15 @@ namespace MechkeyShop.Controllers
 
             return RedirectToAction("Index", "Home");
 
+        }
+
+        [HttpGet("confirm/{id:guid}")]
+        public async Task<IActionResult> ConfirmEmailAsync(Guid id)
+        {
+            // Change IsConfirmed user
+            var user = await _applicaionUserService.UpdateEmailConfirmAsync(id);
+            // -> Redirect to login page
+            return RedirectToAction("Login", "Auth");
         }
 
     }

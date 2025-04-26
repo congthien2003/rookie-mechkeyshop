@@ -1,4 +1,6 @@
-﻿using Application.Interfaces.IServices;
+﻿using Application.Interfaces.IApiClient.MassTransit;
+using Application.Interfaces.IApiClient.Supabase;
+using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
@@ -31,6 +33,12 @@ namespace Infrastructure
             services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
             services.AddScoped<IProductImageRepository, ProductImageRepository>();
             services.AddScoped<ISupabaseService, SupabaseService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            services.AddScoped<IEventBus, MassTransitService>();
+
+
+
             return services;
         }
     }
