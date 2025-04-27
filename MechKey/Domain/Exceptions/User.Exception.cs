@@ -16,6 +16,7 @@ namespace Domain.Exceptions
         }
     }
 
+
     public class UserHandleFailedException : UserException
     {
         public UserHandleFailedException()
@@ -35,12 +36,22 @@ namespace Domain.Exceptions
 
     }
 
-    public class UserImageHandleFailedException : UserException
+    public class UserEmailExistsException : UserException
     {
-        public UserImageHandleFailedException()
+        public UserEmailExistsException()
         {
-            Type = Enum.ExceptionType.HANDLED_FAILED;
-            Message = "User Image handle failed";
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Email is already in use";
         }
+
+    }
+    public class UserPhoneExistsException : UserException
+    {
+        public UserPhoneExistsException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Phone is already in use";
+        }
+
     }
 }

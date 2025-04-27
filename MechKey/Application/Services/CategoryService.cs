@@ -2,8 +2,10 @@
 using Application.Interfaces.IServices;
 using AutoMapper;
 using Domain.Entity;
+using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Category;
 
@@ -13,11 +15,16 @@ namespace Application.Services
     {
         private readonly ICategoryRepository<Category> _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<CategoryService> _logger;
 
-        public CategoryService(ICategoryRepository<Category> repository, IMapper mapper)
+        public CategoryService(
+            ICategoryRepository<Category> repository,
+            IMapper mapper,
+            ILogger<CategoryService> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model)
@@ -34,7 +41,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Add category failed", ex);
+                _logger.LogError(ex, "Error occurred in {Method}. Model: {Model}, Message: {Message}", nameof(AddAsync), model, ex.Message);
+                throw new CategoryHandleFailedException();
             }
         }
 
@@ -43,7 +51,8 @@ namespace Application.Services
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new KeyNotFoundException("Category not found");
+                _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(DeleteAsync), id);
+                throw new CategoryNotFoundException();
             }
 
             try
@@ -53,7 +62,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Delete category failed", ex);
+                _logger.LogError(ex, "Error occurred in {Method}. CategoryId: {CategoryId}, Message: {Message}", nameof(DeleteAsync), id, ex.Message);
+                throw new CategoryHandleFailedException();
             }
         }
 
@@ -86,19 +96,33 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Get category list failed", ex);
+                _logger.LogError(ex, "Error occurred in {Method}. Pagination: {Pagination}, Message: {Message}", nameof(GetAllAsync), pagiModel, ex.Message);
+                throw new Exception("Get category list failed");
             }
         }
 
         public async Task<Result<CategoryModel>> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null)
+            try
             {
-                throw new KeyNotFoundException("Category not found");
-            }
+                var entity = await _repository.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(GetByIdAsync), id);
+                    throw new CategoryNotFoundException();
+                }
 
-            return Result<CategoryModel>.Success("Get category by id success", _mapper.Map<CategoryModel>(entity));
+                return Result<CategoryModel>.Success("Get category by id success", _mapper.Map<CategoryModel>(entity));
+            }
+            catch (CategoryNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in {Method}. CategoryId: {CategoryId}, Message: {Message}", nameof(GetByIdAsync), id, ex.Message);
+                throw new CategoryHandleFailedException();
+            }
         }
 
         public async Task<Result<CategoryModel>> UpdateAsync(CategoryModel model)
@@ -107,7 +131,10 @@ namespace Application.Services
             {
                 var entity = await _repository.GetByIdAsync(model.Id);
                 if (entity == null)
-                    throw new KeyNotFoundException("Category not found");
+                {
+                    _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(UpdateAsync), model.Id);
+                    throw new CategoryNotFoundException();
+                }
 
                 entity.Name = model.Name;
                 entity.LastUpdatedAt = DateTime.UtcNow;
@@ -115,9 +142,14 @@ namespace Application.Services
                 var updatedEntity = await _repository.UpdateAsync(entity);
                 return Result<CategoryModel>.Success("Update category success", _mapper.Map<CategoryModel>(updatedEntity));
             }
+            catch (CategoryNotFoundException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
-                throw new Exception("Update category failed", ex);
+                _logger.LogError(ex, "Error occurred in {Method}. CategoryId: {CategoryId}, Message: {Message}", nameof(UpdateAsync), model.Id, ex.Message);
+                throw new CategoryHandleFailedException();
             }
         }
     }

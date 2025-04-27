@@ -7,6 +7,7 @@ using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Auth;
 
@@ -15,14 +16,17 @@ namespace Application.Services
     public class ApplicationUserService : IApplicaionUserService
     {
         private readonly IApplicationUserRepository<ApplicationUser> applicationUserRepository;
-
         private readonly IMapper mapper;
+        private readonly ILogger<ApplicationUserService> logger;
 
-        public ApplicationUserService(IApplicationUserRepository<ApplicationUser> applicationUserRepository,
-            IMapper mapper)
+        public ApplicationUserService(
+            IApplicationUserRepository<ApplicationUser> applicationUserRepository,
+            IMapper mapper,
+            ILogger<ApplicationUserService> logger)
         {
             this.applicationUserRepository = applicationUserRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         public async Task<Result<ApplicationUserModel>> AddAsync(RegisterModel user)
@@ -35,31 +39,58 @@ namespace Application.Services
                 var newEntity = await applicationUserRepository.CreateAsync(entity);
                 return Result<ApplicationUserModel>.Success(
                     "Add success",
-                    mapper.Map<ApplicationUser, ApplicationUserModel>(newEntity
-                    ));
+                    mapper.Map<ApplicationUser, ApplicationUserModel>(newEntity));
             }
             catch (Exception ex)
             {
-                throw new Exception("Add failed");
+                logger.LogError(ex, "Error occurred in {Method}. User: {User}, Message: {Message}", nameof(AddAsync), user, ex.Message);
+                throw new UserHandleFailedException();
+            }
+        }
+
+        public async Task<bool> CheckEmailAddressExists(string email, string phone)
+        {
+            try
+            {
+                var emailExists = await applicationUserRepository.GetByEmailAsync(email);
+                if (emailExists != null)
+                    throw new UserEmailExistsException();
+
+                var phoneExists = applicationUserRepository.CheckPhoneExists(phone);
+                if (phoneExists)
+                    throw new UserPhoneExistsException();
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred in {Method}. Email: {Email}, Phone: {Phone}, Message: {Message}", nameof(CheckEmailAddressExists), email, phone, ex.Message);
+                throw;
             }
         }
 
         public async Task<Result> DeleteAsync(Guid id)
         {
-            var entity = await applicationUserRepository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new UserNotFoundException();
-            }
-
             try
             {
+                var entity = await applicationUserRepository.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    throw new UserNotFoundException();
+                }
+
                 await applicationUserRepository.DeleteAsync(entity);
                 return Result.Success("Delete user success");
             }
+            catch (UserNotFoundException ex)
+            {
+                logger.LogWarning(ex, "User not found in {Method}. UserId: {UserId}", nameof(DeleteAsync), id);
+                throw;
+            }
             catch (Exception ex)
             {
-                throw new Exception("Delete user failed");
+                logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(DeleteAsync), id, ex.Message);
+                throw new UserHandleFailedException();
             }
         }
 
@@ -78,7 +109,7 @@ namespace Application.Services
                 var items = await query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
-                    .ProjectTo<ApplicationUserModel>(mapper.ConfigurationProvider) // AutoMapper
+                    .ProjectTo<ApplicationUserModel>(mapper.ConfigurationProvider)
                     .ToListAsync();
 
                 return Result<PagedResult<ApplicationUserModel>>.Success("Get List user success", new PagedResult<ApplicationUserModel>
@@ -91,19 +122,33 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Get list failed");
+                logger.LogError(ex, "Error occurred in {Method}. Page: {Page}, PageSize: {PageSize}, SearchTerm: {SearchTerm}, Message: {Message}", nameof(GetAllAsync), page, pageSize, searchTerm, ex.Message);
+                throw new Exception(nameof(GetAllAsync));
             }
         }
 
         public async Task<Result<ApplicationUserModel>> GetByIdAsync(Guid id)
         {
-            var entity = await applicationUserRepository.GetByIdAsync(id);
-            if (entity == null)
+            try
             {
-                throw new UserNotFoundException();
+                var entity = await applicationUserRepository.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    throw new UserNotFoundException();
+                }
+                return Result<ApplicationUserModel>.Success("Get user by id success",
+                    mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
             }
-            return Result<ApplicationUserModel>.Success("Get user by id success",
-                mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
+            catch (UserNotFoundException ex)
+            {
+                logger.LogWarning(ex, "User not found in {Method}. UserId: {UserId}", nameof(GetByIdAsync), id);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(GetByIdAsync), id, ex.Message);
+                throw new UserHandleFailedException();
+            }
         }
 
         public async Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user)
@@ -124,20 +169,39 @@ namespace Application.Services
                 return Result<ApplicationUserModel>.Success("Update user success",
                     mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
             }
+            catch (UserNotFoundException ex)
+            {
+                logger.LogWarning(ex, "User not found in {Method}. UserId: {UserId}", nameof(UpdateAsync), user.Id);
+                throw;
+            }
             catch (Exception ex)
             {
-                throw new Exception("Update user failed");
+                logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(UpdateAsync), user.Id, ex.Message);
+                throw new UserHandleFailedException();
             }
         }
 
         public async Task<Result<ApplicationUserModel>> UpdateEmailConfirmAsync(Guid id)
         {
-            var user = await applicationUserRepository.GetByIdAsync(id) ?? throw new UserNotFoundException();
-            user.ChangeEmailConfirm(true);
+            try
+            {
+                var user = await applicationUserRepository.GetByIdAsync(id) ?? throw new UserNotFoundException();
+                user.ChangeEmailConfirm(true);
 
-            var result = await applicationUserRepository.UpdateAsync(user);
-            return Result<ApplicationUserModel>.Success("Update user success",
-                   mapper.Map<ApplicationUser, ApplicationUserModel>(result));
+                var result = await applicationUserRepository.UpdateAsync(user);
+                return Result<ApplicationUserModel>.Success("Update user success",
+                       mapper.Map<ApplicationUser, ApplicationUserModel>(result));
+            }
+            catch (UserNotFoundException ex)
+            {
+                logger.LogWarning(ex, "User not found in {Method}. UserId: {UserId}", nameof(UpdateEmailConfirmAsync), id);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(UpdateEmailConfirmAsync), id, ex.Message);
+                throw new UserHandleFailedException();
+            }
         }
     }
 }

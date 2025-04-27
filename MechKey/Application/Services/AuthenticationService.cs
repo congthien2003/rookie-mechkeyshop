@@ -5,6 +5,7 @@ using Application.Interfaces.IServices;
 using Application.Services.Common;
 using AutoMapper;
 using Domain.Entity;
+using Domain.Exceptions;
 using Domain.IRepositories;
 using Shared.ViewModels.Auth;
 
@@ -27,60 +28,60 @@ namespace Application.Services
 
         public async Task<Result<ApplicationUserModel>> Login(LoginModel model)
         {
-            try
-            {
-                // Tìm user theo email hoặc username
-                var user = await applicationUserRepository.GetByEmailAsync(model.Email);
-                if (user == null)
-                {
-                    throw new InvalidDataException("Invalid email or password");
-                }
 
-                // Lấy salt từ DB và hash lại password nhập vào
-                var salt = Convert.FromBase64String(user.Salting);
-                var hashedInputPassword = Hashing.VerifyPassword(model.Password, user.Password, salt);
-
-                // So sánh password
-                if (!hashedInputPassword)
-                {
-                    throw new InvalidDataException("Invalid email or password");
-
-                }
-
-                // Nếu đúng thì trả về success (có thể kèm token hoặc thông tin user nếu cần)
-                return Result<ApplicationUserModel>.Success(
-                    "Login success",
-                    mapper.Map<ApplicationUser, ApplicationUserModel>(user)
-                    );
-            }
-            catch (Exception ex)
+            // Tìm user theo email hoặc username
+            var user = await applicationUserRepository.GetByEmailAsync(model.Email);
+            if (user == null)
             {
                 throw new InvalidDataException("Invalid email or password");
             }
+
+            // Lấy salt từ DB và hash lại password nhập vào
+            var salt = Convert.FromBase64String(user.Salting);
+            var hashedInputPassword = Hashing.VerifyPassword(model.Password, user.Password, salt);
+
+            // So sánh password
+            if (!hashedInputPassword)
+            {
+                throw new InvalidDataException("Invalid email or password");
+
+            }
+
+            // Nếu đúng thì trả về success (có thể kèm token hoặc thông tin user nếu cần)
+            return Result<ApplicationUserModel>.Success(
+                "Login success",
+                mapper.Map<ApplicationUser, ApplicationUserModel>(user)
+                );
+
         }
 
         public async Task<Result> Register(RegisterModel model)
         {
-            try
-            {
-                var entity = mapper.Map<RegisterModel, ApplicationUser>(model);
-                entity.Password = Hashing.HashPasword(entity.Password, out var salt);
-                entity.Salting = Convert.ToBase64String(salt);
-                var newEntity = await applicationUserRepository.CreateAsync(entity);
 
-                Console.WriteLine("Publish Event Register Success !!!");
-                await eventBus.PublishAsync(new RegisterSuccessEvent
-                {
-                    UserId = newEntity.Id,
-                    Email = newEntity.Email,
-                });
+            // Check phone and email exists
+            var checkPhoneExist = applicationUserRepository.CheckPhoneExists(model.Phones)
+                ? throw new UserPhoneExistsException() : "";
 
-                return Result.Success("Register success");
-            }
-            catch (Exception ex)
+            var checkEmailExist = await applicationUserRepository.GetByEmailAsync(model.Email);
+            if (checkEmailExist != null)
+                throw new UserEmailExistsException();
+
+            // Map
+            var entity = mapper.Map<RegisterModel, ApplicationUser>(model);
+
+            entity.Password = Hashing.HashPasword(entity.Password, out var salt);
+            entity.Salting = Convert.ToBase64String(salt);
+            var newEntity = await applicationUserRepository.CreateAsync(entity);
+
+            // Publish Event
+            await eventBus.PublishAsync(new RegisterSuccessEvent
             {
-                throw new InvalidDataException("Register failed");
-            }
+                UserId = newEntity.Id,
+                Email = newEntity.Email,
+            });
+
+            return Result.Success("Register success");
+
         }
     }
 }

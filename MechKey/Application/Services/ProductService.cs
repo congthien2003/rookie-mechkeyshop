@@ -18,21 +18,23 @@ namespace Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository<Product> _repository;
-        private readonly IMapper mapper;
-        private readonly ILogger<ProductService> logger;
-        private readonly IProductUnitOfWork unitOfWork;
-        private readonly ISupabaseService supabaseService;
-        public ProductService(IProductRepository<Product> repository,
+        private readonly IMapper _mapper;
+        private readonly ILogger<ProductService> _logger;
+        private readonly IProductUnitOfWork _unitOfWork;
+        private readonly ISupabaseService _supabaseService;
+
+        public ProductService(
+            IProductRepository<Product> repository,
             IMapper mapper,
             ILogger<ProductService> logger,
             IProductUnitOfWork unitOfWork,
             ISupabaseService supabaseService)
         {
             _repository = repository;
-            this.mapper = mapper;
-            this.logger = logger;
-            this.unitOfWork = unitOfWork;
-            this.supabaseService = supabaseService;
+            _mapper = mapper;
+            _logger = logger;
+            _unitOfWork = unitOfWork;
+            _supabaseService = supabaseService;
         }
 
         public async Task<Result<ProductModel>> AddAsync(CreateProductModel model)
@@ -42,14 +44,13 @@ namespace Application.Services
                 var img = model.Base64String.Split("data:image/png;base64,");
                 byte[] imageBytes = Convert.FromBase64String(img[1]);
 
-                var uploadImageResponse = await supabaseService.UploadImage(imageBytes);
+                var uploadImageResponse = await _supabaseService.UploadImage(imageBytes);
 
-                var entity = mapper.Map<Product>(model);
+                var entity = _mapper.Map<Product>(model);
 
                 if (uploadImageResponse.IsSuccess)
                 {
-
-                    ProductImage productImage = new ProductImage()
+                    ProductImage productImage = new ProductImage
                     {
                         FilePath = uploadImageResponse.Data.FilePath,
                         Url = uploadImageResponse.Data.PublicUrl,
@@ -59,7 +60,7 @@ namespace Application.Services
                         LastUpdatedAt = DateTime.UtcNow,
                     };
 
-                    await unitOfWork.ProductImageRepository.CreateAsync(productImage);
+                    await _unitOfWork.ProductImageRepository.CreateAsync(productImage);
                 }
                 else
                 {
@@ -68,35 +69,40 @@ namespace Application.Services
 
                 entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
 
-                var newEntity = await unitOfWork.ProductRepository.CreateAsync(entity);
+                var newEntity = await _unitOfWork.ProductRepository.CreateAsync(entity);
 
-                await unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
 
-                return Result<ProductModel>.Success("Add product success", mapper.Map<ProductModel>(newEntity));
+                return Result<ProductModel>.Success("Add product success", _mapper.Map<ProductModel>(newEntity));
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message.ToString());
+                _logger.LogError(ex, "Error occurred in {Method}. Model: {Model}, Message: {Message}", nameof(AddAsync), model, ex.Message);
                 throw new ProductHandleFailedException();
             }
         }
 
         public async Task<Result> DeleteAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new ProductNotFoundException();
-            }
-
             try
             {
+                var entity = await _repository.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(DeleteAsync), id);
+                    throw new ProductNotFoundException();
+                }
+
                 await _repository.DeleteAsync(entity);
                 return Result.Success("Delete product success");
             }
+            catch (ProductNotFoundException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message.ToString());
+                _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(DeleteAsync), id, ex.Message);
                 throw new ProductHandleFailedException();
             }
         }
@@ -116,9 +122,9 @@ namespace Application.Services
                     query = query.Where(q => q.Category.Id.ToString() == categoryId);
                 }
 
-                if (!string.IsNullOrEmpty(pagiModel.SearchTerm.ToString()))
+                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
                 {
-                    query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm.ToString()));
+                    query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm));
                 }
 
                 if (!string.IsNullOrEmpty(sortCol))
@@ -126,21 +132,14 @@ namespace Application.Services
                     switch (sortCol)
                     {
                         case "price":
-                            {
-                                query = ascOrder ? query.OrderBy(p => p.Price.ToString()) : query.OrderByDescending(p => p.Price.ToString());
-                                break;
-                            }
+                            query = ascOrder ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+                            break;
                         case "createdAt":
-                            {
-                                query = ascOrder ? query.OrderBy(p => p.CreatedAt.ToString()) : query.OrderByDescending(p => p.CreatedAt.ToString());
-                                break;
-                            }
+                            query = ascOrder ? query.OrderBy(p => p.CreatedAt) : query.OrderByDescending(p => p.CreatedAt);
+                            break;
                         default:
-                            {
-                                break;
-                            }
+                            break;
                     }
-
                 }
 
                 var totalCount = query.Count();
@@ -149,7 +148,7 @@ namespace Application.Services
                     .Take(pagiModel.PageSize)
                     .Include(p => p.Category)
                     .Include(p => p.ProductRatings)
-                    .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
+                    .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
                     .ToListAsync();
 
                 return Result<PagedResult<ProductModel>>.Success("Get list product success", new PagedResult<ProductModel>
@@ -163,8 +162,9 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message.ToString());
-                throw new ProductNotFoundException();
+                _logger.LogError(ex, "Error occurred in {Method}. Pagination: {Pagination}, CategoryId: {CategoryId}, SortCol: {SortCol}, AscOrder: {AscOrder}, Message: {Message}",
+                    nameof(GetAllAsync), pagiModel, categoryId, sortCol, ascOrder, ex.Message);
+                throw new ProductHandleFailedException();
             }
         }
 
@@ -177,30 +177,41 @@ namespace Application.Services
                     .OrderByDescending(p => p.SellCount)
                     .Take(4)
                     .Include(p => p.Category)
-                    .ProjectTo<ProductModel>(mapper.ConfigurationProvider) // AutoMapper
+                    .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
                     .ToListAsync();
 
                 return Result<IEnumerable<ProductModel>>.Success("Get Best seller", items);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message.ToString());
-                throw new ProductNotFoundException();
+                _logger.LogError(ex, "Error occurred in {Method}. Message: {Message}", nameof(GetBestSellerAsync), ex.Message);
+                throw new ProductHandleFailedException();
             }
         }
 
         public async Task<Result<ProductModel>> GetByIdAsync(Guid id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null)
+            try
             {
-                throw new ProductNotFoundException();
+                var entity = await _repository.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(GetByIdAsync), id);
+                    throw new ProductNotFoundException();
+                }
+
+                return Result<ProductModel>.Success("Get product by id success", _mapper.Map<ProductModel>(entity));
             }
-
-            return Result<ProductModel>.Success("Get product by id success",
-                mapper.Map<ProductModel>(entity));
+            catch (ProductNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(GetByIdAsync), id, ex.Message);
+                throw new ProductHandleFailedException();
+            }
         }
-
 
         public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model)
         {
@@ -208,23 +219,28 @@ namespace Application.Services
             {
                 var entity = await _repository.GetByIdAsync(model.Id);
                 if (entity == null)
+                {
+                    _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(UpdateAsync), model.Id);
                     throw new ProductNotFoundException();
+                }
 
-                entity.Name = model.Name.ToString();
-                entity.Description = model.Description.ToString();
+                entity.Name = model.Name;
+                entity.Description = model.Description;
                 entity.Price = model.Price;
-                entity.ImageUrl = model.ImageUrl.ToString();
+                entity.ImageUrl = model.ImageUrl;
                 entity.LastUpdatedAt = DateTime.UtcNow;
                 entity.Variants = JsonConvert.SerializeObject(model.Variants);
 
                 var result = await _repository.UpdateAsync(entity);
-                return Result<ProductModel>.Success("Update product success",
-                    mapper.Map<ProductModel>(entity));
+                return Result<ProductModel>.Success("Update product success", _mapper.Map<ProductModel>(result));
+            }
+            catch (ProductNotFoundException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message.ToString());
-
+                _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(UpdateAsync), model.Id, ex.Message);
                 throw new ProductHandleFailedException();
             }
         }

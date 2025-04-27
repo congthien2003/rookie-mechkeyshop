@@ -36,6 +36,16 @@ namespace Domain.Exceptions
 
     }
 
+    public class ProductDuplicateNameFailedException : ProductException
+    {
+        public ProductDuplicateNameFailedException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Product's name is already in use";
+        }
+
+    }
+
     public class ProductImageHandleFailedException : ProductException
     {
         public ProductImageHandleFailedException()

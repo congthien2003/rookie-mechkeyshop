@@ -38,7 +38,6 @@ namespace Application.Services
         {
             try
             {
-
                 var order = new Order
                 {
                     Id = Guid.NewGuid(),
@@ -64,7 +63,7 @@ namespace Application.Services
             catch (Exception ex)
             {
                 _unitOfWork.Dispose();
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(CreateOrder), model.UserId, ex.Message);
                 throw new OrderHandleFailedException();
             }
         }
@@ -101,54 +100,86 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "Error occurred in {Method}. Message: {Message}", nameof(GetAllOrders), ex.Message);
                 throw new OrderHandleFailedException();
             }
         }
 
         public async Task<OrderModel> GetOrdersById(Guid orderId)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId)
-                ?? throw new OrderNotFoundException();
-
-            return _mapper.Map<OrderModel>(order);
-        }
-
-        public async Task<OrderModel> UpdateOrder(UpdateInfoOrderModel model)
-        {
-            var order = await _orderRepository.GetByIdAsync(model.Id)
-                ?? throw new OrderNotFoundException();
-
-            order.ChangeStatus(model.Status);
-            order.LastUpdatedAt = DateTime.UtcNow;
-
-            if (order.Status != Enum.Parse<OrderStatus>(model.Status)
-    && Enum.Parse<OrderStatus>(model.Status) == OrderStatus.Accepted)
-            {
-                await _productSalesTracker.ProductIncreaseSellCount(order.OrderItems);
-            }
-
             try
             {
-                var updatedOrder = await _orderRepository.UpdateAsync(order);
-                return _mapper.Map<OrderModel>(updatedOrder);
+                var order = await _orderRepository.GetByIdAsync(orderId)
+                    ?? throw new OrderNotFoundException();
+
+                return _mapper.Map<OrderModel>(order);
+            }
+            catch (OrderNotFoundException)
+            {
+                _logger.LogWarning("Order not found in {Method}. OrderId: {OrderId}", nameof(GetOrdersById), orderId);
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to update order with ID {OrderId}", model.Id);
+                _logger.LogError(ex, "Error occurred in {Method}. OrderId: {OrderId}, Message: {Message}", nameof(GetOrdersById), orderId, ex.Message);
                 throw new OrderHandleFailedException();
             }
         }
 
+        public async Task<OrderModel> UpdateOrder(UpdateInfoOrderModel model)
+        {
+            try
+            {
+                var order = await _orderRepository.GetByIdAsync(model.Id)
+                    ?? throw new OrderNotFoundException();
+
+                order.ChangeStatus(model.Status);
+                order.LastUpdatedAt = DateTime.UtcNow;
+
+                if (order.Status != Enum.Parse<OrderStatus>(model.Status)
+                    && Enum.Parse<OrderStatus>(model.Status) == OrderStatus.Accepted)
+                {
+                    await _productSalesTracker.ProductIncreaseSellCount(order.OrderItems);
+                }
+
+                var updatedOrder = await _orderRepository.UpdateAsync(order);
+                return _mapper.Map<OrderModel>(updatedOrder);
+            }
+            catch (OrderNotFoundException)
+            {
+                _logger.LogWarning("Order not found in {Method}. OrderId: {OrderId}", nameof(UpdateOrder), model.Id);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in {Method}. OrderId: {OrderId}, Message: {Message}", nameof(UpdateOrder), model.Id, ex.Message);
+                throw new OrderHandleFailedException();
+            }
+        }
 
         public async Task<bool> DeleteOrder(Guid orderId)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
-            if (order == null)
-                throw new OrderNotFoundException();
+            try
+            {
+                var order = await _orderRepository.GetByIdAsync(orderId);
+                if (order == null)
+                {
+                    _logger.LogWarning("Attempted to delete non-existing order in {Method}. OrderId: {OrderId}", nameof(DeleteOrder), orderId);
+                    throw new OrderNotFoundException();
+                }
 
-            await _orderRepository.DeleteAsync(order);
-            return true;
+                await _orderRepository.DeleteAsync(order);
+                return true;
+            }
+            catch (OrderNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in {Method}. OrderId: {OrderId}, Message: {Message}", nameof(DeleteOrder), orderId, ex.Message);
+                throw new OrderHandleFailedException();
+            }
         }
 
         public async Task<IEnumerable<OrderModel>> GetAllOrdersByIdUser(Guid userId, PaginationReqModel pagiModel, string sortCol, bool ascending)
@@ -183,9 +214,10 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(GetAllOrdersByIdUser), userId, ex.Message);
                 throw new OrderHandleFailedException();
             }
         }
+
     }
 }

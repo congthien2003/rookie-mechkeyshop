@@ -13,6 +13,10 @@ namespace Infrastructure.Repositories
         {
             this.context = context;
         }
+        public bool CheckPhoneExists(string phone)
+        {
+            return context.ApplicationUsers.FirstOrDefault(x => x.Phones == phone) != null ? true : false;
+        }
 
         public async Task<ApplicationUser> CreateAsync(ApplicationUser entity)
         {
