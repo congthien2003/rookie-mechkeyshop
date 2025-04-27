@@ -52,12 +52,12 @@ namespace Infrastructure.Helpers
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price))
                 .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Product.ImageUrl))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
-                .ForMember(dest => dest.Option, opt => opt.MapFrom(src => JsonConvert.DeserializeObject<VariantAttribute>(src.Option)))
+                .ForMember(dest => dest.Option, opt => opt.MapFrom(src => JsonConvert.DeserializeObject<OrderItemVariant>(src.Option)))
                 .ReverseMap();
 
             CreateMap<OrderItem, CreateOrderItemViewModel>()
                 .ForMember(dest => dest.Option, opt =>
-                opt.MapFrom(src => JsonConvert.DeserializeObject<VariantAttribute>(src.Option)))
+                opt.MapFrom(src => JsonConvert.DeserializeObject<OrderItemVariant>(src.Option)))
                 .ReverseMap();
 
             CreateMap<ProductImage, ProductImageModel>().ReverseMap();

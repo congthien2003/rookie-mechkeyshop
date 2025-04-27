@@ -5,8 +5,10 @@ using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
 using Infrastructure.ApiClient;
+using Infrastructure.ApiClient.Consumer;
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;
+using MassTransit;
 using MechkeyShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +38,30 @@ namespace Infrastructure
             services.AddScoped<IEmailService, EmailService>();
 
             services.AddScoped<IEventBus, MassTransitService>();
+            services.AddMassTransit(busConfigurator =>
+            {
+                busConfigurator.SetKebabCaseEndpointNameFormatter();
 
+                busConfigurator.AddConsumer<RequestEmailConsumer>();
+
+                busConfigurator.UsingRabbitMq((context, config) =>
+                {
+
+                    config.Host("localhost", "/", h =>
+                    {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+
+                    config.ReceiveEndpoint("email", e =>
+                    {
+                        e.ConfigureConsumer<RequestEmailConsumer>(context);
+                    });
+
+
+                });
+
+            });
 
 
             return services;

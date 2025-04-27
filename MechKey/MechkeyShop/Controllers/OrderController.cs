@@ -52,7 +52,7 @@ namespace MechkeyShop.Controllers
                 SearchTerm = ""
             };
 
-            var listOrder = await orderService.GetAllOrdersByIdUser(Guid.Parse(userId), pagiModel, "", true);
+            var listOrder = await orderService.GetAllOrdersByIdUser(Guid.Parse(userId), pagiModel, "createdAt", false);
 
             return View(listOrder);
         }

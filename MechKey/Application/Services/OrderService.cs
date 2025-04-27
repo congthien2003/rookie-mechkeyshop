@@ -94,7 +94,7 @@ namespace Application.Services
                     }
                 }
 
-                query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
+                query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize).OrderBy(o => o.CreatedAt);
                 var list = await query.ToListAsync();
 
                 return list.Select(order => _mapper.Map<OrderModel>(order));

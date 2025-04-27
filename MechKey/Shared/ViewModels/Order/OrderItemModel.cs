@@ -1,6 +1,4 @@
-﻿using Shared.ViewModels.Product;
-
-namespace Shared.ViewModels.Order
+﻿namespace Shared.ViewModels.Order
 {
     public class OrderItemModel
     {
@@ -11,6 +9,12 @@ namespace Shared.ViewModels.Order
         public string ImageUrl { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
-        public VariantAttribute Option { get; set; }
+        public OrderItemVariant Option { get; set; }
+    }
+
+    public class OrderItemVariant
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 }

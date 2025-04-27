@@ -35,8 +35,9 @@ namespace MechkeyShop.Controllers
 
         // Post Login
         [HttpPost]
-        public async Task<IActionResult> LoginAsync(LoginModel model, string returnUrl)
+        public async Task<IActionResult> LoginAsync(LoginModel model, string returnUrl = "/")
         {
+            returnUrl = "/";
             if (!ModelState.IsValid)
             {
                 ViewBag.returnUrl = returnUrl;
@@ -50,6 +51,13 @@ namespace MechkeyShop.Controllers
 
                 // Add Token into Cookies
                 Response.Cookies.Append("accessToken", token, new CookieOptions
+                {
+                    HttpOnly = true,  // Prevent JavaScript access
+                    Secure = true,    // Only send over HTTPS
+                    Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
+                });
+
+                Response.Cookies.Append("username", result.Data.Name.ToString(), new CookieOptions
                 {
                     HttpOnly = true,  // Prevent JavaScript access
                     Secure = true,    // Only send over HTTPS
