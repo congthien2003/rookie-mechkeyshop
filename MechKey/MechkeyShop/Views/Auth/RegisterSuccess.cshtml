@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Registration Success";
+}
+<div class="container register-success">
+    <div class="text-center mt-5">
+        <h2 class="text-gradient-blue-purple">🎉 Registration Successful!</h2>
+        <p>Please check your email to confirm your account.</p>
+
+        <a class="btn btn-primary mt-4" href="/Auth/Login">Go to Login</a>
+
+    </div>
+</div>
+
+
+<style>
+
+</style>
+<!-- Optional: Auto Redirect to Login page after 5 seconds -->
+<script>
+    setTimeout(function() {
+        window.location.href = '/Auth/Login';
+    }, 5000);
+</script>

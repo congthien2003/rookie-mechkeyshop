@@ -128,6 +128,12 @@ namespace MechkeyShop.Controllers
 
         }
 
+        [HttpGet]
+        public IActionResult RegisterSuccess()
+        {
+            return View();
+        }
+
         [HttpGet("confirm/{id:guid}")]
         public async Task<IActionResult> ConfirmEmailAsync(Guid id)
         {
