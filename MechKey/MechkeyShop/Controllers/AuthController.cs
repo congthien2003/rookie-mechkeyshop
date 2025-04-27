@@ -35,9 +35,9 @@ namespace MechkeyShop.Controllers
 
         // Post Login
         [HttpPost]
-        public async Task<IActionResult> LoginAsync(LoginModel model, string returnUrl = "/")
+        public async Task<IActionResult> LoginAsync(LoginModel model, string returnUrl)
         {
-            returnUrl = "/";
+            returnUrl = returnUrl ?? "/";
             if (!ModelState.IsValid)
             {
                 ViewBag.returnUrl = returnUrl;
