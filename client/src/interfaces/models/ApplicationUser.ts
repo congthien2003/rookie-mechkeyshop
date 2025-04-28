@@ -1,12 +1,12 @@
 export default interface ApplicationUser {
-	Id: string;
-	Name: string;
-	Email: string;
-	IsEmailConfirm: boolean;
-	Phones: string;
-	Address: string;
-	RoleId: number;
-	IsDeleted: boolean;
-	CreatedAt: Date;
-	LastUpdated: Date;
+	id: string;
+	name: string;
+	email: string;
+	isEmailConfirmed: boolean;
+	phones: string;
+	address: string;
+	roleId: number;
+	isDeleted: boolean;
+	createdAt: Date;
+	lastUpdated: Date;
 }

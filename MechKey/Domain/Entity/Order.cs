@@ -15,6 +15,12 @@ namespace Domain.Entity
         public string Address { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+        public Order()
+        {
+            Id = Guid.NewGuid();
+            CreatedAt = DateTime.UtcNow;
+        }
+
         public void ChangeStatus(string status)
         {
             switch (status)

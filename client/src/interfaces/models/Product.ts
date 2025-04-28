@@ -22,5 +22,17 @@ export interface CreateProduct {
 	price: number;
 	categoryId: string;
 	variants: Variant[];
-	base64string: string;
+	imageData: string;
+}
+
+export interface EditProduct {
+	id: string;
+	name: string;
+	description: string;
+	price: number;
+	imageUrl: string;
+	categoryId: string;
+	variants: Variant[];
+	imageData: string;
+	isDeleted: boolean;
 }

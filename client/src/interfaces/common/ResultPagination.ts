@@ -12,14 +12,14 @@ export interface ResultPagination<T> {
 	data: DataType<T>;
 }
 
-export const ResultPaginationFail: ResultPagination<T> = {
-	isSuccess: false,
-	message: "Get fail",
-	data: {
-		items: [] as T[],
-		totalItems: 0,
-		totalPages: 0,
-		page: 0,
-		pageSize: 0,
-	},
-};
+// export const ResultPaginationFail: ResultPagination<T> = {
+// 	isSuccess: false,
+// 	message: "Get fail",
+// 	data: {
+// 		items: [] as T[],
+// 		totalItems: 0,
+// 		totalPages: 0,
+// 		page: 0,
+// 		pageSize: 0,
+// 	},
+// };

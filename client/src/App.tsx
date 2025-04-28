@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage.tsx";
 import AdminLayout from "./layout/AdminLayout.tsx";
 import AuthLayout from "./layout/AuthLayout.tsx";
@@ -19,7 +19,10 @@ function App() {
 
 			<BrowserRouter>
 				<Routes>
-					<Route path="/" element={<PageTest />} />
+					<Route
+						path="/"
+						element={<Navigate to="/admin" replace={true} />}
+					/>
 					{/* Layout Admin */}
 					<Route path="/admin" element={<AdminLayout />}>
 						<Route index element={<AdminDashboard />} />

@@ -1,8 +1,5 @@
 import { Result } from "@/interfaces/common/Result";
-import {
-	ResultPagination,
-	ResultPaginationFail,
-} from "@/interfaces/common/ResultPagination";
+import { ResultPagination } from "@/interfaces/common/ResultPagination";
 import { Category } from "@/interfaces/models/Category";
 import api from "@/lib/axios";
 

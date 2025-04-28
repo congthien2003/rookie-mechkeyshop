@@ -7,7 +7,10 @@
         public string Description { get; set; }
         public double Price { get; set; }
         public string ImageUrl { get; set; }
+        public string? ImageData { get; set; }
         public Guid CategoryId { get; set; }
         public List<VariantAttribute> Variants { get; set; } = new List<VariantAttribute>();
+        public bool IsDeleted { get; set; }
+
     }
 }

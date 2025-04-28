@@ -7,6 +7,6 @@
         public double Price { get; set; }
         public Guid CategoryId { get; set; }
         public List<VariantAttribute> Variants { get; set; } = new List<VariantAttribute>();
-        public string? Base64String { get; set; }
+        public string ImageData { get; set; }
     }
 }

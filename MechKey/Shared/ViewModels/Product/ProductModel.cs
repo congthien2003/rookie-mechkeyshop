@@ -13,5 +13,6 @@
         public double TotalRating { get; set; } = 0;
         public long SellCount { get; set; } = 0;
         public List<VariantAttribute> Variants { get; set; } = new List<VariantAttribute>();
+        public bool IsDeleted { get; set; }
     }
 }

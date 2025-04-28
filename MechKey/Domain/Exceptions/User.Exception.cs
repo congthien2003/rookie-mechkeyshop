@@ -54,4 +54,14 @@ namespace Domain.Exceptions
         }
 
     }
+
+    public class UserNotConfirmEmailException : UserException
+    {
+        public UserNotConfirmEmailException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Your email is not confirmed. Please check your inbox to confirm it.";
+        }
+
+    }
 }

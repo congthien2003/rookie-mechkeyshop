@@ -1,4 +1,6 @@
 ﻿using Application.Comoon;
+using Application.Events;
+using Application.Interfaces.IApiClient.MassTransit;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Shared.Common;
+using Shared.ViewModels.ImageUpload;
 using Shared.ViewModels.Product;
 
 namespace Application.Services
@@ -22,30 +25,32 @@ namespace Application.Services
         private readonly ILogger<ProductService> _logger;
         private readonly IProductUnitOfWork _unitOfWork;
         private readonly ISupabaseService _supabaseService;
+        private readonly IEventBus _eventBus;
 
         public ProductService(
             IProductRepository<Product> repository,
             IMapper mapper,
             ILogger<ProductService> logger,
             IProductUnitOfWork unitOfWork,
-            ISupabaseService supabaseService)
+            ISupabaseService supabaseService,
+            IEventBus eventBus)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
             _unitOfWork = unitOfWork;
             _supabaseService = supabaseService;
+            _eventBus = eventBus;
         }
 
         public async Task<Result<ProductModel>> AddAsync(CreateProductModel model)
         {
+            // Upload image on cloud
+            var uploadImageResponse = await UploadFileAsync(model.ImageData);
+
             try
             {
-                var img = model.Base64String.Split("data:image/png;base64,");
-                byte[] imageBytes = Convert.FromBase64String(img[1]);
-
-                var uploadImageResponse = await _supabaseService.UploadImage(imageBytes);
-
+                // save to db
                 var entity = _mapper.Map<Product>(model);
 
                 if (uploadImageResponse.IsSuccess)
@@ -78,6 +83,14 @@ namespace Application.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred in {Method}. Model: {Model}, Message: {Message}", nameof(AddAsync), model, ex.Message);
+
+                // Send event to delete image on cloud
+                await _eventBus.PublishAsync(new DeleteImageEvent
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    Url = uploadImageResponse.Data.PublicUrl
+                });
                 throw new ProductHandleFailedException();
             }
         }
@@ -94,6 +107,14 @@ namespace Application.Services
                 }
 
                 await _repository.DeleteAsync(entity);
+
+                // Send event to remove image on cloud
+                await _eventBus.PublishAsync(new DeleteImageEvent
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    Url = entity.ImageUrl
+                });
                 return Result.Success("Delete product success");
             }
             catch (ProductNotFoundException)
@@ -215,6 +236,7 @@ namespace Application.Services
 
         public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model)
         {
+            Result<UploadFileResponseModel> uploadImageResponse = null;
             try
             {
                 var entity = await _repository.GetByIdAsync(model.Id);
@@ -224,12 +246,31 @@ namespace Application.Services
                     throw new ProductNotFoundException();
                 }
 
+                // check image update
+                if (!string.IsNullOrEmpty(model.ImageData))
+                {
+                    // Upload image on cloud
+                    uploadImageResponse = await UploadFileAsync(model.ImageData);
+
+                    if (uploadImageResponse.IsSuccess)
+                    {
+                        entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
+
+                        await _eventBus.PublishAsync(new DeleteImageEvent
+                        {
+                            Id = Guid.NewGuid(),
+                            CreatedAt = DateTime.UtcNow,
+                            Url = entity.ImageUrl,
+                        });
+                    }
+                }
+
                 entity.Name = model.Name;
                 entity.Description = model.Description;
                 entity.Price = model.Price;
-                entity.ImageUrl = model.ImageUrl;
                 entity.LastUpdatedAt = DateTime.UtcNow;
                 entity.Variants = JsonConvert.SerializeObject(model.Variants);
+                entity.IsDeleted = model.IsDeleted;
 
                 var result = await _repository.UpdateAsync(entity);
                 return Result<ProductModel>.Success("Update product success", _mapper.Map<ProductModel>(result));
@@ -240,9 +281,27 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
+                if (uploadImageResponse != null && uploadImageResponse.IsSuccess)
+                {
+                    await _eventBus.PublishAsync(new DeleteImageEvent
+                    {
+                        Id = Guid.NewGuid(),
+                        CreatedAt = DateTime.UtcNow,
+                        Url = uploadImageResponse.Data.PublicUrl
+                    });
+                }
+
                 _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(UpdateAsync), model.Id, ex.Message);
                 throw new ProductHandleFailedException();
             }
+        }
+
+        public async Task<Result<UploadFileResponseModel>> UploadFileAsync(string base64string)
+        {
+            var img = base64string.Substring(23);
+            byte[] imageBytes = Convert.FromBase64String(img);
+
+            return await _supabaseService.UploadImage(imageBytes);
         }
     }
 }
