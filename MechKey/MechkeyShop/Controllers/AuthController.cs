@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.IServices;
+using Domain.Exceptions;
 using MechkeyShop.Constant;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ViewModels.Auth;
@@ -11,7 +12,10 @@ namespace MechkeyShop.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly IApplicaionUserService _applicaionUserService;
 
-        public AuthController(IJwtManager jwtManager, IAuthenticationService authenticationService, IApplicaionUserService applicaionUserService)
+        public AuthController(
+            IJwtManager jwtManager,
+            IAuthenticationService authenticationService,
+            IApplicaionUserService applicaionUserService)
         {
             _jwtManager = jwtManager;
             _authenticationService = authenticationService;
@@ -77,6 +81,15 @@ namespace MechkeyShop.Controllers
                 return RedirectToAction("Index", "Home");
 
             }
+            catch (UserNotConfirmEmailException ex)
+            {
+                ViewBag.Error = ex.Message;
+                TempData[Toast.KEY] = "Login failed";
+                TempData[Toast.MESSAGE] = ex.Message;
+                TempData[Toast.TYPE] = Toast.ERROR_TYPE;
+                ViewBag.returnUrl = returnUrl;
+                return View(model);
+            }
             catch (Exception ex)
             {
                 //_logger.LogError(ex.Message);
@@ -88,6 +101,7 @@ namespace MechkeyShop.Controllers
                 return View(model);
 
             }
+
         }
 
         // Get Register Page
@@ -102,18 +116,22 @@ namespace MechkeyShop.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Error = "Invalid Register Data";
+                TempData[Toast.KEY] = "Register failed";
+                TempData[Toast.MESSAGE] = "Invalid Register Data";
+                TempData[Toast.TYPE] = Toast.ERROR_TYPE;
                 return View(model);
             }
-
-            var result = await _authenticationService.Register(model);
-            if (result.IsSuccess)
+            try
             {
+                var result = await _authenticationService.Register(model);
                 return View("Login");
             }
-            else
+            catch (Exception ex)
             {
                 ViewBag.Error = "Register failed";
+                TempData[Toast.KEY] = "Failed";
+                TempData[Toast.MESSAGE] = ex.Message;
+                TempData[Toast.TYPE] = Toast.ERROR_TYPE;
                 return View("Register");
             }
         }
@@ -138,7 +156,7 @@ namespace MechkeyShop.Controllers
         public async Task<IActionResult> ConfirmEmailAsync(Guid id)
         {
             // Change IsConfirmed user
-            var user = await _applicaionUserService.UpdateEmailConfirmAsync(id);
+            await _applicaionUserService.UpdateEmailConfirmAsync(id);
             // -> Redirect to login page
             return RedirectToAction("Login", "Auth");
         }

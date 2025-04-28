@@ -47,6 +47,12 @@ namespace Application.Services
 
             }
 
+            if (!user.IsEmailConfirmed)
+            {
+                throw new InvalidDataException("Please confirm email to active your account");
+
+            }
+
             // Nếu đúng thì trả về success (có thể kèm token hoặc thông tin user nếu cần)
             return Result<ApplicationUserModel>.Success(
                 "Login success",

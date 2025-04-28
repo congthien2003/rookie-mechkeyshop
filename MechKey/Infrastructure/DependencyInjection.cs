@@ -42,7 +42,10 @@ namespace Infrastructure
             {
                 busConfigurator.SetKebabCaseEndpointNameFormatter();
 
-                busConfigurator.AddConsumer<RequestEmailConsumer>();
+                busConfigurator.AddConsumer<RegisterSuccessConsumer>();
+                busConfigurator.AddConsumer<OrderCreatedConsumer>();
+                busConfigurator.AddConsumer<DeleteImageConsumer>();
+
 
                 busConfigurator.UsingRabbitMq((context, config) =>
                 {
@@ -55,9 +58,18 @@ namespace Infrastructure
 
                     config.ReceiveEndpoint("email", e =>
                     {
-                        e.ConfigureConsumer<RequestEmailConsumer>(context);
+                        e.ConfigureConsumer<RegisterSuccessConsumer>(context);
                     });
 
+                    config.ReceiveEndpoint("order", e =>
+                    {
+                        e.ConfigureConsumer<OrderCreatedConsumer>(context);
+                    });
+
+                    config.ReceiveEndpoint("delete-image", e =>
+                    {
+                        e.ConfigureConsumer<DeleteImageConsumer>(context);
+                    });
 
                 });
 

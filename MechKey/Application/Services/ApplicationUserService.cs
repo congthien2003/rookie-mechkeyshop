@@ -50,23 +50,15 @@ namespace Application.Services
 
         public async Task<bool> CheckEmailAddressExists(string email, string phone)
         {
-            try
-            {
-                var emailExists = await applicationUserRepository.GetByEmailAsync(email);
-                if (emailExists != null)
-                    throw new UserEmailExistsException();
+            var emailExists = await applicationUserRepository.GetByEmailAsync(email);
+            if (emailExists != null)
+                throw new UserEmailExistsException();
 
-                var phoneExists = applicationUserRepository.CheckPhoneExists(phone);
-                if (phoneExists)
-                    throw new UserPhoneExistsException();
+            var phoneExists = applicationUserRepository.CheckPhoneExists(phone);
+            if (phoneExists)
+                throw new UserPhoneExistsException();
 
-                return false;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred in {Method}. Email: {Email}, Phone: {Phone}, Message: {Message}", nameof(CheckEmailAddressExists), email, phone, ex.Message);
-                throw;
-            }
+            return false;
         }
 
         public async Task<Result> DeleteAsync(Guid id)
@@ -81,11 +73,6 @@ namespace Application.Services
 
                 await applicationUserRepository.DeleteAsync(entity);
                 return Result.Success("Delete user success");
-            }
-            catch (UserNotFoundException ex)
-            {
-                logger.LogWarning(ex, "User not found in {Method}. UserId: {UserId}", nameof(DeleteAsync), id);
-                throw;
             }
             catch (Exception ex)
             {
@@ -117,7 +104,8 @@ namespace Application.Services
                     Items = items,
                     TotalItems = totalCount,
                     Page = page,
-                    PageSize = pageSize
+                    PageSize = pageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
                 });
             }
             catch (Exception ex)
@@ -181,16 +169,14 @@ namespace Application.Services
             }
         }
 
-        public async Task<Result<ApplicationUserModel>> UpdateEmailConfirmAsync(Guid id)
+        public async Task UpdateEmailConfirmAsync(Guid id)
         {
             try
             {
                 var user = await applicationUserRepository.GetByIdAsync(id) ?? throw new UserNotFoundException();
                 user.ChangeEmailConfirm(true);
 
-                var result = await applicationUserRepository.UpdateAsync(user);
-                return Result<ApplicationUserModel>.Success("Update user success",
-                       mapper.Map<ApplicationUser, ApplicationUserModel>(result));
+                await applicationUserRepository.UpdateAsync(user);
             }
             catch (UserNotFoundException ex)
             {

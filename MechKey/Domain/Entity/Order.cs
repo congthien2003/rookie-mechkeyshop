@@ -8,7 +8,7 @@ namespace Domain.Entity
     {
         public Guid UserId { get; set; }
         public ApplicationUser User { get; set; }
-        public OrderStatus Status { get; set; } = OrderStatus.Pending;
+        public OrderStatus Status { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public double TotalAmount { get; set; }
         public string Phone { get; set; }
@@ -21,20 +21,20 @@ namespace Domain.Entity
             CreatedAt = DateTime.UtcNow;
         }
 
-        public void ChangeStatus(string status)
+        public void ChangeStatus(int status)
         {
             switch (status)
             {
-                case "Pending":
+                case 0:
                     Status = OrderStatus.Pending;
                     break;
-                case "Accepted":
+                case 1:
                     Status = OrderStatus.Accepted;
                     break;
-                case "Canceled":
+                case 2:
                     Status = OrderStatus.Cancelled;
                     break;
-                case "Completed":
+                case 3:
                     Status = OrderStatus.Completed;
                     break;
                 default: return;

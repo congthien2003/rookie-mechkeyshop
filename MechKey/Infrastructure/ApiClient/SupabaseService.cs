@@ -62,14 +62,14 @@ namespace Infrastructure.ApiClient
             }
         }
 
-        public async Task<bool> DeleteImage(string filePath)
+        public async Task<bool> DeleteImage(string publicURL)
         {
-            const string BUCKET = "products";
-
             using var httpClient = new HttpClient();
+            var url = publicURL.Split("/public/");
+
 
             var request = new HttpRequestMessage(HttpMethod.Delete,
-                $"{SUPABASE_URL}/storage/v1/object/{BUCKET}/{filePath}");
+                $"{url[0]}/{url[1]}");
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SUPABASE_KEY);
 

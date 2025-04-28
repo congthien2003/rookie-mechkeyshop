@@ -68,7 +68,93 @@ namespace Infrastructure.ApiClient
 
         public bool SendEmailOrder(string email, OrderModel order)
         {
-            throw new NotImplementedException();
+            try
+            {
+                MailMessage mailMessage = new MailMessage();
+                var to = email;
+                var from = "nhat23891@gmail.com";
+                var pass = "zohi sncr hcqk kwwd";
+                mailMessage.To.Add(to);
+                mailMessage.From = new MailAddress(from);
+                mailMessage.Subject = "MechkeyShop - THANK YOU FOR YOUR ORDER";
+                string messageBody = $@"
+                <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: Arial, sans-serif;
+                            background-color: #f9f9f9;
+                            margin: 0;
+                            padding: 20px;
+                        }}
+                        .container {{
+                            background-color: #ffffff;
+                            padding: 20px;
+                            border-radius: 8px;
+                            max-width: 600px;
+                            margin: auto;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        }}
+                        h2 {{
+                            color: #333333;
+                        }}
+                        h3 {{
+                            color: #555555;
+                            border-bottom: 1px solid #eeeeee;
+                            padding-bottom: 5px;
+                        }}
+                        ul {{
+                            list-style: none;
+                            padding: 0;
+                        }}
+                        li {{
+                            padding: 8px 0;
+                            border-bottom: 1px solid #f1f1f1;
+                        }}
+                        li strong {{
+                            display: inline-block;
+                            width: 150px;
+                        }}
+                        p {{
+                            color: #666666;
+                            line-height: 1.5;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>Hi, {order.Name}</h2>
+                        <p>We have received your order and are preparing it for shipment.</p>
+                        <h3>Order infomation:</h3>
+                        <ul>
+                            <li><strong>ID:</strong> {order.Id.ToString().Substring(0, 8)}</li>
+                            <li><strong>Total:</strong> {order.TotalAmount:C}</li>
+                            <li><strong>Phone:</strong> {order.Phone}</li>
+                            <li><strong>Shipping Address:</strong> {order.Address}</li>
+                        </ul>
+                        <p>Peaceful,<br/>MechKeyShop</p>
+                    </div>
+                </body>
+                </html>";
+
+                mailMessage.IsBodyHtml = true;
+                mailMessage.Body = messageBody;
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com");
+                smtp.EnableSsl = true;
+                smtp.Port = 587;
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(from, pass);
+
+                smtp.Send(mailMessage);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
         }
     }
 }

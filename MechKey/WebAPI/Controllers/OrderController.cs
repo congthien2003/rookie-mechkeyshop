@@ -7,7 +7,7 @@ using Shared.ViewModels.Order;
 namespace WebAPI.Controllers
 {
     [ApiVersion(1)]
-    [Route("api/v{v:apiVersion}/order")]
+    [Route("api/v{v:apiVersion}/orders")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -23,6 +23,8 @@ namespace WebAPI.Controllers
             int page = 1,
             int pageSize = 10,
             string searchTerm = "",
+            string startDate = "",
+            string endDate = "",
             string sortCol = "",
             bool asc = true)
         {
@@ -33,7 +35,7 @@ namespace WebAPI.Controllers
                 SearchTerm = searchTerm,
             };
 
-            var result = await _orderService.GetAllOrders(pagination, sortCol, asc);
+            var result = await _orderService.GetAllOrders(pagination, startDate, endDate, sortCol, asc);
             return Ok(result);
         }
 

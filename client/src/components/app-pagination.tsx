@@ -41,7 +41,6 @@ function PaginationComponent({
 			pages.push(
 				<PaginationItem key={1}>
 					<PaginationLink
-						href="#"
 						onClick={(e) => {
 							e.preventDefault();
 							handlePageChange(1);
@@ -101,40 +100,42 @@ function PaginationComponent({
 	};
 
 	return (
-		<div className="w-full flex items-center justify-center mt-4">
-			<Pagination>
-				<PaginationContent>
-					<PaginationItem>
-						<PaginationPrevious
-							onClick={(e) => {
-								e.preventDefault();
-								handlePageChange(page - 1);
-							}}
-							className={
-								page === 1
-									? "pointer-events-none opacity-50"
-									: ""
-							}
-						/>
-					</PaginationItem>
-					{renderPageNumbers()}
-					<PaginationItem>
-						<PaginationNext
-							href="#"
-							onClick={(e) => {
-								e.preventDefault();
-								handlePageChange(page + 1);
-							}}
-							className={
-								page === totalPages
-									? "pointer-events-none opacity-50"
-									: ""
-							}
-						/>
-					</PaginationItem>
-				</PaginationContent>
-			</Pagination>
-		</div>
+		totalPages > 0 && (
+			<div className="w-full flex items-center justify-center mt-4">
+				<Pagination>
+					<PaginationContent>
+						<PaginationItem>
+							<PaginationPrevious
+								onClick={(e) => {
+									e.preventDefault();
+									handlePageChange(page - 1);
+								}}
+								className={
+									page === 1
+										? "pointer-events-none opacity-50"
+										: ""
+								}
+							/>
+						</PaginationItem>
+						{renderPageNumbers()}
+						<PaginationItem>
+							<PaginationNext
+								href="#"
+								onClick={(e) => {
+									e.preventDefault();
+									handlePageChange(page + 1);
+								}}
+								className={
+									page === totalPages
+										? "pointer-events-none opacity-50"
+										: ""
+								}
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
+			</div>
+		)
 	);
 }
 

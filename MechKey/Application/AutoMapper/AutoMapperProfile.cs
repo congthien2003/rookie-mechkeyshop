@@ -45,7 +45,7 @@ namespace Infrastructure.Helpers
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ((OrderStatus)src.Status).ToString()))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => ((OrderStatus)src.Status)))
                 .ReverseMap();
 
             CreateMap<OrderItem, OrderItemModel>()
