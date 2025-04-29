@@ -25,6 +25,13 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("delete-image")]
+        public async Task<IActionResult> DeleteImage(string url)
+        {
+            var result = await _supabaseService.DeleteImage(url);
+            return Ok(result);
+        }
+
         public class UploadFileModel
         {
             public string Base64String { get; set; }

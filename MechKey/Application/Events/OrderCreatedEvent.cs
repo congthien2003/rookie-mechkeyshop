@@ -1,7 +1,9 @@
-﻿namespace Application.Events
+﻿using Shared.ViewModels.Order;
+
+namespace Application.Events
 {
     public class OrderCreatedEvent : BaseEvent
     {
-        public Guid OrderId { get; set; }
+        public OrderModel OrderModel { get; set; }
     }
 }

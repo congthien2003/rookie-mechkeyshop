@@ -29,13 +29,10 @@ namespace Application.Services
 
         public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model)
         {
+            if (string.IsNullOrEmpty(model.Name)) throw new CategoryInvalidDataException();
             try
             {
-                var entity = new Category()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = model.Name,
-                };
+                var entity = new Category(Guid.NewGuid(), model.Name);
                 var newEntity = await _repository.CreateAsync(entity);
                 return Result<CategoryModel>.Success("Add category success", _mapper.Map<CategoryModel>(newEntity));
             }
