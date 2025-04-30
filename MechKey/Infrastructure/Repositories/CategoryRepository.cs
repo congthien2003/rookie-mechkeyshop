@@ -1,4 +1,5 @@
 ﻿using Domain.Entity;
+using Domain.Exceptions;
 using Domain.IRepositories;
 using MechkeyShop.Data;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,8 @@ namespace Infrastructure.Repositories
 
         public async Task<Category> CreateAsync(Category entity)
         {
+            if (string.IsNullOrEmpty(entity.Name))
+                throw new CategoryValidateFailedException();
             var result = await context.Categories.AddAsync(entity);
             await context.SaveChangesAsync();
             return result.Entity;

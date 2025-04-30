@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Exceptions;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entity
@@ -19,6 +20,7 @@ namespace Domain.Entity
         public ICollection<ProductRating> ProductRatings { get; set; } = new List<ProductRating>();
         public string Variants { get; set; } = string.Empty;
         public long SellCount { get; set; } = 0;
+
 
         /// <summary>
         /// Add rating to the product, you can add duplicate check here
@@ -43,6 +45,7 @@ namespace Domain.Entity
 
         public void IncreaseSellCount(int quantity)
         {
+            if (quantity < 1) throw new ProductValidateFailedException();
             SellCount += quantity;
         }
     }

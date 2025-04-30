@@ -55,5 +55,14 @@ namespace Domain.Exceptions
         }
     }
 
+    public class ProductInvalidDataException : ProductException
+    {
+        public ProductInvalidDataException()
+        {
+            Type = Enum.ExceptionType.HANDLED_FAILED;
+            Message = "Invalid data";
+        }
+    }
+
 
 }

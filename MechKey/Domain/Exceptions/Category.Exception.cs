@@ -33,4 +33,13 @@ namespace Domain.Exceptions
             Message = "Validate Category failed";
         }
     }
+
+    public class CategoryInvalidDataException : CategoryException
+    {
+        public CategoryInvalidDataException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Invalid data";
+        }
+    }
 }
