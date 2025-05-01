@@ -44,6 +44,7 @@ namespace Application.Services
         {
             try
             {
+                await _unitOfWork.BeginTransactionAsync();
                 var order = new Order
                 {
                     Id = Guid.NewGuid(),
@@ -74,17 +75,23 @@ namespace Application.Services
                     CreatedAt = DateTime.UtcNow
                 });
 
+                await _unitOfWork.CommitAsync();
+
                 return Result<OrderModel>.Success("Create order success", result);
             }
             catch (Exception ex)
             {
-                _unitOfWork.Dispose();
+                await _unitOfWork.RollbackAsync();
                 _logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(CreateOrder), model.UserId, ex.Message);
                 throw new OrderHandleFailedException();
             }
         }
 
-        public async Task<Result<PagedResult<OrderModel>>> GetAllOrders(PaginationReqModel pagiModel, string startDate, string endDate, string sortCol, bool ascending)
+        public async Task<Result<PagedResult<OrderModel>>> GetAllOrders(PaginationReqModel pagiModel,
+                                                                        string startDate,
+                                                                        string endDate,
+                                                                        string sortCol,
+                                                                        bool ascending)
         {
             try
             {

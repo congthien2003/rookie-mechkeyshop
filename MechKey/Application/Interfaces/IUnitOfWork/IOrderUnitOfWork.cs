@@ -2,10 +2,10 @@
 
 namespace Application.Interfaces.IUnitOfWork
 {
-    public interface IOrderUnitOfWork : IDisposable
+    public interface IOrderUnitOfWork : BaseUnitOfWork
     {
         IOrderRepository Orders { get; }
         IOrderItemsRepository OrderItems { get; }
-        Task<int> SaveChangesAsync();
+
     }
 }

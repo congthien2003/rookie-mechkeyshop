@@ -50,6 +50,8 @@ namespace Application.Services
 
             try
             {
+                await _unitOfWork.BeginTransactionAsync();
+
                 // save to db
                 var entity = _mapper.Map<Product>(model);
 
@@ -76,7 +78,8 @@ namespace Application.Services
 
                 var newEntity = await _unitOfWork.ProductRepository.CreateAsync(entity);
 
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
+
 
                 return Result<ProductModel>.Success("Add product success", _mapper.Map<ProductModel>(newEntity));
             }
@@ -91,6 +94,9 @@ namespace Application.Services
                     CreatedAt = DateTime.UtcNow,
                     Url = uploadImageResponse.Data.PublicUrl
                 });
+
+                await _unitOfWork.RollbackAsync();
+
                 throw new ProductHandleFailedException();
             }
         }

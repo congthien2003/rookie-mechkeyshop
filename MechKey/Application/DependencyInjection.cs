@@ -20,8 +20,6 @@ namespace Application
             service.AddScoped<IJwtManager, JwtManager>();
             service.AddScoped<IOrderService, OrderService>();
 
-
-
             return service;
         }
     }
