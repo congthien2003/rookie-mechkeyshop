@@ -105,7 +105,7 @@
                                 </div>
                                 <div class="product-item__footer">
                                     <a class="btn btn-sm btn-outline-info" href="Product/Detail/@item.Id"><i class="fa fa-eye"></i></a>
-                                    @if (item.Variants is not null)
+                                    @if (item.Variants.Count > 0)
                                     {
                                         <a class="btn btn-gradient-red-orange" asp-action="Detail" asp-controller="Product" asp-route-id="@item.Id">
                                             Choose variant

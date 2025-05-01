@@ -8,14 +8,13 @@
 
         <form asp-action="Register" asp-controller="Auth" method="post">
             <h2 class="text-center">Register Page</h2>
-            <div class="form-group w-100">
+            <p class="text-muted text-center">Create your new account to shopping now</p>
+            <div class="form-group w-100 mb-3">
                 <label asp-for="Email">Email</label>
                 <input asp-for="Email" class="form-control" />
                 <span class="text-danger"></span>
             </div>
             <div class="d-flex align-items-center gap-4">
-                
-
                 <div class="form-group w-100">
                     <label asp-for="Name">Name</label>
                     <input asp-for="Name" class="form-control" />
@@ -29,13 +28,13 @@
             </div>
             
 
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Password">Password</label>
                 <input asp-for="Password" type="password" class="form-control" />
                 <span class="text-danger"></span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="ConfirmPassword">Confirm Password</label>
                 <input asp-for="ConfirmPassword" type="password" class="form-control" />
                 <span class="text-danger"></span>
@@ -43,7 +42,7 @@
 
            
 
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Address">Address</label>
                 <input asp-for="Address" class="form-control" />
                 <span class="text-danger"></span>
@@ -67,19 +66,18 @@
     }
 
         .form-auth--wrapper form {
-            width: 45rem;
+            width: 40rem;
             background-color: #efefef;
             padding: 4rem;
             border-radius: 24px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         }
 
     .form-action {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 12px;
     }
 </style>
