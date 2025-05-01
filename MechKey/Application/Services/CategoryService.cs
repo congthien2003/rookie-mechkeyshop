@@ -4,7 +4,6 @@ using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Category;
@@ -77,11 +76,11 @@ namespace Application.Services
 
                 int totalCount = query.ToList().Count;
 
-                var items = await query
+                var items = query
                     .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                     .Take(pagiModel.PageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
-                    .ToListAsync();
+                    .ToList();
                 return Result<PagedResult<CategoryModel>>.Success("Get category list success", new PagedResult<CategoryModel>
                 {
                     Items = items,
