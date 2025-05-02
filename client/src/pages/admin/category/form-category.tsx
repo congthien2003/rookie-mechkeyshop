@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { Category } from "@/interfaces/models/Category";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { Input } from "@/components/ui/input";
 interface FormCategoryProps {
 	data: Category | undefined;
 	onClose: () => void;
@@ -60,6 +61,7 @@ function FormCategory({ data, onClose, onSave, onDelete }: FormCategoryProps) {
 							<div className="space-y-2">
 								<Label htmlFor="name">Name</Label>
 								<Field
+									as={Input}
 									name="name"
 									type="text"
 									placeholder="Input category name"
