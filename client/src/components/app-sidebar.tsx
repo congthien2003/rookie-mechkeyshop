@@ -35,7 +35,7 @@ export function AppSidebar() {
 	const location = useLocation();
 
 	return (
-		<div className="flex h-[100vh] m-w-64 w-64 flex-col border-r bg-slate-100">
+		<div className="flex min-h-[100vh] m-w-64 w-64 flex-col border-r bg-slate-100">
 			<div className="flex h-16 items-center border-b px-4">
 				<h1 className="text-lg font-bold">Admin - MechkeyShop</h1>
 			</div>

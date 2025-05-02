@@ -2,7 +2,7 @@ import api from "@/lib/axios";
 
 const getList = async (
 	page: number = 1,
-	pageSize: number = 10,
+	pageSize: number,
 	searchTerm: string = ""
 ) => {
 	try {

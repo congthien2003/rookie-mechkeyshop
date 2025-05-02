@@ -94,8 +94,8 @@ function FormOrder({ data, onClose, onSave, onDelete }: FormOrderProps) {
 								id="name"
 								name="name"
 								value={formData.name}
-								onChange={handleChange}
-								readOnly
+								disabled
+								className="bg-gray-100"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -105,8 +105,8 @@ function FormOrder({ data, onClose, onSave, onDelete }: FormOrderProps) {
 								name="email"
 								type="email"
 								value={formData.email}
-								onChange={handleChange}
-								readOnly
+								disabled
+								className="bg-gray-100"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -116,7 +116,7 @@ function FormOrder({ data, onClose, onSave, onDelete }: FormOrderProps) {
 								name="phone"
 								value={formData.phone}
 								onChange={handleChange}
-								readOnly
+								placeholder="Enter phone number"
 							/>
 						</div>
 						<div className="space-y-2">
@@ -126,12 +126,12 @@ function FormOrder({ data, onClose, onSave, onDelete }: FormOrderProps) {
 								name="address"
 								value={formData.address}
 								onChange={handleChange}
-								readOnly
+								placeholder="Enter address"
 							/>
 						</div>
 						<div className="space-y-2">
 							<Label>Order Date</Label>
-							<div className="text-sm text-gray-500">
+							<div className="text-sm text-gray-500 bg-gray-100 p-2 rounded">
 								{new Date(formData.orderDate).toLocaleString()}
 							</div>
 						</div>
@@ -160,7 +160,7 @@ function FormOrder({ data, onClose, onSave, onDelete }: FormOrderProps) {
 							{data.orderItems.map((item, index) => (
 								<div
 									key={index}
-									className="flex items-center gap-4 p-4 border rounded-lg">
+									className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50">
 									<img
 										src={item.imageUrl}
 										alt={item.productName}

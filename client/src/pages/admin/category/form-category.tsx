@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { Category } from "@/interfaces/models/Category";
-
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 interface FormCategoryProps {
 	data: Category | undefined;
 	onClose: () => void;
@@ -12,30 +11,29 @@ interface FormCategoryProps {
 	onDelete: (id: string) => void;
 }
 
+const validationSchema = Yup.object({
+	name: Yup.string().required("Name is required"),
+});
+
 function FormCategory({ data, onClose, onSave, onDelete }: FormCategoryProps) {
-	const newCategory: Category = {
+	const initValueForm: Category = {
 		id: "",
 		name: "",
 		isDeleted: false,
 	};
+	if (data) {
+		initValueForm.id = data.id;
+		initValueForm.name = data.name;
+		initValueForm.isDeleted = data.isDeleted;
+	}
+
+	console.log(data);
 
 	const isEdit = data ? true : false;
-	const [formData, setFormData] = useState<Category>(data ?? newCategory);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		console.log({ name, value });
-		setFormData((prev) => ({
-			...prev,
-			[name]: value,
-		}));
-	};
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (formData) {
-			onSave(formData);
-		}
+	const handleSubmit = (values: Category) => {
+		console.log(values);
+		onSave(values);
 	};
 
 	return (
@@ -51,40 +49,51 @@ function FormCategory({ data, onClose, onSave, onDelete }: FormCategoryProps) {
 						<X className="h-5 w-5" />
 					</button>
 				</div>
-				<form onSubmit={handleSubmit} className="p-6 space-y-6">
-					<div className="grid grid-cols-1 gap-6">
-						<div className="space-y-2">
-							<Label htmlFor="name">Name</Label>
-							<Input
-								id="name"
-								name="name"
-								value={formData.name}
-								onChange={handleChange}
-								placeholder="Enter name"
-							/>
+				<Formik
+					initialValues={initValueForm}
+					validationSchema={validationSchema}
+					onSubmit={(value) => {
+						handleSubmit(value);
+					}}>
+					<Form className="p-6 space-y-6">
+						<div className="grid grid-cols-1 gap-6">
+							<div className="space-y-2">
+								<Label htmlFor="name">Name</Label>
+								<Field
+									name="name"
+									type="text"
+									placeholder="Input category name"
+									className="block border-[1px] w-full rounded-md p-2"
+								/>
+								<ErrorMessage
+									name="name"
+									component="div"
+									className="text-red-400"
+								/>
+							</div>
 						</div>
-					</div>
-					<div className="flex justify-end space-x-4 pt-4 border-t">
-						<Button
-							variant="outline"
-							onClick={onClose}
-							type="button">
-							Cancel
-						</Button>
-						{isEdit && (
+						<div className="flex justify-end space-x-4 pt-4 border-t">
 							<Button
-								type="button"
-								className="bg-red-600 hover:bg-red-500"
-								onClick={() => onDelete(formData.id)}>
-								Delete
+								variant="outline"
+								onClick={onClose}
+								type="button">
+								Cancel
 							</Button>
-						)}
+							{isEdit && (
+								<Button
+									type="button"
+									className="bg-red-600 hover:bg-red-500"
+									onClick={() => onDelete(initValueForm.id)}>
+									Delete
+								</Button>
+							)}
 
-						<Button type="submit">
-							{isEdit ? "Save Changes" : "Create"}
-						</Button>
-					</div>
-				</form>
+							<Button type="submit">
+								{isEdit ? "Save Changes" : "Create"}
+							</Button>
+						</div>
+					</Form>
+				</Formik>
 			</div>
 		</div>
 	);
