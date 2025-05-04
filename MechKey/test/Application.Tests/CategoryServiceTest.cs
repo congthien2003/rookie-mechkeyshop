@@ -8,7 +8,7 @@ using Moq;
 using Shared.Common;
 using Shared.ViewModels.Category;
 
-namespace Application.xUnitTest
+namespace Application.Test
 {
     public class CategoryServiceTest
     {
