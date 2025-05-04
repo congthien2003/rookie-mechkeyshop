@@ -1,9 +1,9 @@
 ﻿using Application.Events;
-using Application.Interfaces.IServices;
+using Application.Interfaces.IApiClient.Smtp;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.ApiClient.Consumer
+namespace Infrastructure.ApiClient.MassTransit.Consumer
 {
     public class RegisterSuccessConsumer : IConsumer<RegisterSuccessEvent>
     {

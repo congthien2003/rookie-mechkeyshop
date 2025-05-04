@@ -1,6 +1,8 @@
 using Application;
 using Asp.Versioning;
 using Infrastructure;
+using Infrastructure.ApiClient.MassTransit;
+using Infrastructure.ApiClient.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -70,6 +72,8 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.AddRedisCache();
+builder.AddMassTransit();
 
 var app = builder.Build();
 

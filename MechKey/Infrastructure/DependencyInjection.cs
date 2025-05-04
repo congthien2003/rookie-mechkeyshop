@@ -1,14 +1,16 @@
 ﻿using Application.Interfaces.IApiClient.MassTransit;
+using Application.Interfaces.IApiClient.Redis;
+using Application.Interfaces.IApiClient.Smtp;
 using Application.Interfaces.IApiClient.Supabase;
-using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
-using Infrastructure.ApiClient;
-using Infrastructure.ApiClient.Consumer;
+using Infrastructure.ApiClient.MassTransit;
+using Infrastructure.ApiClient.Redis;
+using Infrastructure.ApiClient.Smtp;
+using Infrastructure.ApiClient.SupabaseCloud;
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;
-using MassTransit;
 using MechkeyShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -38,44 +40,7 @@ namespace Infrastructure
             services.AddScoped<IEmailService, EmailService>();
 
             services.AddScoped<IEventBus, MassTransitService>();
-            services.AddMassTransit(busConfigurator =>
-            {
-                busConfigurator.SetKebabCaseEndpointNameFormatter();
-
-                busConfigurator.AddConsumer<RegisterSuccessConsumer>();
-                busConfigurator.AddConsumer<OrderCreatedConsumer>();
-                busConfigurator.AddConsumer<DeleteImageConsumer>();
-
-
-                busConfigurator.UsingRabbitMq((context, config) =>
-                {
-
-                    config.Host("localhost", "/", h =>
-                    {
-                        h.Username("guest");
-                        h.Password("guest");
-                    });
-
-                    config.ReceiveEndpoint("email", e =>
-                    {
-                        e.ConfigureConsumer<RegisterSuccessConsumer>(context);
-                    });
-
-                    config.ReceiveEndpoint("order", e =>
-                    {
-                        e.ConfigureConsumer<OrderCreatedConsumer>(context);
-                    });
-
-                    config.ReceiveEndpoint("delete-image", e =>
-                    {
-                        e.ConfigureConsumer<DeleteImageConsumer>(context);
-                    });
-
-                });
-
-            });
-
-
+            services.AddScoped<IRedisService, RedisService>();
             return services;
         }
     }

@@ -3,7 +3,7 @@ using Application.Interfaces.IApiClient.Supabase;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.ApiClient.Consumer
+namespace Infrastructure.ApiClient.MassTransit.Consumer
 {
     public class DeleteImageConsumer : IConsumer<DeleteImageEvent>
     {

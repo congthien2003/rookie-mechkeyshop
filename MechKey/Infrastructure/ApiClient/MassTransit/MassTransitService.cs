@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces.IApiClient.MassTransit;
 using MassTransit;
 
-namespace Infrastructure.ApiClient
+namespace Infrastructure.ApiClient.MassTransit
 {
     public class MassTransitService : IEventBus
     {

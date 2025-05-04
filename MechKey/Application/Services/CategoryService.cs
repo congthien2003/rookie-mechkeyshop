@@ -1,4 +1,5 @@
 ﻿using Application.Comoon;
+using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IServices;
 using AutoMapper;
 using Domain.Entity;
@@ -15,15 +16,18 @@ namespace Application.Services
         private readonly ICategoryRepository<Category> _repository;
         private readonly IMapper _mapper;
         private readonly ILogger<CategoryService> _logger;
+        private readonly IRedisService _redisService;
 
         public CategoryService(
             ICategoryRepository<Category> repository,
             IMapper mapper,
-            ILogger<CategoryService> logger)
+            ILogger<CategoryService> logger,
+            IRedisService redisService)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
+            _redisService = redisService;
         }
 
         public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model)
@@ -65,30 +69,43 @@ namespace Application.Services
 
         public async Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel)
         {
+            string key = $"category-{pagiModel.Page}-{pagiModel.PageSize}";
+
             try
             {
-                var query = _repository.GetAllAsync();
+                var data = _redisService.Get<PagedResult<CategoryModel>>(key);
 
-                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
+                if (data is null)
                 {
-                    query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
+                    var query = _repository.GetAllAsync();
+
+                    if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
+                    {
+                        query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
+                    }
+
+                    int totalCount = query.ToList().Count;
+
+                    var items = query
+                        .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
+                        .Take(pagiModel.PageSize)
+                        .Select(c => _mapper.Map<CategoryModel>(c))
+                        .ToList();
+
+
+                    data = new PagedResult<CategoryModel>
+                    {
+                        Items = items,
+                        TotalItems = totalCount,
+                        Page = pagiModel.Page,
+                        PageSize = pagiModel.PageSize,
+                        TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize)
+                    };
+
+                    _redisService.Set(key, data, 120);
                 }
 
-                int totalCount = query.ToList().Count;
-
-                var items = query
-                    .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
-                    .Take(pagiModel.PageSize)
-                    .Select(c => _mapper.Map<CategoryModel>(c))
-                    .ToList();
-                return Result<PagedResult<CategoryModel>>.Success("Get category list success", new PagedResult<CategoryModel>
-                {
-                    Items = items,
-                    TotalItems = totalCount,
-                    Page = pagiModel.Page,
-                    PageSize = pagiModel.PageSize,
-                    TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize)
-                });
+                return Result<PagedResult<CategoryModel>>.Success("Get category list success", data);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,6 @@
 ﻿using Shared.ViewModels.Order;
 
-namespace Application.Interfaces.IServices
+namespace Application.Interfaces.IApiClient.Smtp
 {
     public interface IEmailService
     {

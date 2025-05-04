@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Shared.ViewModels.ImageUpload;
 using System.Net.Http.Headers;
 
-namespace Infrastructure.ApiClient
+namespace Infrastructure.ApiClient.SupabaseCloud
 {
     public class SupabaseService : ISupabaseService
     {
@@ -20,7 +20,7 @@ namespace Infrastructure.ApiClient
             Console.WriteLine(SUPABASE_URL);
             _logger = logger;
         }
-        public async Task<Result<UploadFileResponseModel>> UploadImage(Byte[] imageBytes)
+        public async Task<Result<UploadFileResponseModel>> UploadImage(byte[] imageBytes)
         {
             var supabase = new Supabase.Client(SUPABASE_URL, SUPABASE_KEY);
             await supabase.InitializeAsync();
