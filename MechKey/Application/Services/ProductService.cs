@@ -1,6 +1,7 @@
 ﻿using Application.Comoon;
 using Application.Events;
 using Application.Interfaces.IApiClient.MassTransit;
+using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
@@ -26,6 +27,7 @@ namespace Application.Services
         private readonly IProductUnitOfWork _unitOfWork;
         private readonly ISupabaseService _supabaseService;
         private readonly IEventBus _eventBus;
+        private readonly IRedisService _redisService;
 
         public ProductService(
             IProductRepository<Product> repository,
@@ -33,7 +35,8 @@ namespace Application.Services
             ILogger<ProductService> logger,
             IProductUnitOfWork unitOfWork,
             ISupabaseService supabaseService,
-            IEventBus eventBus)
+            IEventBus eventBus,
+            IRedisService redisService)
         {
             _repository = repository;
             _mapper = mapper;
@@ -41,6 +44,7 @@ namespace Application.Services
             _unitOfWork = unitOfWork;
             _supabaseService = supabaseService;
             _eventBus = eventBus;
+            _redisService = redisService;
         }
 
         public async Task<Result<ProductModel>> AddAsync(CreateProductModel model)
@@ -140,8 +144,15 @@ namespace Application.Services
             string sortCol = "",
             bool ascOrder = false)
         {
+            string key = $"product-{pagiModel.Page}-{pagiModel.PageSize}-{categoryId}-{pagiModel.SearchTerm}-{sortCol}-{ascOrder}";
             try
             {
+                var data = _redisService.Get<PagedResult<ProductModel>>(key);
+                if (data is not null)
+                {
+                    return Result<PagedResult<ProductModel>>.Success("Get list product from cache", data);
+                }
+
                 var query = _repository.GetAllAsync();
 
                 if (!string.IsNullOrEmpty(categoryId))
@@ -178,14 +189,18 @@ namespace Application.Services
                     .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
                     .ToList();
 
-                return Result<PagedResult<ProductModel>>.Success("Get list product success", new PagedResult<ProductModel>
+                data = new PagedResult<ProductModel>
                 {
                     Items = items,
                     TotalItems = totalCount,
                     Page = pagiModel.Page,
                     PageSize = pagiModel.PageSize,
                     TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
-                });
+                };
+
+                _redisService.Set(key, data, 15);
+
+                return Result<PagedResult<ProductModel>>.Success("Get list product success", data);
             }
             catch (Exception ex)
             {
