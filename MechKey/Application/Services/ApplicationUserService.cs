@@ -6,7 +6,6 @@ using AutoMapper.QueryableExtensions;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Auth;
@@ -63,22 +62,16 @@ namespace Application.Services
 
         public async Task<Result> DeleteAsync(Guid id)
         {
-            try
-            {
-                var entity = await applicationUserRepository.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    throw new UserNotFoundException();
-                }
 
-                await applicationUserRepository.DeleteAsync(entity);
-                return Result.Success("Delete user success");
-            }
-            catch (Exception ex)
+            var entity = await applicationUserRepository.GetByIdAsync(id);
+            if (entity == null)
             {
-                logger.LogError(ex, "Error occurred in {Method}. UserId: {UserId}, Message: {Message}", nameof(DeleteAsync), id, ex.Message);
-                throw new UserHandleFailedException();
+                throw new UserNotFoundException();
             }
+
+            await applicationUserRepository.DeleteAsync(entity);
+            return Result.Success("Delete user success");
+
         }
 
         public async Task<Result<PagedResult<ApplicationUserModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "")
@@ -93,11 +86,11 @@ namespace Application.Services
                 }
 
                 var totalCount = query.Count();
-                var items = await query
+                var items = query
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ProjectTo<ApplicationUserModel>(mapper.ConfigurationProvider)
-                    .ToListAsync();
+                    .ToList();
 
                 return Result<PagedResult<ApplicationUserModel>>.Success("Get List user success", new PagedResult<ApplicationUserModel>
                 {
