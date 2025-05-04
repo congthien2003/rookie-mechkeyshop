@@ -1,5 +1,6 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IApiClient.Supabase;
+using Domain.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Shared.ViewModels.ImageUpload;
@@ -58,7 +59,7 @@ namespace Infrastructure.ApiClient
                 var error = await response.Content.ReadAsStringAsync();
                 _logger.LogError("Upload failed: " + error);
 
-                throw new Exception(error);
+                throw new ProductImageHandleFailedException();
             }
         }
 

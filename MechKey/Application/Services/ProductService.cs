@@ -170,13 +170,13 @@ namespace Application.Services
                 }
 
                 var totalCount = query.Count();
-                var items = await query
+                var items = query
                     .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                     .Take(pagiModel.PageSize)
                     .Include(p => p.Category)
                     .Include(p => p.ProductRatings)
                     .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
-                    .ToListAsync();
+                    .ToList();
 
                 return Result<PagedResult<ProductModel>>.Success("Get list product success", new PagedResult<ProductModel>
                 {
@@ -304,10 +304,18 @@ namespace Application.Services
 
         public async Task<Result<UploadFileResponseModel>> UploadFileAsync(string base64string)
         {
-            var img = base64string.Substring(23);
-            byte[] imageBytes = Convert.FromBase64String(img);
+            try
+            {
+                var img = base64string.Substring(23);
+                byte[] imageBytes = Convert.FromBase64String(img);
 
-            return await _supabaseService.UploadImage(imageBytes);
+                return await _supabaseService.UploadImage(imageBytes);
+            }
+            catch (Exception ex)
+            {
+                throw new ProductImageHandleFailedException();
+            }
+
         }
     }
 }
