@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Interfaces.IApiClient.Redis;
+using Application.Services;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
@@ -15,6 +16,7 @@ namespace Application.Test
         private readonly Mock<ICategoryRepository<Category>> _categoryRepoMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<CategoryService>> _loggerMock;
+        private readonly Mock<IRedisService> _redisServiceMock;
         private readonly CategoryService _categoryService;
         public CategoryServiceTest()
         {
@@ -26,7 +28,8 @@ namespace Application.Test
             _mapperMock = new Mock<IMapper>();
             _mapperMock.Setup((x) => x.ConfigurationProvider).Returns(config);
             _loggerMock = new Mock<ILogger<CategoryService>>();
-            _categoryService = new CategoryService(_categoryRepoMock.Object, _mapperMock.Object, _loggerMock.Object);
+            _redisServiceMock = new Mock<IRedisService>();
+            _categoryService = new CategoryService(_categoryRepoMock.Object, _mapperMock.Object, _loggerMock.Object, _redisServiceMock.Object);
         }
         private static Category CreateCategoryEntity() => new Category(Guid.NewGuid(), "Category Name");
 
@@ -52,7 +55,7 @@ namespace Application.Test
         }
 
         [Fact]
-        public async Task Add_Category_Async_With_Empty_Name_Should_Throw_Exception()
+        public async Task Add_Category_Async_With_Empty_Name_Should_Throw_InvalidDataException()
         {
             // Arrange
             const string name = "";
@@ -69,6 +72,26 @@ namespace Application.Test
             repo.CreateAsync(It.IsAny<Category>()), Times.Never);
 
         }
+
+        [Fact]
+        public async Task Add_Category_Async_Should_Throw_HandleFailedException()
+        {
+            // Arrange
+            const string name = "";
+            CreateCategoryModel model = new CreateCategoryModel()
+            {
+                Name = name,
+            };
+            Category category = new Category(Guid.NewGuid(), "Test");
+            _categoryRepoMock.Setup(repo => repo.CreateAsync(category)).Throws(new CategoryInvalidDataException());
+            // Assert
+            await Assert.ThrowsAsync<CategoryHandleFailedException>(() => _categoryService.AddAsync(model));
+
+            _categoryRepoMock.Verify(repo =>
+            repo.CreateAsync(It.IsAny<Category>()), Times.Once);
+
+        }
+
 
         [Fact]
         public async Task Update_Category_Async_With_Valid_Data_Should_Update_Category()
@@ -187,6 +210,7 @@ namespace Application.Test
                 .AsQueryable();
 
             // Giả lập repository trả ra full list
+            _redisServiceMock.Setup(r => r.Get<PagedResult<CategoryModel>>(It.IsAny<string>())).Returns((PagedResult<CategoryModel>)null);
             _categoryRepoMock.Setup(r => r.GetAllAsync())
                 .Returns(allData); // đổi từ IQueryable -> List
 

@@ -1,5 +1,6 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IApiClient.MassTransit;
+using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IUnitOfWork;
 using Application.Services;
@@ -24,6 +25,7 @@ namespace Application.Test
         private readonly Mock<IProductUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IEventBus> _mockEventBus;
         private readonly Mock<ISupabaseService> _mockSupabaseClient;
+        private readonly Mock<IRedisService> _mockRedisService;
         private readonly ProductService _productService;
 
         public ProductServiceTest()
@@ -53,13 +55,15 @@ namespace Application.Test
             _mockUnitOfWork = new Mock<IProductUnitOfWork>();
             _mockEventBus = new Mock<IEventBus>();
             _mockSupabaseClient = new Mock<ISupabaseService>();
+            _mockRedisService = new Mock<IRedisService>();
             _productService = new ProductService(
                 _mockRepository.Object,
                 mapper,
                 _mockLogger.Object,
                 _mockUnitOfWork.Object,
                 _mockSupabaseClient.Object,
-                _mockEventBus.Object
+                _mockEventBus.Object,
+                _mockRedisService.Object
             );
         }
 
@@ -186,6 +190,8 @@ namespace Application.Test
                     new ProductModel { Id = Guid.NewGuid(), Name = "Product 2", CategoryId = category.Id }
                 }.AsQueryable();
 
+
+            _mockRedisService.Setup(r => r.Get<PagedResult<ProductModel>>("test")).Returns((PagedResult<ProductModel>)null);
 
             _mockRepository.Setup(r => r.GetAllAsync()).Returns(products);
             // Act

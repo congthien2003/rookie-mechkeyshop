@@ -30,7 +30,7 @@ namespace WebAPI.Extensions.Middlewares
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.StatusCode = 500;
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, ex.InnerException);
 
             }
         }
