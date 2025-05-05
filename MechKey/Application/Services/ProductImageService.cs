@@ -32,30 +32,22 @@ namespace Application.Services
 
         public async Task<Result<string>> AddAsync(UploadFileModel model)
         {
-            try
+            var img = model.Base64String.Split("data:image/png;base64,");
+            byte[] imageBytes = Convert.FromBase64String(img[1]);
+
+            var response = await _supabaseService.UploadImage(imageBytes);
+
+            ProductImage entity = new ProductImage()
             {
-                var img = model.Base64String.Split("data:image/png;base64,");
-                byte[] imageBytes = Convert.FromBase64String(img[1]);
+                Id = Guid.NewGuid(),
+                FilePath = response.Data.FileName,
+                Url = response.Data.PublicUrl,
+                ProductId = Guid.Empty,
+            };
 
-                var response = await _supabaseService.UploadImage(imageBytes);
+            var result = await _repository.CreateAsync(entity);
 
-                ProductImage entity = new ProductImage()
-                {
-                    Id = Guid.NewGuid(),
-                    FilePath = response.Data.FileName,
-                    Url = response.Data.PublicUrl,
-                    ProductId = Guid.Empty,
-                };
-
-                var result = await _repository.CreateAsync(entity);
-
-                return Result<string>.Success("Create product image success", result.Url);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception("Upload file failed");
-            }
+            return Result<string>.Success("Create product image success", result.Url);
         }
 
         public async Task<Result> DeleteAsync(Guid id)
@@ -66,32 +58,24 @@ namespace Application.Services
 
         public async Task<Result<PagedResult<ProductImageModel>>> GetAllAsync(PaginationReqModel pagiModel)
         {
-            try
+            var query = _repository.GetAllAsync();
+
+            var totalCount = query.Count();
+
+            var items = await query
+                .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
+            .Take(pagiModel.PageSize)
+                .ProjectTo<ProductImageModel>(mapper.ConfigurationProvider)
+            .ToListAsync();
+
+            return Result<PagedResult<ProductImageModel>>.Success("Get images success", new PagedResult<ProductImageModel>
             {
-                var query = _repository.GetAllAsync();
-
-                var totalCount = query.Count();
-
-                var items = await query
-                    .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
-                .Take(pagiModel.PageSize)
-                    .ProjectTo<ProductImageModel>(mapper.ConfigurationProvider)
-                .ToListAsync();
-
-                return Result<PagedResult<ProductImageModel>>.Success("Get images success", new PagedResult<ProductImageModel>
-                {
-                    Items = items,
-                    TotalItems = totalCount,
-                    Page = pagiModel.Page,
-                    PageSize = pagiModel.PageSize,
-                    TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to get image list");
-                return Result<PagedResult<ProductImageModel>>.Failure("Failed to get image list", null);
-            }
+                Items = items,
+                TotalItems = totalCount,
+                Page = pagiModel.Page,
+                PageSize = pagiModel.PageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
+            });
         }
 
         public Task<Result<ProductImageModel>> GetByIdAsync(Guid id)

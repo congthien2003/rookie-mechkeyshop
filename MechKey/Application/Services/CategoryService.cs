@@ -33,17 +33,11 @@ namespace Application.Services
         public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model)
         {
             if (string.IsNullOrEmpty(model.Name)) throw new CategoryInvalidDataException();
-            try
-            {
-                var entity = new Category(Guid.NewGuid(), model.Name);
-                var newEntity = await _repository.CreateAsync(entity);
-                return Result<CategoryModel>.Success("Add category success", _mapper.Map<CategoryModel>(newEntity));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. Model: {Model}, Message: {Message}", nameof(AddAsync), model, ex.Message);
-                throw new CategoryHandleFailedException();
-            }
+
+            var entity = new Category(Guid.NewGuid(), model.Name);
+            var newEntity = await _repository.CreateAsync(entity);
+            return Result<CategoryModel>.Success("Add category success", _mapper.Map<CategoryModel>(newEntity));
+
         }
 
         public async Task<Result> DeleteAsync(Guid id)
@@ -55,115 +49,78 @@ namespace Application.Services
                 throw new CategoryNotFoundException();
             }
 
-            try
-            {
-                await _repository.DeleteAsync(entity);
-                return Result.Success("Delete category success");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. CategoryId: {CategoryId}, Message: {Message}", nameof(DeleteAsync), id, ex.Message);
-                throw new CategoryHandleFailedException();
-            }
+            await _repository.DeleteAsync(entity);
+            return Result.Success("Delete category success");
+
         }
 
         public async Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel)
         {
             string key = $"category-{pagiModel.Page}-{pagiModel.PageSize}";
+            var data = _redisService.Get<PagedResult<CategoryModel>>(key);
 
-            try
+            if (data is null)
             {
-                var data = _redisService.Get<PagedResult<CategoryModel>>(key);
+                var query = _repository.GetAllAsync();
 
-                if (data is null)
+                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
                 {
-                    var query = _repository.GetAllAsync();
-
-                    if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
-                    {
-                        query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
-                    }
-
-                    int totalCount = query.ToList().Count;
-
-                    var items = query
-                        .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
-                        .Take(pagiModel.PageSize)
-                        .Select(c => _mapper.Map<CategoryModel>(c))
-                        .ToList();
-
-
-                    data = new PagedResult<CategoryModel>
-                    {
-                        Items = items,
-                        TotalItems = totalCount,
-                        Page = pagiModel.Page,
-                        PageSize = pagiModel.PageSize,
-                        TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize)
-                    };
-
-                    _redisService.Set(key, data, 120);
+                    query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
                 }
 
-                return Result<PagedResult<CategoryModel>>.Success("Get category list success", data);
+                int totalCount = query.ToList().Count;
+
+                var items = query
+                    .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
+                    .Take(pagiModel.PageSize)
+                    .Select(c => _mapper.Map<CategoryModel>(c))
+                    .ToList();
+
+
+                data = new PagedResult<CategoryModel>
+                {
+                    Items = items,
+                    TotalItems = totalCount,
+                    Page = pagiModel.Page,
+                    PageSize = pagiModel.PageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize)
+                };
+
+                _redisService.Set(key, data, 120);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. Pagination: {Pagination}, Message: {Message}", nameof(GetAllAsync), pagiModel, ex.Message);
-                throw new Exception("Get category list failed");
-            }
+
+            return Result<PagedResult<CategoryModel>>.Success("Get category list success", data);
+
         }
 
         public async Task<Result<CategoryModel>> GetByIdAsync(Guid id)
         {
-            try
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
             {
-                var entity = await _repository.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(GetByIdAsync), id);
-                    throw new CategoryNotFoundException();
-                }
+                _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(GetByIdAsync), id);
+                throw new CategoryNotFoundException();
+            }
 
-                return Result<CategoryModel>.Success("Get category by id success", _mapper.Map<CategoryModel>(entity));
-            }
-            catch (CategoryNotFoundException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. CategoryId: {CategoryId}, Message: {Message}", nameof(GetByIdAsync), id, ex.Message);
-                throw new CategoryHandleFailedException();
-            }
+            return Result<CategoryModel>.Success("Get category by id success", _mapper.Map<CategoryModel>(entity));
+
         }
 
         public async Task<Result<CategoryModel>> UpdateAsync(CategoryModel model)
         {
-            try
+            var entity = await _repository.GetByIdAsync(model.Id);
+            if (entity == null)
             {
-                var entity = await _repository.GetByIdAsync(model.Id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(UpdateAsync), model.Id);
-                    throw new CategoryNotFoundException();
-                }
+                _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(UpdateAsync), model.Id);
+                throw new CategoryNotFoundException();
+            }
 
-                entity.Name = model.Name;
-                entity.LastUpdatedAt = DateTime.UtcNow;
+            entity.Name = model.Name;
+            entity.LastUpdatedAt = DateTime.UtcNow;
 
-                var updatedEntity = await _repository.UpdateAsync(entity);
-                return Result<CategoryModel>.Success("Update category success", _mapper.Map<CategoryModel>(updatedEntity));
-            }
-            catch (CategoryNotFoundException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. CategoryId: {CategoryId}, Message: {Message}", nameof(UpdateAsync), model.Id, ex.Message);
-                throw new CategoryHandleFailedException();
-            }
+            var updatedEntity = await _repository.UpdateAsync(entity);
+            return Result<CategoryModel>.Success("Update category success", _mapper.Map<CategoryModel>(updatedEntity));
+
         }
     }
 

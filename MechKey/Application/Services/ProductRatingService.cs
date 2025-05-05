@@ -31,64 +31,49 @@ namespace Application.Services
         }
         public async Task<Result> AddAsync(ProductRatingModel model)
         {
-            try
-            {
+            ProductRating entity = mapper.Map<ProductRating>(model);
 
-                ProductRating entity = mapper.Map<ProductRating>(model);
+            Product product = await productRepository.GetByIdAsync(entity.ProductId);
+            product.AddRating(entity);
 
-                Product product = await productRepository.GetByIdAsync(entity.ProductId);
-                product.AddRating(entity);
-
-                await productRepository.UpdateAsync(product);
-                //var result = await productRatingRepository.CreateAsync(entity);
-                return Result.Success("Add rating success");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.Message);
-                throw new Exception("Add rating failed");
-            }
+            await productRepository.UpdateAsync(product);
+            //var result = await productRatingRepository.CreateAsync(entity);
+            return Result.Success("Add rating success");
         }
 
         public async Task<Result<PagedResult<ProductRatingModel>>>? GetAllByIdProductAsync(Guid id, int pageSize = 4, bool ascOrder = false)
         {
-            try
+
+            var query = productRatingRepository.GetListByProdut(id);
+
+            if (ascOrder)
             {
-                var query = productRatingRepository.GetListByProdut(id);
+                query = query.OrderBy(pr => pr.RatedAt);
 
-                if (ascOrder)
-                {
-                    query = query.OrderBy(pr => pr.RatedAt);
-
-                }
-                else
-                {
-                    query = query.OrderByDescending(pr => pr.Id);
-                }
-
-                var userInfo = await applicationUserRepository.GetByIdAsync(id);
-
-                var data = await query.Take(pageSize)
-                    .Include(pr => pr.User)
-                    .Select(pr => mapper.Map<ProductRatingModel>(pr))
-                    .ToListAsync();
-
-                PagedResult<ProductRatingModel> result = new PagedResult<ProductRatingModel>()
-                {
-                    Page = 1,
-                    PageSize = pageSize,
-                    TotalItems = query.Count(),
-                    Items = data,
-                    TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize)
-                };
-
-                return Result<PagedResult<ProductRatingModel>>.Success("Get rating success", result);
             }
-            catch (Exception ex)
+            else
             {
-                logger.LogError(ex.Message);
-                return Result<PagedResult<ProductRatingModel>>.Failure("Get failed", null);
+                query = query.OrderByDescending(pr => pr.Id);
             }
+
+            var userInfo = await applicationUserRepository.GetByIdAsync(id);
+
+            var data = await query.Take(pageSize)
+                .Include(pr => pr.User)
+                .Select(pr => mapper.Map<ProductRatingModel>(pr))
+                .ToListAsync();
+
+            PagedResult<ProductRatingModel> result = new PagedResult<ProductRatingModel>()
+            {
+                Page = 1,
+                PageSize = pageSize,
+                TotalItems = query.Count(),
+                Items = data,
+                TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize)
+            };
+
+            return Result<PagedResult<ProductRatingModel>>.Success("Get rating success", result);
+
         }
     }
 }

@@ -51,7 +51,8 @@ namespace Application.Services
         {
             // Upload image on cloud
             var uploadImageResponse = await UploadFileAsync(model.ImageData);
-
+            if (!uploadImageResponse.IsSuccess)
+                throw new ProductImageHandleFailedException();
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
@@ -59,31 +60,23 @@ namespace Application.Services
                 // save to db
                 var entity = _mapper.Map<Product>(model);
 
-                if (uploadImageResponse.IsSuccess)
+                ProductImage productImage = new ProductImage
                 {
-                    ProductImage productImage = new ProductImage
-                    {
-                        FilePath = uploadImageResponse.Data.FilePath,
-                        Url = uploadImageResponse.Data.PublicUrl,
-                        ProductId = entity.Id,
-                        IsDeleted = false,
-                        CreatedAt = DateTime.UtcNow,
-                        LastUpdatedAt = DateTime.UtcNow,
-                    };
+                    FilePath = uploadImageResponse.Data.FilePath,
+                    Url = uploadImageResponse.Data.PublicUrl,
+                    ProductId = entity.Id,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow,
+                };
 
-                    await _unitOfWork.ProductImageRepository.CreateAsync(productImage);
-                }
-                else
-                {
-                    throw new ProductImageHandleFailedException();
-                }
+                await _unitOfWork.ProductImageRepository.CreateAsync(productImage);
 
                 entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
 
                 var newEntity = await _unitOfWork.ProductRepository.CreateAsync(entity);
 
                 await _unitOfWork.CommitAsync();
-
 
                 return Result<ProductModel>.Success("Add product success", _mapper.Map<ProductModel>(newEntity));
             }
@@ -145,69 +138,61 @@ namespace Application.Services
             bool ascOrder = false)
         {
             string key = $"product-{pagiModel.Page}-{pagiModel.PageSize}-{categoryId}-{pagiModel.SearchTerm}-{sortCol}-{ascOrder}";
-            try
+            var data = _redisService.Get<PagedResult<ProductModel>>(key);
+            if (data is not null)
             {
-                var data = _redisService.Get<PagedResult<ProductModel>>(key);
-                if (data is not null)
-                {
-                    return Result<PagedResult<ProductModel>>.Success("Get list product from cache", data);
-                }
-
-                var query = _repository.GetAllAsync();
-
-                if (!string.IsNullOrEmpty(categoryId))
-                {
-                    query = query.Where(q => q.Category.Id.ToString() == categoryId);
-                }
-
-                if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
-                {
-                    query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm));
-                }
-
-                if (!string.IsNullOrEmpty(sortCol))
-                {
-                    switch (sortCol)
-                    {
-                        case "price":
-                            query = ascOrder ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
-                            break;
-                        case "createdAt":
-                            query = ascOrder ? query.OrderBy(p => p.CreatedAt) : query.OrderByDescending(p => p.CreatedAt);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                var totalCount = query.Count();
-                var items = query
-                    .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
-                    .Take(pagiModel.PageSize)
-                    .Include(p => p.Category)
-                    .Include(p => p.ProductRatings)
-                    .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
-                    .ToList();
-
-                data = new PagedResult<ProductModel>
-                {
-                    Items = items,
-                    TotalItems = totalCount,
-                    Page = pagiModel.Page,
-                    PageSize = pagiModel.PageSize,
-                    TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
-                };
-
-                _redisService.Set(key, data, 15);
-
-                return Result<PagedResult<ProductModel>>.Success("Get list product success", data);
+                return Result<PagedResult<ProductModel>>.Success("Get list product from cache", data);
             }
-            catch (Exception ex)
+
+            var query = _repository.GetAllAsync();
+
+            if (!string.IsNullOrEmpty(categoryId))
             {
-                _logger.LogError(ex, "Error occurred in {Method}. Pagination: {Pagination}, CategoryId: {CategoryId}, SortCol: {SortCol}, AscOrder: {AscOrder}, Message: {Message}",
-                    nameof(GetAllAsync), pagiModel, categoryId, sortCol, ascOrder, ex.Message);
-                throw new ProductHandleFailedException();
+                query = query.Where(q => q.Category.Id.ToString() == categoryId);
             }
+
+            if (!string.IsNullOrEmpty(pagiModel.SearchTerm))
+            {
+                query = query.Where(u => u.Name.Contains(pagiModel.SearchTerm));
+            }
+
+            if (!string.IsNullOrEmpty(sortCol))
+            {
+                switch (sortCol)
+                {
+                    case "price":
+                        query = ascOrder ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+                        break;
+                    case "createdAt":
+                        query = ascOrder ? query.OrderBy(p => p.CreatedAt) : query.OrderByDescending(p => p.CreatedAt);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var totalCount = query.Count();
+            var items = query
+                .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
+                .Take(pagiModel.PageSize)
+                /*.Include(p => p.Category)*/
+                /*.Include(p => p.ProductRatings)*/
+                .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
+                .AsNoTracking()
+                .AsEnumerable();
+
+            data = new PagedResult<ProductModel>
+            {
+                Items = items,
+                TotalItems = totalCount,
+                Page = pagiModel.Page,
+                PageSize = pagiModel.PageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
+            };
+
+            _redisService.Set(key, data, 15);
+
+            return Result<PagedResult<ProductModel>>.Success("Get list product success", data);
         }
 
         public async Task<Result<IEnumerable<ProductModel>>> GetBestSellerAsync()
@@ -233,88 +218,55 @@ namespace Application.Services
 
         public async Task<Result<ProductModel>> GetByIdAsync(Guid id)
         {
-            try
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
             {
-                var entity = await _repository.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(GetByIdAsync), id);
-                    throw new ProductNotFoundException();
-                }
+                _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(GetByIdAsync), id);
+                throw new ProductNotFoundException();
+            }
 
-                return Result<ProductModel>.Success("Get product by id success", _mapper.Map<ProductModel>(entity));
-            }
-            catch (ProductNotFoundException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(GetByIdAsync), id, ex.Message);
-                throw new ProductHandleFailedException();
-            }
+            return Result<ProductModel>.Success("Get product by id success", _mapper.Map<ProductModel>(entity));
         }
 
         public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model)
         {
             Result<UploadFileResponseModel> uploadImageResponse = null;
-            try
+            var entity = await _repository.GetByIdAsync(model.Id);
+            if (entity == null)
             {
-                var entity = await _repository.GetByIdAsync(model.Id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(UpdateAsync), model.Id);
-                    throw new ProductNotFoundException();
-                }
-
-                // check image update
-                if (!string.IsNullOrEmpty(model.ImageData))
-                {
-                    // Upload image on cloud
-                    uploadImageResponse = await UploadFileAsync(model.ImageData);
-
-                    if (uploadImageResponse.IsSuccess)
-                    {
-                        entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
-
-                        await _eventBus.PublishAsync(new DeleteImageEvent
-                        {
-                            Id = Guid.NewGuid(),
-                            CreatedAt = DateTime.UtcNow,
-                            Url = entity.ImageUrl,
-                        });
-                    }
-                }
-
-                entity.Name = model.Name;
-                entity.Description = model.Description;
-                entity.Price = model.Price;
-                entity.LastUpdatedAt = DateTime.UtcNow;
-                entity.Variants = JsonConvert.SerializeObject(model.Variants);
-                entity.IsDeleted = model.IsDeleted;
-
-                var result = await _repository.UpdateAsync(entity);
-                return Result<ProductModel>.Success("Update product success", _mapper.Map<ProductModel>(result));
+                _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(UpdateAsync), model.Id);
+                throw new ProductNotFoundException();
             }
-            catch (ProductNotFoundException)
+
+            // check image update
+            if (!string.IsNullOrEmpty(model.ImageData))
             {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                if (uploadImageResponse != null && uploadImageResponse.IsSuccess)
+                // Upload image on cloud
+                uploadImageResponse = await UploadFileAsync(model.ImageData);
+
+                if (uploadImageResponse.IsSuccess)
                 {
+                    entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
+
                     await _eventBus.PublishAsync(new DeleteImageEvent
                     {
                         Id = Guid.NewGuid(),
                         CreatedAt = DateTime.UtcNow,
-                        Url = uploadImageResponse.Data.PublicUrl
+                        Url = entity.ImageUrl,
                     });
                 }
-
-                _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(UpdateAsync), model.Id, ex.Message);
-                throw new ProductHandleFailedException();
             }
+
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.Price = model.Price;
+            entity.LastUpdatedAt = DateTime.UtcNow;
+            entity.Variants = JsonConvert.SerializeObject(model.Variants);
+            entity.IsDeleted = model.IsDeleted;
+
+            var result = await _repository.UpdateAsync(entity);
+            return Result<ProductModel>.Success("Update product success", _mapper.Map<ProductModel>(result));
+
         }
 
         public async Task<Result<UploadFileResponseModel>> UploadFileAsync(string base64string)
@@ -333,4 +285,5 @@ namespace Application.Services
 
         }
     }
+
 }

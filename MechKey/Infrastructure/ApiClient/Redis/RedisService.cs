@@ -29,14 +29,14 @@ namespace Infrastructure.ApiClient.Redis
             _cache?.Remove(key);
         }
 
-        public void Set<T>(string key, T value, int minutes)
+        public async Task Set<T>(string key, T value, int minutes)
         {
             var options = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(minutes)
             };
             var data = JsonSerializer.Serialize<T>(value);
-            _cache?.SetString(key, data, options);
+            _cache?.SetStringAsync(key, data, options);
         }
     }
 }
