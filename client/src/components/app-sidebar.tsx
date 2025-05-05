@@ -1,6 +1,7 @@
 import { Box, Cuboid, File, Home, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import UserBlock from "./UserBlock";
 
 // Menu items.
 const items = [
@@ -39,7 +40,7 @@ export function AppSidebar() {
 			<div className="flex h-16 items-center border-b px-4">
 				<h1 className="text-lg font-bold">Admin - MechkeyShop</h1>
 			</div>
-			<nav className="flex-1 space-y-1 p-2">
+			<nav className="space-y-1 p-2 mb-[100%]	">
 				{items.map((item) => {
 					const Icon = item.icon;
 					return (
@@ -58,6 +59,7 @@ export function AppSidebar() {
 					);
 				})}
 			</nav>
+			<UserBlock />
 		</div>
 	);
 }
