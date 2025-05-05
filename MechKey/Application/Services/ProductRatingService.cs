@@ -58,10 +58,10 @@ namespace Application.Services
 
             var userInfo = await applicationUserRepository.GetByIdAsync(id);
 
-            var data = await query.Take(pageSize)
+            var data = query.Take(pageSize)
                 .Include(pr => pr.User)
                 .Select(pr => mapper.Map<ProductRatingModel>(pr))
-                .ToListAsync();
+                .ToList();
 
             PagedResult<ProductRatingModel> result = new PagedResult<ProductRatingModel>()
             {

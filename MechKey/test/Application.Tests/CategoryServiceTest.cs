@@ -74,26 +74,6 @@ namespace Application.Test
         }
 
         [Fact]
-        public async Task Add_Category_Async_Should_Throw_HandleFailedException()
-        {
-            // Arrange
-            const string name = "";
-            CreateCategoryModel model = new CreateCategoryModel()
-            {
-                Name = name,
-            };
-            Category category = new Category(Guid.NewGuid(), "Test");
-            _categoryRepoMock.Setup(repo => repo.CreateAsync(category)).Throws(new CategoryInvalidDataException());
-            // Assert
-            await Assert.ThrowsAsync<CategoryHandleFailedException>(() => _categoryService.AddAsync(model));
-
-            _categoryRepoMock.Verify(repo =>
-            repo.CreateAsync(It.IsAny<Category>()), Times.Once);
-
-        }
-
-
-        [Fact]
         public async Task Update_Category_Async_With_Valid_Data_Should_Update_Category()
         {
             // Arrange

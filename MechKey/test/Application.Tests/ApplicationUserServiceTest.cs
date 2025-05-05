@@ -148,5 +148,21 @@ namespace Application.Test
             // Act & Assert
             await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.UpdateAsync(updatedUserModel));
         }
+
+        [Fact]
+        public async Task UpdateStatusEmailConfirm_ShouldReturnSuccess()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var applicationUser = new ApplicationUser { Id = userId, Name = "Old Name", Email = "old@example.com", IsEmailConfirmed = false };
+            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(applicationUser);
+
+            // Act
+            await _applicationUserService.UpdateEmailConfirmAsync(userId);
+
+            // Arrange
+            Assert.True(applicationUser.IsEmailConfirmed);
+            _mockRepository.Verify(r => r.GetByIdAsync(userId), Times.Once());
+        }
     }
 }

@@ -96,9 +96,8 @@ namespace Application.Services
         {
             var entity = await applicationUserRepository.GetByIdAsync(id);
             if (entity == null)
-            {
                 throw new UserNotFoundException();
-            }
+
             return Result<ApplicationUserModel>.Success("Get user by id success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
         }
