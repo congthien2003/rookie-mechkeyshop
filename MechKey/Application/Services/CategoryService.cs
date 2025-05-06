@@ -1,6 +1,7 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IServices;
+using Application.Validators;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
@@ -34,7 +35,7 @@ namespace Application.Services
 
         public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrEmpty(model.Name)) throw new CategoryInvalidDataException();
+            CategoryValidator.CreateCategoryModelValidate(model);
 
             var entity = new Category(Guid.NewGuid(), model.Name);
             var newEntity = await _repository.CreateAsync(entity, cancellationToken);
@@ -109,6 +110,7 @@ namespace Application.Services
 
         public async Task<Result<CategoryModel>> UpdateAsync(CategoryModel model, CancellationToken cancellationToken = default)
         {
+            CategoryValidator.CategoryModelValidate(model);
             var entity = await _repository.GetByIdAsync(model.Id, cancellationToken);
             if (entity == null)
             {
