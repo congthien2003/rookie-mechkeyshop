@@ -1,6 +1,7 @@
 ﻿using Application;
 using Infrastructure;
 using Infrastructure.ApiClient.MassTransit;
+using Infrastructure.ApiClient.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -54,7 +55,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+builder.AddRedisCache();
 builder.AddMassTransit();
 
 
