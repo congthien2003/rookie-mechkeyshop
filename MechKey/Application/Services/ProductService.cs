@@ -5,6 +5,7 @@ using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
+using Application.Validators;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.Entity;
@@ -50,6 +51,8 @@ namespace Application.Services
 
         public async Task<Result<ProductModel>> AddAsync(CreateProductModel model, CancellationToken cancellationToken = default)
         {
+            ProductValidator.CreatedProductValidator(model);
+
             // Upload image on cloud
             var uploadImageResponse = await UploadFileAsync(model.ImageData, cancellationToken);
             if (!uploadImageResponse.IsSuccess)
@@ -219,6 +222,8 @@ namespace Application.Services
 
         public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model, CancellationToken cancellationToken = default)
         {
+            ProductValidator.UpdatedProductValidator(model);
+
             Result<UploadFileResponseModel> uploadImageResponse = null;
             var entity = await _repository.GetByIdAsync(model.Id, cancellationToken);
             if (entity == null)
