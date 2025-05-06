@@ -4,6 +4,7 @@ using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.Extensions.Logging;
+using MockQueryable;
 using Moq;
 using Shared.ViewModels.Auth;
 
@@ -15,6 +16,7 @@ namespace Application.Test
         private readonly IMapper _mapper; // Use actual mapper instance
         private readonly Mock<ILogger<ApplicationUserService>> _mockLogger;
         private readonly ApplicationUserService _applicationUserService;
+        private readonly CancellationToken _cancellationToken;
 
         public ApplicationUserServiceTest()
         {
@@ -35,6 +37,8 @@ namespace Application.Test
                 _mapper,
                 _mockLogger.Object
             );
+
+            _cancellationToken = new CancellationToken();
         }
 
         [Fact]
@@ -44,11 +48,11 @@ namespace Application.Test
             var userId = Guid.NewGuid();
             var applicationUser = new ApplicationUser { Id = userId, Name = "Test User" };
 
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(applicationUser);
-            _mockRepository.Setup(r => r.DeleteAsync(applicationUser)).Returns(Task.CompletedTask);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync(applicationUser);
+            _mockRepository.Setup(r => r.DeleteAsync(applicationUser, _cancellationToken)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _applicationUserService.DeleteAsync(userId);
+            var result = await _applicationUserService.DeleteAsync(userId, _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -60,10 +64,10 @@ namespace Application.Test
         {
             // Arrange
             var userId = Guid.NewGuid();
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync((ApplicationUser)null);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.DeleteAsync(userId));
+            await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.DeleteAsync(userId, _cancellationToken));
         }
 
         [Fact]
@@ -71,15 +75,17 @@ namespace Application.Test
         {
             // Arrange
             var users = new List<ApplicationUser>
-                {
-                    new ApplicationUser { Id = Guid.NewGuid(), Name = "User 1", Email = "user1@example.com" },
-                    new ApplicationUser { Id = Guid.NewGuid(), Name = "User 2", Email = "user2@example.com" }
-                };
+                    {
+                        new ApplicationUser { Id = Guid.NewGuid(), Name = "User 1", Email = "user1@example.com" },
+                        new ApplicationUser { Id = Guid.NewGuid(), Name = "User 2", Email = "user2@example.com" }
+                    };
 
-            _mockRepository.Setup(r => r.GetAllAsync()).Returns(users.AsQueryable());
+            var queryable = users.AsQueryable().BuildMock();
+
+            _mockRepository.Setup(r => r.GetAllAsync()).Returns(queryable);
 
             // Act
-            var result = await _applicationUserService.GetAllAsync(1, 10);
+            var result = await _applicationUserService.GetAllAsync(1, 10, "", _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -93,10 +99,10 @@ namespace Application.Test
             var userId = Guid.NewGuid();
             var applicationUser = new ApplicationUser { Id = userId, Name = "Test User", Email = "test@example.com" };
 
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(applicationUser);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act
-            var result = await _applicationUserService.GetByIdAsync(userId);
+            var result = await _applicationUserService.GetByIdAsync(userId, _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -109,10 +115,10 @@ namespace Application.Test
         {
             // Arrange
             var userId = Guid.NewGuid();
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync((ApplicationUser)null);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.GetByIdAsync(userId));
+            await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.GetByIdAsync(userId, _cancellationToken));
         }
 
         [Fact]
@@ -123,11 +129,11 @@ namespace Application.Test
             var applicationUser = new ApplicationUser { Id = userId, Name = "Old Name", Email = "old@example.com" };
             var updatedUserModel = new ApplicationUserModel { Id = userId, Name = "New Name", Email = "new@example.com" };
 
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(applicationUser);
-            _mockRepository.Setup(r => r.UpdateAsync(applicationUser)).ReturnsAsync(applicationUser);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync(applicationUser);
+            _mockRepository.Setup(r => r.UpdateAsync(applicationUser, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act
-            var result = await _applicationUserService.UpdateAsync(updatedUserModel);
+            var result = await _applicationUserService.UpdateAsync(updatedUserModel, _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -143,10 +149,10 @@ namespace Application.Test
             var userId = Guid.NewGuid();
             var updatedUserModel = new ApplicationUserModel { Id = userId, Name = "New Name", Email = "new@example.com" };
 
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync((ApplicationUser)null);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.UpdateAsync(updatedUserModel));
+            await Assert.ThrowsAsync<UserNotFoundException>(() => _applicationUserService.UpdateAsync(updatedUserModel, _cancellationToken));
         }
 
         [Fact]
@@ -155,14 +161,14 @@ namespace Application.Test
             // Arrange
             var userId = Guid.NewGuid();
             var applicationUser = new ApplicationUser { Id = userId, Name = "Old Name", Email = "old@example.com", IsEmailConfirmed = false };
-            _mockRepository.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(applicationUser);
+            _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act
-            await _applicationUserService.UpdateEmailConfirmAsync(userId);
+            await _applicationUserService.UpdateEmailConfirmAsync(userId, _cancellationToken);
 
-            // Arrange
+            // Assert
             Assert.True(applicationUser.IsEmailConfirmed);
-            _mockRepository.Verify(r => r.GetByIdAsync(userId), Times.Once());
+            _mockRepository.Verify(r => r.GetByIdAsync(userId, _cancellationToken), Times.Once());
         }
     }
 }
