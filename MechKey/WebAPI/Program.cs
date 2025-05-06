@@ -2,6 +2,7 @@ using Application;
 using Asp.Versioning;
 using Infrastructure;
 using Infrastructure.ApiClient.MassTransit;
+using Infrastructure.ApiClient.OpenTelemetry;
 using Infrastructure.ApiClient.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -74,25 +75,7 @@ builder.Services.AddApiVersioning(options =>
 
 builder.AddRedisCache();
 builder.AddMassTransit();
-
-/*builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing =>
-    {
-        tracing
-            *//*.AddAspNetCoreInstrumentation()*//*
-            .AddHttpClientInstrumentation()
-            //.AddMassTransitInstrumentation()
-            .AddConsoleExporter();
-    });*/
-//.WithMetrics(metrics =>
-//{
-//    metrics
-//        .AddRuntimeInstrumentation()
-//        .AddAspNetCoreInstrumentation()
-//        .AddConsoleExporter();
-//    //.AddPrometheusExporter();
-//});
-
+builder.AddOpenTelemetry();
 
 var app = builder.Build();
 
