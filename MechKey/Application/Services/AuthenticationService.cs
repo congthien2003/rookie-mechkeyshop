@@ -3,6 +3,7 @@ using Application.Events;
 using Application.Interfaces.IApiClient.MassTransit;
 using Application.Interfaces.IServices;
 using Application.Services.Common;
+using Application.Validators;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
@@ -28,6 +29,7 @@ namespace Application.Services
 
         public async Task<Result<ApplicationUserModel>> Login(LoginModel model, CancellationToken cancellationToken = default)
         {
+            AuthValidator.ValidateLogin(model);
             // Tìm user theo email hoặc username
             var user = await applicationUserRepository.GetByEmailAsync(model.Email, cancellationToken);
             if (user == null)
@@ -59,6 +61,7 @@ namespace Application.Services
 
         public async Task<Result> Register(RegisterModel model, CancellationToken cancellationToken = default)
         {
+            AuthValidator.ValidateRegister(model);
             // Check phone and email exists
             var checkPhoneExist = applicationUserRepository.CheckPhoneExists(model.Phones)
                 ? throw new UserPhoneExistsException() : "";
