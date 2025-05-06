@@ -1,0 +1,6 @@
+@Mechkey.Yarp_HostAddress = http://localhost:5160
+
+GET {{Mechkey.Yarp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
