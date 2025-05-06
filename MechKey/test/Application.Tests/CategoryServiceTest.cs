@@ -5,6 +5,7 @@ using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.Extensions.Logging;
+using MockQueryable;
 using Moq;
 using Shared.Common;
 using Shared.ViewModels.Category;
@@ -18,6 +19,8 @@ namespace Application.Test
         private readonly Mock<ILogger<CategoryService>> _loggerMock;
         private readonly Mock<IRedisService> _redisServiceMock;
         private readonly CategoryService _categoryService;
+        private readonly CancellationToken _cancellationToken;
+
         public CategoryServiceTest()
         {
             var config = new MapperConfiguration(cfg =>
@@ -30,7 +33,9 @@ namespace Application.Test
             _loggerMock = new Mock<ILogger<CategoryService>>();
             _redisServiceMock = new Mock<IRedisService>();
             _categoryService = new CategoryService(_categoryRepoMock.Object, _mapperMock.Object, _loggerMock.Object, _redisServiceMock.Object);
+            _cancellationToken = new CancellationToken();
         }
+
         private static Category CreateCategoryEntity() => new Category(Guid.NewGuid(), "Category Name");
 
         [Fact]
@@ -44,14 +49,13 @@ namespace Application.Test
             };
 
             // Act
-            var result = await _categoryService.AddAsync(model);
+            var result = await _categoryService.AddAsync(model, _cancellationToken);
 
             // Assert
             Assert.NotNull(result);
             Assert.True(result.IsSuccess);
             _categoryRepoMock.Verify(repo =>
-            repo.CreateAsync(It.Is<Category>(c => c.Name == "Name test")), Times.Once);
-
+            repo.CreateAsync(It.Is<Category>(c => c.Name == "Name test"), _cancellationToken), Times.Once);
         }
 
         [Fact]
@@ -65,12 +69,10 @@ namespace Application.Test
             };
 
             // Assert
-
-            await Assert.ThrowsAsync<CategoryInvalidDataException>(() => _categoryService.AddAsync(model));
+            await Assert.ThrowsAsync<CategoryInvalidDataException>(() => _categoryService.AddAsync(model, _cancellationToken));
 
             _categoryRepoMock.Verify(repo =>
-            repo.CreateAsync(It.IsAny<Category>()), Times.Never);
-
+            repo.CreateAsync(It.IsAny<Category>(), _cancellationToken), Times.Never);
         }
 
         [Fact]
@@ -79,9 +81,9 @@ namespace Application.Test
             // Arrange
             var category = CreateCategoryEntity();
             _categoryRepoMock.Setup(repo =>
-                repo.GetByIdAsync(It.IsAny<Guid>()))
+                repo.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
             .ReturnsAsync(category);
-            _categoryRepoMock.Setup(repo => repo.UpdateAsync(It.IsAny<Category>()));
+            _categoryRepoMock.Setup(repo => repo.UpdateAsync(It.IsAny<Category>(), _cancellationToken));
 
             // Act
             category.Name = "Category Updated";
@@ -90,13 +92,13 @@ namespace Application.Test
                 Name = category.Name,
                 Id = category.Id
             };
-            var result = await _categoryService.UpdateAsync(categoryModel);
+            var result = await _categoryService.UpdateAsync(categoryModel, _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
 
             _categoryRepoMock.Verify(repo =>
-                    repo.UpdateAsync(It.Is<Category>(c => c.Name == "Category Updated")), Times.Once);
+                    repo.UpdateAsync(It.Is<Category>(c => c.Name == "Category Updated"), _cancellationToken), Times.Once);
         }
 
         [Fact]
@@ -108,74 +110,74 @@ namespace Application.Test
                 Id = Guid.NewGuid()
             };
             _categoryRepoMock.Setup(r =>
-                r.GetByIdAsync(It.IsAny<Guid>()))
+                r.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
                 .ReturnsAsync((Category)null);
 
-            await Assert.ThrowsAsync<CategoryNotFoundException>(() => _categoryService.UpdateAsync(categoryModel));
+            await Assert.ThrowsAsync<CategoryNotFoundException>(() => _categoryService.UpdateAsync(categoryModel, _cancellationToken));
         }
 
         [Fact]
         public async Task Delete_Category_Async_With_Valid_Id_Should_Delete_Category()
         {
-            // Arange
+            // Arrange
             var category = CreateCategoryEntity();
             _categoryRepoMock.Setup(repo =>
-                repo.GetByIdAsync(It.IsAny<Guid>()))
+                repo.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
             .ReturnsAsync(category);
-            _categoryRepoMock.Setup(repo => repo.DeleteAsync(It.IsAny<Category>()));
+            _categoryRepoMock.Setup(repo => repo.DeleteAsync(It.IsAny<Category>(), _cancellationToken));
 
             // Act
-            var result = await _categoryService.DeleteAsync(category.Id);
+            var result = await _categoryService.DeleteAsync(category.Id, _cancellationToken);
 
             // Assert
             Assert.NotNull(result);
             Assert.True(result.IsSuccess);
-            _categoryRepoMock.Verify(repo => repo.DeleteAsync(category), Times.Once);
+            _categoryRepoMock.Verify(repo => repo.DeleteAsync(category, _cancellationToken), Times.Once);
         }
 
         [Fact]
         public async Task Delete_Category_Async_With_Invalid_Id_Should_Throw()
         {
-            // Arange
+            // Arrange
             var category = CreateCategoryEntity();
-            var Invalid_ID = Guid.NewGuid();
-            _categoryRepoMock.Setup(repo => repo.GetByIdAsync(It.IsAny<Guid>()))
+            var invalidId = Guid.NewGuid();
+            _categoryRepoMock.Setup(repo => repo.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken))
                 .ReturnsAsync((Category)null);
-            _categoryRepoMock.Setup(repo => repo.DeleteAsync(It.IsAny<Category>()));
+            _categoryRepoMock.Setup(repo => repo.DeleteAsync(It.IsAny<Category>(), _cancellationToken));
 
-            await Assert.ThrowsAsync<CategoryNotFoundException>(() => _categoryService.DeleteAsync(Invalid_ID));
+            await Assert.ThrowsAsync<CategoryNotFoundException>(() => _categoryService.DeleteAsync(invalidId, _cancellationToken));
 
             _categoryRepoMock.Verify(repo =>
-            repo.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
+            repo.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken), Times.Once);
             _categoryRepoMock.Verify(repo =>
-                repo.DeleteAsync(It.IsAny<Category>()), Times.Never);
+                repo.DeleteAsync(It.IsAny<Category>(), _cancellationToken), Times.Never);
         }
 
         [Fact]
         public async Task Get_Category_By_Id_Async_Should_Return_Category_If_Exists()
         {
             var category = CreateCategoryEntity();
-            _categoryRepoMock.Setup(r => r.GetByIdAsync(category.Id))
+            _categoryRepoMock.Setup(r => r.GetByIdAsync(category.Id, _cancellationToken))
                 .ReturnsAsync(category);
 
-            var result = await _categoryService.GetByIdAsync(category.Id);
+            var result = await _categoryService.GetByIdAsync(category.Id, _cancellationToken);
 
             Assert.NotNull(result);
             _categoryRepoMock.Verify(repo =>
-            repo.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
+            repo.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken), Times.Once);
         }
 
         [Fact]
         public async Task Get_Category_By_Id_Async_Should_Throw_If_Not_Exists()
         {
             var category = CreateCategoryEntity();
-            _categoryRepoMock.Setup(r => r.GetByIdAsync(Guid.NewGuid()))
+            _categoryRepoMock.Setup(r => r.GetByIdAsync(Guid.NewGuid(), _cancellationToken))
                 .ReturnsAsync((Category)null);
 
-            await Assert.ThrowsAsync<CategoryNotFoundException>(() => _categoryService.GetByIdAsync(category.Id));
+            await Assert.ThrowsAsync<CategoryNotFoundException>(() => _categoryService.GetByIdAsync(category.Id, _cancellationToken));
 
             _categoryRepoMock.Verify(repo =>
-            repo.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
+            repo.GetByIdAsync(It.IsAny<Guid>(), _cancellationToken), Times.Once);
         }
 
         [Fact]
@@ -187,31 +189,31 @@ namespace Application.Test
 
             var allData = Enumerable.Range(1, 20)
                 .Select(i => new Category(Guid.NewGuid(), $"Category {i}"))
-                .AsQueryable();
+                .ToList();
 
-            // Giả lập repository trả ra full list
+            var mockQueryable = allData.AsQueryable().BuildMock();
+
             _redisServiceMock.Setup(r => r.Get<PagedResult<CategoryModel>>(It.IsAny<string>())).Returns((PagedResult<CategoryModel>)null);
             _categoryRepoMock.Setup(r => r.GetAllAsync())
-                .Returns(allData); // đổi từ IQueryable -> List
+                .Returns(mockQueryable);
 
             var model = new PaginationReqModel
             {
                 Page = page,
                 PageSize = pageSize,
-                SearchTerm = "" // chưa search
+                SearchTerm = ""
             };
 
             // Act
-            var result = await _categoryService.GetAllAsync(model);
+            var result = await _categoryService.GetAllAsync(model, _cancellationToken);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(page, result.Data.Page);
             Assert.Equal(pageSize, result.Data.PageSize);
-            Assert.Equal(pageSize, result.Data.Items.Count()); // đúng số lượng phân trang
+            Assert.Equal(pageSize, result.Data.Items.Count());
 
             _categoryRepoMock.Verify(r => r.GetAllAsync(), Times.Once);
         }
-
     }
 }
