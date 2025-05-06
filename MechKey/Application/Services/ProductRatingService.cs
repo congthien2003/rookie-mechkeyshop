@@ -1,7 +1,9 @@
 ﻿using Application.Comoon;
 using Application.Interfaces.IServices;
+using Application.Validators;
 using AutoMapper;
 using Domain.Entity;
+using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -31,13 +33,18 @@ namespace Application.Services
         }
         public async Task<Result> AddAsync(ProductRatingModel model, CancellationToken cancellationToken = default)
         {
+            ProductValidator.ProductRatingModelValidate(model);
+
             ProductRating entity = mapper.Map<ProductRating>(model);
 
             Product product = await productRepository.GetByIdAsync(entity.ProductId, cancellationToken);
+
+            if (product is null)
+                throw new ProductNotFoundException();
+
             product.AddRating(entity);
 
             await productRepository.UpdateAsync(product, cancellationToken);
-            //var result = await productRatingRepository.CreateAsync(entity);
             return Result.Success("Add rating success");
         }
 
