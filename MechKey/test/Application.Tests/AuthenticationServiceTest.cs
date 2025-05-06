@@ -17,7 +17,18 @@ namespace Application.Test
         private readonly Mock<IEventBus> _mockEventBus;
         private readonly IMapper _mapper;
         private readonly AuthenticationService _authenticationService;
-
+        private readonly CancellationToken _cancellationToken;
+        private static RegisterModel CreateRegisterModel() => new RegisterModel
+        {
+            Id = Guid.NewGuid(),
+            Name = "Name",
+            Email = "test@example.com",
+            Password = "password123",
+            ConfirmPassword = "password123",
+            Phones = "1234567890",
+            Address = "TPHCM",
+            RoleId = 2,
+        };
         public AuthenticationServiceTest()
         {
             _mockUserRepository = new Mock<IApplicationUserRepository<ApplicationUser>>();
@@ -37,6 +48,8 @@ namespace Application.Test
                 _mapper,
                 _mockEventBus.Object
             );
+
+            _cancellationToken = new CancellationToken();
         }
 
         [Fact]
@@ -53,10 +66,10 @@ namespace Application.Test
                 IsEmailConfirmed = true
             };
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email)).ReturnsAsync(applicationUser);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act
-            var result = await _authenticationService.Login(loginModel);
+            var result = await _authenticationService.Login(loginModel, _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -70,10 +83,10 @@ namespace Application.Test
             // Arrange
             var loginModel = new LoginModel { Email = "nonexistent@example.com", Password = "password123" };
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email)).ReturnsAsync((ApplicationUser)null);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel));
+            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel, _cancellationToken));
         }
 
         [Fact]
@@ -90,10 +103,10 @@ namespace Application.Test
                 IsEmailConfirmed = true
             };
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email)).ReturnsAsync(applicationUser);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel));
+            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel, _cancellationToken));
         }
 
         [Fact]
@@ -110,22 +123,17 @@ namespace Application.Test
                 IsEmailConfirmed = false
             };
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email)).ReturnsAsync(applicationUser);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel));
+            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel, _cancellationToken));
         }
 
         [Fact]
         public async Task Register_ShouldReturnSuccess_WhenDataIsValid()
         {
             // Arrange
-            var registerModel = new RegisterModel
-            {
-                Email = "test@example.com",
-                Password = "password123",
-                Phones = "1234567890"
-            };
+            var registerModel = CreateRegisterModel();
 
             var applicationUser = new ApplicationUser
             {
@@ -136,13 +144,13 @@ namespace Application.Test
                 Phones = registerModel.Phones
             };
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(registerModel.Email)).ReturnsAsync((ApplicationUser)null);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(registerModel.Email, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
             _mockUserRepository.Setup(r => r.CheckPhoneExists(registerModel.Phones)).Returns(false);
-            _mockUserRepository.Setup(r => r.CreateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(applicationUser);
-            _mockEventBus.Setup(e => e.PublishAsync(It.IsAny<RegisterSuccessEvent>())).Returns(Task.CompletedTask);
+            _mockUserRepository.Setup(r => r.CreateAsync(It.IsAny<ApplicationUser>(), _cancellationToken)).ReturnsAsync(applicationUser);
+            _mockEventBus.Setup(e => e.PublishAsync(It.IsAny<RegisterSuccessEvent>(), _cancellationToken)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _authenticationService.Register(registerModel);
+            var result = await _authenticationService.Register(registerModel, _cancellationToken);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -153,12 +161,7 @@ namespace Application.Test
         public async Task Register_ShouldThrowException_WhenEmailAlreadyExists()
         {
             // Arrange
-            var registerModel = new RegisterModel
-            {
-                Email = "test@example.com",
-                Password = "password123",
-                Phones = "1234567890"
-            };
+            var registerModel = CreateRegisterModel();
 
             var existingUser = new ApplicationUser
             {
@@ -166,28 +169,23 @@ namespace Application.Test
                 Email = registerModel.Email
             };
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(registerModel.Email)).ReturnsAsync(existingUser);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(registerModel.Email, _cancellationToken)).ReturnsAsync(existingUser);
 
             // Act & Assert
-            await Assert.ThrowsAsync<UserEmailExistsException>(() => _authenticationService.Register(registerModel));
+            await Assert.ThrowsAsync<UserEmailExistsException>(() => _authenticationService.Register(registerModel, _cancellationToken));
         }
 
         [Fact]
         public async Task Register_ShouldThrowException_WhenPhoneAlreadyExists()
         {
             // Arrange
-            var registerModel = new RegisterModel
-            {
-                Email = "test@example.com",
-                Password = "password123",
-                Phones = "1234567890"
-            };
+            var registerModel = CreateRegisterModel();
 
-            _mockUserRepository.Setup(r => r.GetByEmailAsync(registerModel.Email)).ReturnsAsync((ApplicationUser)null);
+            _mockUserRepository.Setup(r => r.GetByEmailAsync(registerModel.Email, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
             _mockUserRepository.Setup(r => r.CheckPhoneExists(registerModel.Phones)).Returns(true);
 
             // Act & Assert
-            await Assert.ThrowsAsync<UserPhoneExistsException>(() => _authenticationService.Register(registerModel));
+            await Assert.ThrowsAsync<UserPhoneExistsException>(() => _authenticationService.Register(registerModel, _cancellationToken));
         }
     }
 }
