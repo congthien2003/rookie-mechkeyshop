@@ -17,25 +17,11 @@ namespace Application.Validators
                 throw new ProductInvalidDataException("Product's categoryId is required");
 
             // Optional: If ImageData is provided, it must be in valid base64 format
-            if (!string.IsNullOrEmpty(model.ImageData))
-            {
-                try
-                {
-                    Convert.FromBase64String(model.ImageData);
-                }
-                catch (FormatException)
-                {
-                    throw new ProductInvalidDataException("ImageData is not a valid Base64 string");
-                }
-            }
-            else
-            {
+            if (string.IsNullOrEmpty(model.ImageData))
                 throw new ProductInvalidDataException("Product's image data is required");
-            }
 
             if (model.Price < 0)
                 throw new ProductInvalidDataException("Price must be positive");
-
         }
 
         public static void UpdatedProductValidator(UpdateProductModel model)
@@ -54,28 +40,12 @@ namespace Application.Validators
 
             if (Guid.Equals(model.CategoryId, Guid.Empty))
                 throw new ProductInvalidDataException("CategoryId is required");
-
-            // Optional: If ImageData is provided, it must be in valid base64 format
-            if (!string.IsNullOrEmpty(model.ImageData))
-            {
-                try
-                {
-                    Convert.FromBase64String(model.ImageData);
-                }
-                catch (FormatException)
-                {
-                    throw new ProductInvalidDataException("ImageData is not a valid Base64 string");
-                }
-            }
         }
 
         public static void ProductRatingModelValidate(ProductRatingModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
-
-            if (model.Id <= 0)
-                throw new ProductRatingInvalidDataException("Rating Id is required");
 
             if (model.Stars < 1 || model.Stars > 5)
                 throw new ProductRatingInvalidDataException("Stars must be between 1 and 5");
