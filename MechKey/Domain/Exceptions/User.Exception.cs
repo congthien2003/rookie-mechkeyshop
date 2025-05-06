@@ -34,6 +34,12 @@ namespace Domain.Exceptions
             Message = "Validate User failed";
         }
 
+        public UserValidateFailedException(string message)
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = message;
+        }
+
     }
 
     public class UserEmailExistsException : UserException
