@@ -36,11 +36,6 @@ namespace Domain.Exceptions
 
     public class CategoryInvalidDataException : CategoryException
     {
-        public CategoryInvalidDataException()
-        {
-            Type = Enum.ExceptionType.VALIDATION_FAILED;
-            Message = "Invalid data";
-        }
         public CategoryInvalidDataException(string message)
         {
             Type = Enum.ExceptionType.VALIDATION_FAILED;
