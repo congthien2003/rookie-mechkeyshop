@@ -41,5 +41,10 @@ namespace Domain.Exceptions
             Type = Enum.ExceptionType.VALIDATION_FAILED;
             Message = "Invalid data";
         }
+        public CategoryInvalidDataException(string message)
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = message;
+        }
     }
 }
