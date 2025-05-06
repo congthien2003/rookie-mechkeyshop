@@ -14,7 +14,7 @@ namespace Domain.Entity
         public Category(Guid id, string name)
         {
             Id = id;
-            Name = name ?? throw new CategoryInvalidDataException();
+            Name = name ?? throw new CategoryInvalidDataException("Name is required");
             IsDeleted = false;
             CreatedAt = DateTime.UtcNow;
             LastUpdatedAt = DateTime.UtcNow;
