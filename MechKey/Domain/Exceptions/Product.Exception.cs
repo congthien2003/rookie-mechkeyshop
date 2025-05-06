@@ -62,7 +62,12 @@ namespace Domain.Exceptions
             Type = Enum.ExceptionType.HANDLED_FAILED;
             Message = "Invalid data";
         }
-    }
 
+        public ProductInvalidDataException(string message)
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = message;
+        }
+    }
 
 }
