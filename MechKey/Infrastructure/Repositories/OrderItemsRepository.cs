@@ -1,44 +1,53 @@
 using Domain.Entity;
 using Domain.IRepositories;
 using MechkeyShop.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
     public class OrderItemsRepository : IOrderItemsRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public OrderItemsRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
-        public Task<OrderItem> CreateAsync(OrderItem entity)
+        public async Task<OrderItem> CreateAsync(OrderItem entity, CancellationToken cancellationToken = default)
         {
-            _context.OrderItems.Add(entity);
-            return Task.FromResult(entity);
+            var result = await context.OrderItems.AddAsync(entity, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            return result.Entity;
         }
 
-        public Task DeleteAsync(OrderItem entity)
+        public async Task DeleteAsync(OrderItem entity, CancellationToken cancellationToken = default)
         {
-            _context.OrderItems.Remove(entity);
-            return Task.CompletedTask;
+            context.OrderItems.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public IQueryable<OrderItem> GetAllAsync()
         {
-            return _context.OrderItems
+            return context.OrderItems
+                .Include(oi => oi.Product)
+                .Include(oi => oi.Order)
                 .AsQueryable();
         }
 
-        public Task<OrderItem> GetByIdAsync(Guid id)
+        public async Task<OrderItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await context.OrderItems
+                .Include(oi => oi.Product)
+                .Include(oi => oi.Order)
+                .FirstOrDefaultAsync(oi => oi.Id == id, cancellationToken);
         }
 
-        public Task<OrderItem> UpdateAsync(OrderItem entity)
+        public async Task<OrderItem> UpdateAsync(OrderItem entity, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            context.OrderItems.Update(entity);
+            await context.SaveChangesAsync(cancellationToken);
+            return entity;
         }
     }
 }

@@ -34,7 +34,7 @@ function CustomTable<T>({ data, columns, onRowClick }: CustomTableProps<T>) {
 								{columns.map((column, colIndex) => (
 									<td
 										key={colIndex}
-										className="px-6 py-4 max-w-[300px] whitespace-nowrap text-sm font-medium text-gray-800">
+										className="px-6 py-2 max-w-[300px] whitespace-nowrap text-sm font-medium text-gray-800">
 										{column.cell
 											? column.cell({
 													row: { original: row },

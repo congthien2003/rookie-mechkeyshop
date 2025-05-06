@@ -12,9 +12,9 @@ namespace Infrastructure.ApiClient.MassTransit
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task PublishAsync<TEvent>(TEvent @event) where TEvent : class
+        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken token = default) where TEvent : class
         {
-            await _publishEndpoint.Publish(@event);
+            await _publishEndpoint.Publish(@event, token);
         }
     }
 }

@@ -4,6 +4,6 @@ namespace Application.Interfaces.IServices
 {
     public interface IProductSalesTracker
     {
-        Task ProductIncreaseSellCount(IEnumerable<OrderItem> orders);
+        Task ProductIncreaseSellCount(IEnumerable<OrderItem> orders, CancellationToken cancellationToken = default);
     }
 }

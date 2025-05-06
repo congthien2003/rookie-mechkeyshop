@@ -13,15 +13,15 @@ namespace Application.Services
             _repository = repository;
         }
 
-        public async Task ProductIncreaseSellCount(IEnumerable<OrderItem> orderItems)
+        public async Task ProductIncreaseSellCount(IEnumerable<OrderItem> orderItems, CancellationToken cancellationToken = default)
         {
             foreach (var item in orderItems)
             {
-                var product = await _repository.GetByIdAsync(item.ProductId);
+                var product = await _repository.GetByIdAsync(item.ProductId, cancellationToken);
                 if (product == null) continue;
 
                 product.IncreaseSellCount(item.Quantity);
-                await _repository.UpdateAsync(product);
+                await _repository.UpdateAsync(product, cancellationToken);
             }
         }
     }

@@ -47,7 +47,7 @@ export const columns: ColumnDef<Category>[] = [
 function AdminCategory() {
 	const [listCategory, setListCategory] = useState<Category[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
-	const pageSize = 10;
+	const pageSize = 5;
 	const [totalPage, setTotalPage] = useState(0);
 	const [isOpenForm, setIsOpenForm] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState<Category>();
@@ -126,7 +126,7 @@ function AdminCategory() {
 
 	return (
 		<>
-			<div className="flex align-center justify-between p-4 bg-gradient-blue-purple h-16">
+			<div className="flex align-center justify-between p-4 bg-primary h-16">
 				<h2 className="font-bold text-2xl text-white">
 					Category Management
 				</h2>

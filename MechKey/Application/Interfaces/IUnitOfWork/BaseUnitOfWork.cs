@@ -2,9 +2,9 @@
 {
     public interface BaseUnitOfWork : IDisposable
     {
-        Task BeginTransactionAsync();
-        Task CommitAsync();
-        Task RollbackAsync();
+        Task BeginTransactionAsync(CancellationToken token = default);
+        Task CommitAsync(CancellationToken token = default);
+        Task RollbackAsync(CancellationToken token = default);
         Task<int> SaveChangesAsync();
     }
 }

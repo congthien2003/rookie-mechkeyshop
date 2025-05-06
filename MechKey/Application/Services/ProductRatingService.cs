@@ -29,51 +29,48 @@ namespace Application.Services
             this.applicationUserRepository = applicationUserRepository;
             this.productRepository = productRepository;
         }
-        public async Task<Result> AddAsync(ProductRatingModel model)
+        public async Task<Result> AddAsync(ProductRatingModel model, CancellationToken cancellationToken = default)
         {
             ProductRating entity = mapper.Map<ProductRating>(model);
 
-            Product product = await productRepository.GetByIdAsync(entity.ProductId);
+            Product product = await productRepository.GetByIdAsync(entity.ProductId, cancellationToken);
             product.AddRating(entity);
 
-            await productRepository.UpdateAsync(product);
+            await productRepository.UpdateAsync(product, cancellationToken);
             //var result = await productRatingRepository.CreateAsync(entity);
             return Result.Success("Add rating success");
         }
 
-        public async Task<Result<PagedResult<ProductRatingModel>>>? GetAllByIdProductAsync(Guid id, int pageSize = 4, bool ascOrder = false)
+        public async Task<Result<PagedResult<ProductRatingModel>>>? GetAllByIdProductAsync(Guid id, int pageSize = 4, bool ascOrder = false, CancellationToken cancellationToken = default)
         {
-
-            var query = productRatingRepository.GetListByProdut(id);
+            var query = productRatingRepository.GetListByProduct(id);
 
             if (ascOrder)
             {
                 query = query.OrderBy(pr => pr.RatedAt);
-
             }
             else
             {
                 query = query.OrderByDescending(pr => pr.Id);
             }
 
-            var userInfo = await applicationUserRepository.GetByIdAsync(id);
+            var userInfo = await applicationUserRepository.GetByIdAsync(id, cancellationToken);
 
-            var data = query.Take(pageSize)
+            var data = await query.Take(pageSize)
                 .Include(pr => pr.User)
                 .Select(pr => mapper.Map<ProductRatingModel>(pr))
-                .ToList();
+                .ToListAsync(cancellationToken);
 
             PagedResult<ProductRatingModel> result = new PagedResult<ProductRatingModel>()
             {
                 Page = 1,
                 PageSize = pageSize,
-                TotalItems = query.Count(),
+                TotalItems = await query.CountAsync(cancellationToken),
                 Items = data,
-                TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize)
+                TotalPages = (int)Math.Ceiling(await query.CountAsync(cancellationToken) / (double)pageSize)
             };
 
             return Result<PagedResult<ProductRatingModel>>.Success("Get rating success", result);
-
         }
     }
 }

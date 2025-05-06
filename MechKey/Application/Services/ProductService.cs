@@ -28,6 +28,7 @@ namespace Application.Services
         private readonly ISupabaseService _supabaseService;
         private readonly IEventBus _eventBus;
         private readonly IRedisService _redisService;
+        private readonly string patternCache = "product";
 
         public ProductService(
             IProductRepository<Product> repository,
@@ -47,15 +48,15 @@ namespace Application.Services
             _redisService = redisService;
         }
 
-        public async Task<Result<ProductModel>> AddAsync(CreateProductModel model)
+        public async Task<Result<ProductModel>> AddAsync(CreateProductModel model, CancellationToken cancellationToken = default)
         {
             // Upload image on cloud
-            var uploadImageResponse = await UploadFileAsync(model.ImageData);
+            var uploadImageResponse = await UploadFileAsync(model.ImageData, cancellationToken);
             if (!uploadImageResponse.IsSuccess)
                 throw new ProductImageHandleFailedException();
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 // save to db
                 var entity = _mapper.Map<Product>(model);
@@ -70,14 +71,12 @@ namespace Application.Services
                     LastUpdatedAt = DateTime.UtcNow,
                 };
 
-                await _unitOfWork.ProductImageRepository.CreateAsync(productImage);
-
                 entity.ImageUrl = uploadImageResponse.Data.PublicUrl;
 
-                var newEntity = await _unitOfWork.ProductRepository.CreateAsync(entity);
+                var newEntity = await _unitOfWork.ProductRepository.CreateAsync(entity, cancellationToken);
 
-                await _unitOfWork.CommitAsync();
-
+                await _unitOfWork.CommitAsync(cancellationToken);
+                await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
                 return Result<ProductModel>.Success("Add product success", _mapper.Map<ProductModel>(newEntity));
             }
             catch (Exception ex)
@@ -90,61 +89,53 @@ namespace Application.Services
                     Id = Guid.NewGuid(),
                     CreatedAt = DateTime.UtcNow,
                     Url = uploadImageResponse.Data.PublicUrl
-                });
+                }, cancellationToken);
 
-                await _unitOfWork.RollbackAsync();
+                await _unitOfWork.RollbackAsync(cancellationToken);
 
                 throw new ProductHandleFailedException();
             }
         }
 
-        public async Task<Result> DeleteAsync(Guid id)
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var entity = await _repository.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(DeleteAsync), id);
-                    throw new ProductNotFoundException();
-                }
 
-                await _repository.DeleteAsync(entity);
+            var entity = await _repository.GetByIdAsync(id, cancellationToken);
+            if (entity == null)
+            {
+                _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(DeleteAsync), id);
+                throw new ProductNotFoundException();
+            }
 
-                // Send event to remove image on cloud
-                await _eventBus.PublishAsync(new DeleteImageEvent
-                {
-                    Id = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow,
-                    Url = entity.ImageUrl
-                });
-                return Result.Success("Delete product success");
-            }
-            catch (ProductNotFoundException)
+            await _repository.DeleteAsync(entity, cancellationToken);
+            await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
+
+            // Send event to remove image on cloud
+            await _eventBus.PublishAsync(new DeleteImageEvent
             {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred in {Method}. ProductId: {ProductId}, Message: {Message}", nameof(DeleteAsync), id, ex.Message);
-                throw new ProductHandleFailedException();
-            }
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow,
+                Url = entity.ImageUrl
+            }, cancellationToken);
+
+            return Result.Success("Delete product success");
         }
 
         public async Task<Result<PagedResult<ProductModel>>> GetAllAsync(
             PaginationReqModel pagiModel,
             string categoryId = "",
             string sortCol = "",
-            bool ascOrder = false)
+            bool ascOrder = false,
+            CancellationToken cancellationToken = default)
         {
-            string key = $"product-{pagiModel.Page}-{pagiModel.PageSize}-{categoryId}-{pagiModel.SearchTerm}-{sortCol}-{ascOrder}";
+            string key = $"{patternCache}-{pagiModel.Page}-{pagiModel.PageSize}-{categoryId}-{pagiModel.SearchTerm}-{sortCol}-{ascOrder}";
             var data = _redisService.Get<PagedResult<ProductModel>>(key);
             if (data is not null)
             {
                 return Result<PagedResult<ProductModel>>.Success("Get list product from cache", data);
             }
 
-            var query = _repository.GetAllAsync();
+            var query = _repository.GetAllAsync().AsNoTracking();
 
             if (!string.IsNullOrEmpty(categoryId))
             {
@@ -171,15 +162,13 @@ namespace Application.Services
                 }
             }
 
-            var totalCount = query.Count();
-            var items = query
+            var totalCount = await query.CountAsync(cancellationToken);
+            var items = await query
                 .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                 .Take(pagiModel.PageSize)
-                /*.Include(p => p.Category)*/
-                /*.Include(p => p.ProductRatings)*/
                 .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
                 .AsNoTracking()
-                .AsEnumerable();
+                .ToListAsync(cancellationToken);
 
             data = new PagedResult<ProductModel>
             {
@@ -190,12 +179,12 @@ namespace Application.Services
                 TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize),
             };
 
-            _redisService.Set(key, data, 15);
+            await _redisService.Set(key, data, 15);
 
             return Result<PagedResult<ProductModel>>.Success("Get list product success", data);
         }
 
-        public async Task<Result<IEnumerable<ProductModel>>> GetBestSellerAsync()
+        public async Task<Result<IEnumerable<ProductModel>>> GetBestSellerAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -205,7 +194,7 @@ namespace Application.Services
                     .Take(4)
                     .Include(p => p.Category)
                     .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 return Result<IEnumerable<ProductModel>>.Success("Get Best seller", items);
             }
@@ -216,9 +205,9 @@ namespace Application.Services
             }
         }
 
-        public async Task<Result<ProductModel>> GetByIdAsync(Guid id)
+        public async Task<Result<ProductModel>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id, cancellationToken);
             if (entity == null)
             {
                 _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(GetByIdAsync), id);
@@ -228,10 +217,10 @@ namespace Application.Services
             return Result<ProductModel>.Success("Get product by id success", _mapper.Map<ProductModel>(entity));
         }
 
-        public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model)
+        public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model, CancellationToken cancellationToken = default)
         {
             Result<UploadFileResponseModel> uploadImageResponse = null;
-            var entity = await _repository.GetByIdAsync(model.Id);
+            var entity = await _repository.GetByIdAsync(model.Id, cancellationToken);
             if (entity == null)
             {
                 _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(UpdateAsync), model.Id);
@@ -253,7 +242,7 @@ namespace Application.Services
                         Id = Guid.NewGuid(),
                         CreatedAt = DateTime.UtcNow,
                         Url = entity.ImageUrl,
-                    });
+                    }, cancellationToken);
                 }
             }
 
@@ -264,26 +253,23 @@ namespace Application.Services
             entity.Variants = JsonConvert.SerializeObject(model.Variants);
             entity.IsDeleted = model.IsDeleted;
 
-            var result = await _repository.UpdateAsync(entity);
-            return Result<ProductModel>.Success("Update product success", _mapper.Map<ProductModel>(result));
+            var result = await _repository.UpdateAsync(entity, cancellationToken);
+            await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
 
+            return Result<ProductModel>.Success("Update product success", _mapper.Map<ProductModel>(result));
         }
 
-        public async Task<Result<UploadFileResponseModel>> UploadFileAsync(string base64string)
+        public async Task<Result<UploadFileResponseModel>> UploadFileAsync(string base64string, CancellationToken cancellationToken = default)
         {
-            try
+            var base64Parts = base64string.Split(',');
+            if (base64Parts.Length != 2)
             {
-                var img = base64string.Substring(23);
-                byte[] imageBytes = Convert.FromBase64String(img);
-
-                return await _supabaseService.UploadImage(imageBytes);
-            }
-            catch (Exception ex)
-            {
-                throw new ProductImageHandleFailedException();
+                throw new InvalidDataException("Base64 is invalid"); // bạn có thể định nghĩa exception riêng
             }
 
+            byte[] imageBytes = Convert.FromBase64String(base64Parts[1]);
+
+            return await _supabaseService.UploadImage(imageBytes);
         }
     }
-
 }

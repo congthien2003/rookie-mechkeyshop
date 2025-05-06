@@ -40,6 +40,7 @@ export function AppSidebar() {
 			<div className="flex h-16 items-center border-b px-4">
 				<h1 className="text-lg font-bold">Admin - MechkeyShop</h1>
 			</div>
+
 			<nav className="space-y-1 p-2 mb-[100%]	">
 				{items.map((item) => {
 					const Icon = item.icon;
@@ -58,8 +59,9 @@ export function AppSidebar() {
 						</Link>
 					);
 				})}
+
+				<UserBlock />
 			</nav>
-			<UserBlock />
 		</div>
 	);
 }

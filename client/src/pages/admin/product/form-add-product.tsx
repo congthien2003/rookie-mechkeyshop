@@ -77,6 +77,7 @@ function FormAddProduct({ onClose, onSave }: FormProductProps) {
 	};
 
 	const handleSubmit = (values: CreateProduct) => {
+		console.log(values);
 		onSave(values);
 	};
 

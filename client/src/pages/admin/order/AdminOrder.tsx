@@ -179,12 +179,12 @@ function AdminOrder() {
 
 	return (
 		<>
-			<div className="flex align-center justify-between p-4 bg-gradient-blue-purple h-16">
-				<h2 className="font-bold text-2xl text-white">
+			<div className="flex align-center justify-between p-4 bg-primary">
+				<h2 className="font-bold text-2xl text-white ">
 					Order Management
 				</h2>
 			</div>
-			<div className="px-4 py-2">
+			<div className="px-4 py-4">
 				{/* Search and Filters */}
 				<div className="space-y-4">
 					<div className="flex items-center gap-4">

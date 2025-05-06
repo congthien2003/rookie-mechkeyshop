@@ -26,11 +26,10 @@ namespace Application.Services
             this.eventBus = eventBus;
         }
 
-        public async Task<Result<ApplicationUserModel>> Login(LoginModel model)
+        public async Task<Result<ApplicationUserModel>> Login(LoginModel model, CancellationToken cancellationToken = default)
         {
-
             // Tìm user theo email hoặc username
-            var user = await applicationUserRepository.GetByEmailAsync(model.Email);
+            var user = await applicationUserRepository.GetByEmailAsync(model.Email, cancellationToken);
             if (user == null)
             {
                 throw new InvalidDataException("Invalid email or password");
@@ -44,13 +43,11 @@ namespace Application.Services
             if (!hashedInputPassword)
             {
                 throw new InvalidDataException("Invalid email or password");
-
             }
 
             if (!user.IsEmailConfirmed)
             {
                 throw new InvalidDataException("Please confirm email to active your account");
-
             }
 
             // Nếu đúng thì trả về success (có thể kèm token hoặc thông tin user nếu cần)
@@ -58,17 +55,15 @@ namespace Application.Services
                 "Login success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(user)
                 );
-
         }
 
-        public async Task<Result> Register(RegisterModel model)
+        public async Task<Result> Register(RegisterModel model, CancellationToken cancellationToken = default)
         {
-
             // Check phone and email exists
             var checkPhoneExist = applicationUserRepository.CheckPhoneExists(model.Phones)
                 ? throw new UserPhoneExistsException() : "";
 
-            var checkEmailExist = await applicationUserRepository.GetByEmailAsync(model.Email);
+            var checkEmailExist = await applicationUserRepository.GetByEmailAsync(model.Email, cancellationToken);
             if (checkEmailExist != null)
                 throw new UserEmailExistsException();
 
@@ -77,19 +72,16 @@ namespace Application.Services
 
             entity.Password = Hashing.HashPasword(entity.Password, out var salt);
             entity.Salting = Convert.ToBase64String(salt);
-            var newEntity = await applicationUserRepository.CreateAsync(entity);
+            var newEntity = await applicationUserRepository.CreateAsync(entity, cancellationToken);
 
             // Publish Event
             await eventBus.PublishAsync(new RegisterSuccessEvent
             {
                 UserId = newEntity.Id,
                 Email = newEntity.Email,
-            });
+            }, cancellationToken);
 
             return Result.Success("Register success");
-
         }
-
-
     }
 }

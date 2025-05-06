@@ -15,36 +15,40 @@ namespace Infrastructure.Repositories
             this.context = context;
         }
 
-        public async Task<Category> CreateAsync(Category entity)
+        public async Task<Category> CreateAsync(Category entity, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(entity.Name))
                 throw new CategoryValidateFailedException();
-            var result = await context.Categories.AddAsync(entity);
-            await context.SaveChangesAsync();
+            var result = await context.Categories.AddAsync(entity, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
             return result.Entity;
         }
 
-        public async Task DeleteAsync(Category entity)
+        public async Task DeleteAsync(Category entity, CancellationToken cancellationToken = default)
         {
             entity.IsDeleted = true;
             context.Categories.Update(entity);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public IQueryable<Category> GetAllAsync()
         {
-            return context.Categories.AsQueryable();
+            return context.Categories
+                .Include(c => c.Products)
+                .AsQueryable();
         }
 
-        public async Task<Category?> GetByIdAsync(Guid id)
+        public async Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            return await context.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
         }
 
-        public async Task<Category> UpdateAsync(Category entity)
+        public async Task<Category> UpdateAsync(Category entity, CancellationToken cancellationToken = default)
         {
             context.Categories.Update(entity);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
             return entity;
         }
     }

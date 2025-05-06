@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Order;
+using Shared.ViewModels.Product;
 
 namespace Application.Services
 {
@@ -40,10 +41,10 @@ namespace Application.Services
             _eventBus = eventBus;
         }
 
-        public async Task<Result<OrderModel>> CreateOrder(CreateOrderModel model)
+        public async Task<Result<OrderModel>> CreateOrder(CreateOrderModel model, CancellationToken cancellationToken)
         {
 
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var order = new Order
             {
                 Id = Guid.NewGuid(),
@@ -55,7 +56,7 @@ namespace Application.Services
                 Address = model.Address,
             };
 
-            await _unitOfWork.Orders.CreateAsync(order);
+            await _unitOfWork.Orders.CreateAsync(order, cancellationToken);
 
             foreach (var item in model.OrderItems)
             {
@@ -63,7 +64,6 @@ namespace Application.Services
                 orderItem.OrderId = order.Id;
                 await _unitOfWork.OrderItems.CreateAsync(orderItem);
             }
-            await _unitOfWork.SaveChangesAsync();
 
             var result = _mapper.Map<OrderModel>(order);
 
@@ -72,9 +72,9 @@ namespace Application.Services
                 Id = Guid.NewGuid(),
                 OrderModel = result,
                 CreatedAt = DateTime.UtcNow
-            });
+            }, cancellationToken);
 
-            await _unitOfWork.CommitAsync();
+            await _unitOfWork.CommitAsync(cancellationToken);
 
             return Result<OrderModel>.Success("Create order success", result);
         }
@@ -83,7 +83,8 @@ namespace Application.Services
                                                                         string startDate,
                                                                         string endDate,
                                                                         string sortCol,
-                                                                        bool ascending)
+                                                                        bool ascending,
+                                                                        CancellationToken cancellationToken)
         {
 
             var query = _orderRepository.GetAllAsync();
@@ -122,7 +123,7 @@ namespace Application.Services
             }
             var totalCount = query.Count();
             query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
-            var list = await query.ProjectTo<OrderModel>(_mapper.ConfigurationProvider).ToListAsync();
+            var list = await query.ProjectTo<OrderModel>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
 
             return Result<PagedResult<OrderModel>>.Success("Get list order success", new PagedResult<OrderModel>
             {
@@ -135,20 +136,20 @@ namespace Application.Services
             );
         }
 
-        public async Task<OrderModel> GetOrdersById(Guid orderId)
+        public async Task<OrderModel> GetOrdersById(Guid orderId, CancellationToken cancellationToken = default)
         {
 
-            var order = await _orderRepository.GetByIdAsync(orderId)
+            var order = await _orderRepository.GetByIdAsync(orderId, cancellationToken)
                 ?? throw new OrderNotFoundException();
 
             return _mapper.Map<OrderModel>(order);
 
         }
 
-        public async Task<OrderModel> UpdateOrder(UpdateInfoOrderModel model)
+        public async Task<OrderModel> UpdateOrder(UpdateInfoOrderModel model, CancellationToken cancellationToken = default)
         {
 
-            var order = await _orderRepository.GetByIdAsync(model.Id)
+            var order = await _orderRepository.GetByIdAsync(model.Id, cancellationToken)
                 ?? throw new OrderNotFoundException();
 
 
@@ -170,10 +171,10 @@ namespace Application.Services
 
         }
 
-        public async Task<bool> DeleteOrder(Guid orderId)
+        public async Task<bool> DeleteOrder(Guid orderId, CancellationToken cancellationToken = default)
         {
 
-            var order = await _orderRepository.GetByIdAsync(orderId);
+            var order = await _orderRepository.GetByIdAsync(orderId, cancellationToken);
             if (order == null)
             {
                 _logger.LogWarning("Attempted to delete non-existing order in {Method}. OrderId: {OrderId}", nameof(DeleteOrder), orderId);
@@ -185,7 +186,7 @@ namespace Application.Services
 
         }
 
-        public async Task<IEnumerable<OrderModel>> GetAllOrdersByIdUser(Guid userId, PaginationReqModel pagiModel, string sortCol, bool ascending)
+        public async Task<Result<IEnumerable<OrderModel>>> GetAllOrdersByIdUser(Guid userId, PaginationReqModel pagiModel, string sortCol, bool ascending, CancellationToken cancellationToken = default)
         {
 
             var query = _orderRepository.GetAllAsync().Where(x => x.UserId == userId).AsQueryable();
@@ -210,9 +211,9 @@ namespace Application.Services
             }
 
             query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
-            var list = await Task.FromResult(query.ToList());
+            var list = await query.ProjectTo<OrderModel>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
 
-            return list.Select(order => _mapper.Map<OrderModel>(order));
+            return Result<IEnumerable<OrderModel>>.Success("gest list order success", list);
 
         }
 

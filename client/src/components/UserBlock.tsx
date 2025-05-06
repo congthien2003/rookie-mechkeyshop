@@ -21,22 +21,12 @@ const UserBlock = () => {
 	};
 
 	return (
-		<div className="flex flex-col gap-2 border-t p-4">
-			<div className="flex items-center gap-2">
-				<div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-					{user?.email?.charAt(0).toUpperCase()}
-				</div>
-				<div className="flex flex-col">
-					<span className="text-sm font-medium">Hello,</span>
-					<span className="text-sm text-muted-foreground">
-						{user?.email}
-					</span>
-				</div>
-			</div>
+		<div className="flex flex-col gap-2 border-t py-4 px-2">
+			<span className="text-sm text-muted-foreground">{user?.email}</span>
 			<Button
 				variant="outline"
 				size="sm"
-				className="w-full justify-start gap-2"
+				className=" gap-2"
 				onClick={handleLogout}>
 				<LogOut className="h-4 w-4" />
 				Logout

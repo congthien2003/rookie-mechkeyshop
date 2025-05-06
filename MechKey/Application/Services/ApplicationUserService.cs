@@ -6,6 +6,7 @@ using AutoMapper.QueryableExtensions;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Auth;
@@ -28,20 +29,20 @@ namespace Application.Services
             this.logger = logger;
         }
 
-        public async Task<Result<ApplicationUserModel>> AddAsync(RegisterModel user)
+        public async Task<Result<ApplicationUserModel>> AddAsync(RegisterModel user, CancellationToken cancellationToken = default)
         {
             var entity = mapper.Map<RegisterModel, ApplicationUser>(user);
             entity.Password = Hashing.HashPasword(entity.Password, out var salt);
             entity.Salting = Convert.ToBase64String(salt);
-            var newEntity = await applicationUserRepository.CreateAsync(entity);
+            var newEntity = await applicationUserRepository.CreateAsync(entity, cancellationToken);
             return Result<ApplicationUserModel>.Success(
                 "Add success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(newEntity));
         }
 
-        public async Task<bool> CheckEmailAddressExists(string email, string phone)
+        public async Task<bool> CheckEmailAddressExists(string email, string phone, CancellationToken cancellationToken = default)
         {
-            var emailExists = await applicationUserRepository.GetByEmailAsync(email);
+            var emailExists = await applicationUserRepository.GetByEmailAsync(email, cancellationToken);
             if (emailExists != null)
                 throw new UserEmailExistsException();
 
@@ -52,21 +53,19 @@ namespace Application.Services
             return false;
         }
 
-        public async Task<Result> DeleteAsync(Guid id)
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-
-            var entity = await applicationUserRepository.GetByIdAsync(id);
+            var entity = await applicationUserRepository.GetByIdAsync(id, cancellationToken);
             if (entity == null)
             {
                 throw new UserNotFoundException();
             }
 
-            await applicationUserRepository.DeleteAsync(entity);
+            await applicationUserRepository.DeleteAsync(entity, cancellationToken);
             return Result.Success("Delete user success");
-
         }
 
-        public async Task<Result<PagedResult<ApplicationUserModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "")
+        public async Task<Result<PagedResult<ApplicationUserModel>>> GetAllAsync(int page = 1, int pageSize = 10, string searchTerm = "", CancellationToken cancellationToken = default)
         {
             var query = applicationUserRepository.GetAllAsync();
 
@@ -75,12 +74,12 @@ namespace Application.Services
                 query = query.Where(u => u.Name.Contains(searchTerm) || u.Email.Contains(searchTerm));
             }
 
-            var totalCount = query.Count();
-            var items = query
+            var totalCount = await query.CountAsync(cancellationToken);
+            var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ProjectTo<ApplicationUserModel>(mapper.ConfigurationProvider)
-                .ToList();
+                .ToListAsync(cancellationToken);
 
             return Result<PagedResult<ApplicationUserModel>>.Success("Get List user success", new PagedResult<ApplicationUserModel>
             {
@@ -92,9 +91,9 @@ namespace Application.Services
             });
         }
 
-        public async Task<Result<ApplicationUserModel>> GetByIdAsync(Guid id)
+        public async Task<Result<ApplicationUserModel>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var entity = await applicationUserRepository.GetByIdAsync(id);
+            var entity = await applicationUserRepository.GetByIdAsync(id, cancellationToken);
             if (entity == null)
                 throw new UserNotFoundException();
 
@@ -102,10 +101,9 @@ namespace Application.Services
                 mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
         }
 
-        public async Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user)
+        public async Task<Result<ApplicationUserModel>> UpdateAsync(ApplicationUserModel user, CancellationToken cancellationToken = default)
         {
-
-            var entity = await applicationUserRepository.GetByIdAsync(user.Id);
+            var entity = await applicationUserRepository.GetByIdAsync(user.Id, cancellationToken);
             if (entity == null)
                 throw new UserNotFoundException();
 
@@ -115,18 +113,17 @@ namespace Application.Services
             entity.Phones = user.Phones;
             entity.RoleId = user.RoleId;
 
-            var result = await applicationUserRepository.UpdateAsync(entity);
+            var result = await applicationUserRepository.UpdateAsync(entity, cancellationToken);
             return Result<ApplicationUserModel>.Success("Update user success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(entity));
         }
 
-        public async Task UpdateEmailConfirmAsync(Guid id)
+        public async Task UpdateEmailConfirmAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var user = await applicationUserRepository.GetByIdAsync(id) ?? throw new UserNotFoundException();
+            var user = await applicationUserRepository.GetByIdAsync(id, cancellationToken) ?? throw new UserNotFoundException();
             user.ChangeEmailConfirm(true);
 
-            await applicationUserRepository.UpdateAsync(user);
-
+            await applicationUserRepository.UpdateAsync(user, cancellationToken);
         }
     }
 }

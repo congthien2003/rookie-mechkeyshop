@@ -11,17 +11,13 @@ namespace Infrastructure.UnitOfWork
         private readonly ApplicationDbContext _context;
         private IDbContextTransaction _transaction;
 
-        public IProductImageRepository ProductImageRepository { get; }
-
         public IProductRepository<Product> ProductRepository { get; }
 
         public ProductUnitOfWork(ApplicationDbContext context,
-    IProductImageRepository productImageRepository,
     IProductRepository<Product> productRepository
     )
         {
             _context = context;
-            ProductImageRepository = productImageRepository;
             ProductRepository = productRepository;
         }
 
@@ -36,19 +32,21 @@ namespace Infrastructure.UnitOfWork
             return await _context.SaveChangesAsync();
         }
 
-        public async Task BeginTransactionAsync()
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
-            _transaction = await _context.Database.BeginTransactionAsync();
+            _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task CommitAsync()
+        public async Task CommitAsync(CancellationToken cancellationToken = default)
         {
-            await _transaction.CommitAsync();
+            await _transaction.CommitAsync(cancellationToken);
         }
 
-        public async Task RollbackAsync()
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            await _transaction.RollbackAsync();
+            await _transaction.RollbackAsync(cancellationToken);
         }
+
+
     }
 }

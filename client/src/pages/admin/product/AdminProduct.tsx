@@ -33,7 +33,7 @@ export const columns: ColumnDef<Product>[] = [
 		accessorKey: "imageUrl",
 		header: "Image",
 		cell: ({ row }) => {
-			return <img width={"80"} src={row.original.imageUrl} />;
+			return <img width={"70px"} src={row.original.imageUrl} />;
 		},
 	},
 	{
@@ -78,7 +78,7 @@ function AdminProduct() {
 	const [listProduct, setListProduct] = useState<Product[]>([]);
 	const [listCategory, setListCategory] = useState<Category[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
-	const pageSize = 10;
+	const pageSize = 5;
 	const [totalPage, setTotalPage] = useState(0);
 	const [isOpenEditForm, setIsOpenEditForm] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState<Product>();
@@ -211,7 +211,7 @@ function AdminProduct() {
 
 	return (
 		<>
-			<div className="flex align-center justify-between p-4 bg-gradient-blue-purple h-16">
+			<div className="flex align-center justify-between p-4 bg-primary h-16">
 				<h2 className="font-bold text-2xl text-white">
 					Product Management
 				</h2>

@@ -26,7 +26,8 @@ namespace WebAPI.Controllers
             string startDate = "",
             string endDate = "",
             string sortCol = "",
-            bool asc = true)
+            bool asc = true,
+            CancellationToken cancellationToken = default)
         {
             PaginationReqModel pagination = new PaginationReqModel()
             {
@@ -35,28 +36,28 @@ namespace WebAPI.Controllers
                 SearchTerm = searchTerm,
             };
 
-            var result = await _orderService.GetAllOrders(pagination, startDate, endDate, sortCol, asc);
+            var result = await _orderService.GetAllOrders(pagination, startDate, endDate, sortCol, asc, cancellationToken);
             return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await _orderService.GetOrdersById(id);
+            var result = await _orderService.GetOrdersById(id, cancellationToken);
             return Ok(result);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(UpdateInfoOrderModel model)
+        public async Task<IActionResult> Update(UpdateInfoOrderModel model, CancellationToken cancellationToken = default)
         {
-            var result = await _orderService.UpdateOrder(model);
+            var result = await _orderService.UpdateOrder(model, cancellationToken);
             return Ok(result);
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await _orderService.DeleteOrder(id);
+            var result = await _orderService.DeleteOrder(id, cancellationToken);
             return Ok(result);
         }
     }

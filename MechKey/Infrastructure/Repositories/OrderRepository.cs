@@ -2,68 +2,72 @@ using Domain.Entity;
 using Domain.IRepositories;
 using MechkeyShop.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace Infrastructure.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public OrderRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
-        public Task<Order> CreateAsync(Order entity)
+        public async Task<Order> CreateAsync(Order entity, CancellationToken cancellationToken = default)
         {
-            _context.Orders.Add(entity);
-            return Task.FromResult(entity);
+            var result = await context.Orders.AddAsync(entity, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            return result.Entity;
         }
 
-        public Task DeleteAsync(Order entity)
+        public async Task DeleteAsync(Order entity, CancellationToken cancellationToken = default)
         {
-            _context.Orders.Remove(entity);
-            return Task.CompletedTask;
+            entity.IsDeleted = true;
+            context.Orders.Update(entity);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public IQueryable<Order> GetAllAsync()
         {
-            return _context.Orders
+            return context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
                 .AsQueryable();
         }
 
-        public Task<Order?> GetByIdAsync(Guid id)
+        public async Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return _context.Orders
+            return await context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == id);
+                .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
 
         public IQueryable<Order> GetOrdersByUserIdAsync(Guid userId)
         {
-            return _context.Orders
+            return context.Orders
                 .Where(o => o.UserId == userId)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
                 .AsQueryable();
         }
 
-        public async Task<Order?> GetOrderWithDetailsAsync(Guid orderId)
+        public async Task<Order?> GetOrderWithDetailsAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await _context.Orders
+            return await context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         }
 
-        public Task<Order> UpdateAsync(Order entity)
+        public async Task<Order> UpdateAsync(Order entity, CancellationToken cancellationToken = default)
         {
-            _context.Orders.Update(entity);
-            return Task.FromResult(entity);
+            context.Orders.Update(entity);
+            await context.SaveChangesAsync(cancellationToken);
+            return entity;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<Result<PagedResult<CategoryModel>>> GetList(int page = 1, int pageSize = 10, string searchTerm = "")
+        public async Task<Result<PagedResult<CategoryModel>>> GetList(int page = 1, int pageSize = 10, string searchTerm = "", CancellationToken cancellationToken = default)
         {
             PaginationReqModel paginationReqModel = new PaginationReqModel()
             {
@@ -28,38 +28,38 @@ namespace WebAPI.Controllers
                 PageSize = pageSize,
                 SearchTerm = searchTerm
             };
-            Result<PagedResult<CategoryModel>> result = await categoryService.GetAllAsync(paginationReqModel);
+            Result<PagedResult<CategoryModel>> result = await categoryService.GetAllAsync(paginationReqModel, cancellationToken);
             return result;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCategoryModel model)
+        public async Task<IActionResult> Create(CreateCategoryModel model, CancellationToken cancellationToken = default)
         {
-            var entity = await categoryService.AddAsync(model);
+            var entity = await categoryService.AddAsync(model, cancellationToken);
 
             return CreatedAtAction(nameof(GetById), new { id = entity.Data.Id }, entity);
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
         {
-            var entity = await categoryService.GetByIdAsync(id);
+            var entity = await categoryService.GetByIdAsync(id, cancellationToken);
             return Ok(entity);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateById(Guid id, CategoryModel model)
+        public async Task<IActionResult> UpdateById(Guid id, CategoryModel model, CancellationToken cancellationToken = default)
         {
             if (id != model.Id)
                 return BadRequest("ID mismatch");
-            var entity = await categoryService.UpdateAsync(model);
+            var entity = await categoryService.UpdateAsync(model, cancellationToken);
             return Ok(entity);
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await categoryService.DeleteAsync(id);
+            var result = await categoryService.DeleteAsync(id, cancellationToken);
             return Ok(result);
         }
     }

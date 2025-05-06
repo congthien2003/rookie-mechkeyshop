@@ -5,8 +5,6 @@ using Infrastructure.ApiClient.MassTransit;
 using Infrastructure.ApiClient.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using System.Text;
 using WebAPI.Extensions.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
@@ -77,15 +75,15 @@ builder.Services.AddApiVersioning(options =>
 builder.AddRedisCache();
 builder.AddMassTransit();
 
-builder.Services.AddOpenTelemetry()
+/*builder.Services.AddOpenTelemetry()
     .WithTracing(tracing =>
     {
         tracing
-            .AddAspNetCoreInstrumentation()
+            *//*.AddAspNetCoreInstrumentation()*//*
             .AddHttpClientInstrumentation()
             //.AddMassTransitInstrumentation()
             .AddConsoleExporter();
-    });
+    });*/
 //.WithMetrics(metrics =>
 //{
 //    metrics

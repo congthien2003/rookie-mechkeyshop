@@ -5,6 +5,7 @@ using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Common;
 using Shared.ViewModels.Category;
@@ -17,6 +18,7 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<CategoryService> _logger;
         private readonly IRedisService _redisService;
+        private readonly string patternCache = "category";
 
         public CategoryService(
             ICategoryRepository<Category> repository,
@@ -30,33 +32,35 @@ namespace Application.Services
             _redisService = redisService;
         }
 
-        public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model)
+        public async Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(model.Name)) throw new CategoryInvalidDataException();
 
             var entity = new Category(Guid.NewGuid(), model.Name);
-            var newEntity = await _repository.CreateAsync(entity);
-            return Result<CategoryModel>.Success("Add category success", _mapper.Map<CategoryModel>(newEntity));
+            var newEntity = await _repository.CreateAsync(entity, cancellationToken);
+            await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
 
+            return Result<CategoryModel>.Success("Add category success", _mapper.Map<CategoryModel>(newEntity));
         }
 
-        public async Task<Result> DeleteAsync(Guid id)
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id, cancellationToken);
             if (entity == null)
             {
                 _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(DeleteAsync), id);
                 throw new CategoryNotFoundException();
             }
 
-            await _repository.DeleteAsync(entity);
-            return Result.Success("Delete category success");
+            await _repository.DeleteAsync(entity, cancellationToken);
+            await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
 
+            return Result.Success("Delete category success");
         }
 
-        public async Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel)
+        public async Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel, CancellationToken cancellationToken = default)
         {
-            string key = $"category-{pagiModel.Page}-{pagiModel.PageSize}";
+            string key = $"{patternCache}-{pagiModel.Page}-{pagiModel.PageSize}";
             var data = _redisService.Get<PagedResult<CategoryModel>>(key);
 
             if (data is null)
@@ -68,14 +72,13 @@ namespace Application.Services
                     query = query.Where(c => c.Name.Contains(pagiModel.SearchTerm.ToString()));
                 }
 
-                int totalCount = query.ToList().Count;
+                int totalCount = await query.CountAsync(cancellationToken);
 
-                var items = query
+                var items = await query
                     .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                     .Take(pagiModel.PageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
-                    .ToList();
-
+                    .ToListAsync(cancellationToken);
 
                 data = new PagedResult<CategoryModel>
                 {
@@ -86,16 +89,15 @@ namespace Application.Services
                     TotalPages = (int)Math.Ceiling(totalCount / (double)pagiModel.PageSize)
                 };
 
-                _redisService.Set(key, data, 120);
+                await _redisService.Set(key, data, 120);
             }
 
             return Result<PagedResult<CategoryModel>>.Success("Get category list success", data);
-
         }
 
-        public async Task<Result<CategoryModel>> GetByIdAsync(Guid id)
+        public async Task<Result<CategoryModel>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id, cancellationToken);
             if (entity == null)
             {
                 _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(GetByIdAsync), id);
@@ -103,12 +105,11 @@ namespace Application.Services
             }
 
             return Result<CategoryModel>.Success("Get category by id success", _mapper.Map<CategoryModel>(entity));
-
         }
 
-        public async Task<Result<CategoryModel>> UpdateAsync(CategoryModel model)
+        public async Task<Result<CategoryModel>> UpdateAsync(CategoryModel model, CancellationToken cancellationToken = default)
         {
-            var entity = await _repository.GetByIdAsync(model.Id);
+            var entity = await _repository.GetByIdAsync(model.Id, cancellationToken);
             if (entity == null)
             {
                 _logger.LogWarning("Category not found in {Method}. CategoryId: {CategoryId}", nameof(UpdateAsync), model.Id);
@@ -118,10 +119,10 @@ namespace Application.Services
             entity.Name = model.Name;
             entity.LastUpdatedAt = DateTime.UtcNow;
 
-            var updatedEntity = await _repository.UpdateAsync(entity);
-            return Result<CategoryModel>.Success("Update category success", _mapper.Map<CategoryModel>(updatedEntity));
+            var updatedEntity = await _repository.UpdateAsync(entity, cancellationToken);
+            await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
 
+            return Result<CategoryModel>.Success("Update category success", _mapper.Map<CategoryModel>(updatedEntity));
         }
     }
-
 }

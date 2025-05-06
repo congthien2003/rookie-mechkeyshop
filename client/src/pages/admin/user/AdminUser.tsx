@@ -131,7 +131,7 @@ function AdminUser() {
 
 	return (
 		<>
-			<div className="flex align-center justify-between p-4 bg-gradient-blue-purple h-16">
+			<div className="flex align-center justify-between p-4 bg-primary h-16">
 				<h2 className="font-bold text-2xl text-white">
 					User Management
 				</h2>

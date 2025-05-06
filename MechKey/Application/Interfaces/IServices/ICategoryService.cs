@@ -6,10 +6,10 @@ namespace Application.Interfaces.IServices
 {
     public interface ICategoryService
     {
-        Task<Result<CategoryModel>> GetByIdAsync(Guid id);
-        Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model);
-        Task<Result<CategoryModel>> UpdateAsync(CategoryModel user);
-        Task<Result> DeleteAsync(Guid id);
-        Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel);
+        Task<Result<CategoryModel>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<Result<CategoryModel>> AddAsync(CreateCategoryModel model, CancellationToken cancellationToken = default);
+        Task<Result<CategoryModel>> UpdateAsync(CategoryModel user, CancellationToken cancellationToken = default);
+        Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<Result<PagedResult<CategoryModel>>> GetAllAsync(PaginationReqModel pagiModel, CancellationToken cancellationToken = default);
     }
 }

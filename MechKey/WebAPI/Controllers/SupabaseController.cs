@@ -15,7 +15,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateImage([FromBody] UploadFileModel model)
+        public async Task<IActionResult> CreateImage([FromBody] UploadFileModel model, CancellationToken cancellationToken = default)
         {
             var img = model.Base64String.Split("data:image/png;base64,");
             byte[] imageBytes = Convert.FromBase64String(img[1]);
@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("delete-image")]
-        public async Task<IActionResult> DeleteImage(string url)
+        public async Task<IActionResult> DeleteImage(string url, CancellationToken cancellationToken = default)
         {
             var result = await _supabaseService.DeleteImage(url);
             return Ok(result);

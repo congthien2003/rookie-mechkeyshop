@@ -33,19 +33,19 @@ namespace Infrastructure.UnitOfWork
             return await _context.SaveChangesAsync();
         }
 
-        public async Task BeginTransactionAsync()
+        public async Task BeginTransactionAsync(CancellationToken token = default)
         {
-            _transaction = await _context.Database.BeginTransactionAsync();
+            _transaction = await _context.Database.BeginTransactionAsync(token);
         }
 
-        public async Task CommitAsync()
+        public async Task CommitAsync(CancellationToken token = default)
         {
-            await _transaction.CommitAsync();
+            await _transaction.CommitAsync(token);
         }
 
-        public async Task RollbackAsync()
+        public async Task RollbackAsync(CancellationToken token = default)
         {
-            await _transaction.RollbackAsync();
+            await _transaction.RollbackAsync(token);
         }
     }
 }

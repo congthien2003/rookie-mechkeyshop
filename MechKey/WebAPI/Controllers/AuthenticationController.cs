@@ -28,23 +28,23 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<Result> Register(RegisterModel model)
+        public async Task<Result> Register(RegisterModel model, CancellationToken cancellationToken = default)
         {
             if (model is null)
             {
                 return Result.Failure("Model is null");
             }
-            return await _authenticationService.Register(model);
+            return await _authenticationService.Register(model, cancellationToken);
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<Result>> Login(LoginModel model)
+        public async Task<ActionResult<Result>> Login(LoginModel model, CancellationToken cancellationToken = default)
         {
             if (model is null)
             {
                 throw new InvalidDataException("Missing login data");
             }
-            var result = await _authenticationService.Login(model);
+            var result = await _authenticationService.Login(model, cancellationToken);
 
             try
             {
@@ -67,7 +67,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<ActionResult<Result>> LogOut()
+        public async Task<ActionResult<Result>> LogOut(CancellationToken cancellationToken = default)
         {
             Response.Cookies.Delete("accessToken");
             return Ok(Result.Success("Logout Success"));

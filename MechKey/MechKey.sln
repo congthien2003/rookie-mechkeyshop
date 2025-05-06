@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Test", "test\Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Test", "test\Domain.Test\Domain.Test.csproj", "{421202C4-1F9C-43AE-A0B5-7119FF30D552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository.Test", "test\Repository.Test\Repository.Test.csproj", "{F31D1370-97B8-4C4E-939F-C4DFF2278BFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository.Test", "test\Repository.Test\Repository.Test.csproj", "{F31D1370-97B8-4C4E-939F-C4DFF2278BFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abstraction", "test\Abstraction\Abstraction.csproj", "{FEE1B39C-D6B6-4779-AE9F-730EB28E787B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abstraction", "test\Abstraction\Abstraction.csproj", "{FEE1B39C-D6B6-4779-AE9F-730EB28E787B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

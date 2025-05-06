@@ -35,7 +35,6 @@ namespace Infrastructure
             services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
             services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
             services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
-            services.AddScoped<IProductImageRepository, ProductImageRepository>();
             services.AddScoped<ISupabaseService, SupabaseService>();
             services.AddScoped<IEmailService, EmailService>();
 

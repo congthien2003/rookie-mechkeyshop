@@ -28,7 +28,7 @@ namespace WebAPI.Extensions.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError($"{ex.Source} - {ex.StackTrace} - {ex.Message}");
                 context.Response.StatusCode = 500;
                 await HandleExceptionAsync(context, ex.InnerException);
 
@@ -38,7 +38,7 @@ namespace WebAPI.Extensions.Middlewares
         private Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
             var statusCode = HttpStatusCode.InternalServerError;
-            var message = ex.Message;
+            var message = ex?.Message ?? "";
             switch (ex)
             {
                 case KeyNotFoundException _:
