@@ -2,7 +2,6 @@ using Application;
 using Asp.Versioning;
 using Infrastructure;
 using Infrastructure.ApiClient.MassTransit;
-using Infrastructure.ApiClient.OpenTelemetry;
 using Infrastructure.ApiClient.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -11,17 +10,18 @@ using WebAPI.Extensions.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.AddServiceDefaults();
+/*builder.AddServiceDefaults();*/
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+/*
+builder.Services.AddLogging();*/
 
-builder.Services.AddLogging();
-
-builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication()
+                .AddInfrastructure(builder.Configuration);
 
 
 // Config CORS
@@ -84,7 +84,7 @@ builder.Services.AddApiVersioning(options =>
 
 builder.AddRedisCache();
 builder.AddMassTransit();
-builder.AddOpenTelemetry();
+/*builder.AddOpenTelemetry();*/
 
 var app = builder.Build();
 
