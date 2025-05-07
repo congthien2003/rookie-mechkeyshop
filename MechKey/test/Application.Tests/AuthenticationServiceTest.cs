@@ -86,7 +86,9 @@ namespace Application.Test
             _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync((ApplicationUser)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel, _cancellationToken));
+            var exception = await Assert.ThrowsAsync<UserInvalidLoginException>(() => _authenticationService.Login(loginModel, _cancellationToken));
+
+            Assert.Equal("Invalid username or password", exception.Message);
         }
 
         [Fact]
@@ -106,7 +108,10 @@ namespace Application.Test
             _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel, _cancellationToken));
+            var exception = await Assert.ThrowsAsync<UserInvalidLoginException>(() => _authenticationService.Login(loginModel, _cancellationToken));
+
+            Assert.Equal("Invalid username or password", exception.Message);
+
         }
 
         [Fact]
@@ -126,7 +131,10 @@ namespace Application.Test
             _mockUserRepository.Setup(r => r.GetByEmailAsync(loginModel.Email, _cancellationToken)).ReturnsAsync(applicationUser);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidDataException>(() => _authenticationService.Login(loginModel, _cancellationToken));
+            var exception = await Assert.ThrowsAsync<UserNotConfirmEmailException>(() => _authenticationService.Login(loginModel, _cancellationToken));
+
+            Assert.Equal("Your email is not confirmed. Please check your inbox to confirm it.", exception.Message);
+
         }
 
         [Fact]

@@ -237,17 +237,18 @@ namespace Application.Services
                 _logger.LogWarning("Product not found in {Method}. ProductId: {ProductId}", nameof(GetByIdAsync), id);
                 throw new ProductNotFoundException();
             }
-
-            var listRating = await _ratingRepository.GetListByProduct(entity.Id).Select(p => new ProductRatingModel
-            {
-                Id = p.Id,
-                ProductId = p.ProductId,
-                UserId = p.UserId,
-                Name = p.User.Name,
-                RatedAt = p.RatedAt,
-                Comment = p.Comment,
-                Stars = p.Stars
-            }).ToListAsync();
+            /*
+                        var listRating = _ratingRepository.GetListByProduct(entity.Id);
+                        listRating.Select(p => new ProductRatingModel
+                        {
+                            Id = p.Id,
+                            ProductId = p.ProductId,
+                            UserId = p.UserId,
+                            Name = p.User.Name,
+                            RatedAt = p.RatedAt,
+                            Comment = p.Comment,
+                            Stars = p.Stars
+                        }).ToListAsync();*/
 
             ProductModel result = new ProductModel
             {

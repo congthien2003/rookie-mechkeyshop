@@ -64,7 +64,7 @@ namespace Application.Test
 
             _mockMapper.Setup(m => m.Map<ProductRating>(ratingModel)).Returns(productRating);
             _mockProductRepository.Setup(r => r.GetByIdAsync(productId, _cancellationToken)).ReturnsAsync(product);
-            _mockProductRepository.Setup(r => r.UpdateAsync(It.IsAny<Product>(), _cancellationToken)).ReturnsAsync(product);
+            _mockProductRatingRepository.Setup(r => r.CreateAsync(It.IsAny<ProductRating>(), _cancellationToken)).ReturnsAsync(productRating);
 
             // Act
             var result = await _productRatingService.AddAsync(ratingModel);
@@ -72,7 +72,7 @@ namespace Application.Test
             // Assert
             Assert.True(result.IsSuccess);
             Assert.Equal("Add rating success", result.Message);
-            _mockProductRepository.Verify(r => r.UpdateAsync(It.IsAny<Product>(), _cancellationToken), Times.Once);
+            _mockProductRatingRepository.Verify(r => r.CreateAsync(It.IsAny<ProductRating>(), _cancellationToken), Times.Once);
         }
 
         [Fact]
