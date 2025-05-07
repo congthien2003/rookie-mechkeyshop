@@ -76,6 +76,8 @@ namespace Application.Services
                 int totalCount = await query.CountAsync(cancellationToken);
 
                 var items = await query
+                    .Where(c => c.IsDeleted == false)
+                    .OrderBy(c => c.Name)
                     .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                     .Take(pagiModel.PageSize)
                     .Select(c => _mapper.Map<CategoryModel>(c))
