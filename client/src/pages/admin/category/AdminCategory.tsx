@@ -121,8 +121,14 @@ function AdminCategory() {
 		handleCloseForm();
 	};
 
-	const handleDeleteCategory = (id: string) => {
-		console.log("Deleted use", id);
+	const handleDeleteCategory = async (id: string) => {
+		const response = await categoryService.deleteById(id);
+		if (response?.isSuccess) {
+			ToastSuccess("Deleted success");
+			await fetch();
+		} else {
+			ToastError("Deleted failed");
+		}
 		handleCloseForm();
 	};
 

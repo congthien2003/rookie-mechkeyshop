@@ -56,7 +56,7 @@ const deleteById = async function (id: string) {
 		return response.data as Result;
 	} catch (error) {
 		console.error(error);
-		return [];
+		return null;
 	}
 };
 
