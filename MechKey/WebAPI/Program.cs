@@ -11,10 +11,16 @@ using WebAPI.Extensions.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.AddServiceDefaults();
+
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddLogging();
+
 builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
 
 
@@ -89,6 +95,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseCors("NgOrigins");
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -100,5 +107,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapDefaultEndpoints();
 
 app.Run();
