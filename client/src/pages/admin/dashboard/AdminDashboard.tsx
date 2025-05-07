@@ -21,8 +21,9 @@ function AdminDashboard() {
 	const fetchDashboardData = async () => {
 		showLoading();
 		try {
-			const data = await dashboardService.getDashboardData();
-			setDashboardData(data);
+			const response = await dashboardService.getDashboardData();
+
+			setDashboardData(response.data);
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -100,7 +101,7 @@ function AdminDashboard() {
 					<CardContent>
 						<div className="text-2xl font-bold">
 							{formatNumber(
-								dashboardData?.totalProductAvalible || 0
+								dashboardData?.totalProductAvailable || 0
 							)}
 						</div>
 						<p className="text-xs text-muted-foreground">
@@ -119,7 +120,7 @@ function AdminDashboard() {
 					<CardContent>
 						<div className="text-2xl font-bold">
 							{formatNumber(
-								dashboardData?.totalUserAvalible || 0
+								dashboardData?.totalUserAvailable || 0
 							)}
 						</div>
 						<p className="text-xs text-muted-foreground">

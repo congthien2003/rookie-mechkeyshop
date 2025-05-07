@@ -63,7 +63,7 @@ function FormOrder({ data, onClose, onSave, onDelete }: FormOrderProps) {
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-40">
 			<div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 				<div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white">
 					<h2 className="text-xl font-semibold">Order Details</h2>

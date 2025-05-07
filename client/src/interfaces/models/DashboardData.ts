@@ -4,6 +4,6 @@ export interface DashboardData {
 	totalOrderCount: number;
 	totalOrderCompleted: number;
 	totalOrderPending: number;
-	totalProductAvalible: number;
-	totalUserAvalible: number;
+	totalProductAvailable: number;
+	totalUserAvailable: number;
 }

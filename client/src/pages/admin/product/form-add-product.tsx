@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Plus, Trash } from "lucide-react";
 import { CreateProduct } from "@/interfaces/models/Product";
-import { Variant } from "@/interfaces/models/Variant";
 import { ResultPagination } from "@/interfaces/common/ResultPagination";
 import { Category } from "@/interfaces/models/Category";
 import { categoryService } from "@/services/apiCategory";
@@ -82,7 +81,7 @@ function FormAddProduct({ onClose, onSave }: FormProductProps) {
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-40">
 			<div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 				<div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white">
 					<h2 className="text-xl font-semibold">Create Product</h2>

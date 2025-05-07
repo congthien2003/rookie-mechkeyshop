@@ -11,6 +11,7 @@ import { Search } from "lucide-react";
 import { userService } from "@/services/apiUser";
 import { ResultPagination } from "@/interfaces/common/ResultPagination";
 import { useLoadingStore } from "@/store/store";
+import { ToastError, ToastSuccess } from "@/lib/toast";
 
 export const columns: ColumnDef<ApplicationUser>[] = [
 	{
@@ -118,10 +119,25 @@ function AdminUser() {
 		setSelectedUser(undefined);
 	};
 
-	const handleSaveUser = (updatedUser: ApplicationUser) => {
-		// Here you would typically make an API call to update the user
-		console.log("Updated user:", updatedUser);
-		handleCloseForm();
+	const handleSaveUser = async (updatedUser: ApplicationUser) => {
+		showLoading();
+		try {
+			const result = await userService.updateById(
+				updatedUser.id,
+				updatedUser
+			);
+			if (result.isSuccess) {
+				await fetch(); // Refresh the data after successful update
+				handleCloseForm();
+				ToastSuccess(result.message);
+			} else {
+				ToastError(result.message);
+			}
+		} catch (error) {
+			console.error("Error updating user:", error);
+		} finally {
+			hideLoading();
+		}
 	};
 
 	const handleDeleteUser = (id: string) => {
