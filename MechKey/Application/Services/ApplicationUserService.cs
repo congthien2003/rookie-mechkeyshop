@@ -112,7 +112,7 @@ namespace Application.Services
             entity.Address = user.Address;
             entity.Phones = user.Phones;
             entity.RoleId = user.RoleId;
-
+            entity.IsDeleted = user.IsDeleted;
             var result = await applicationUserRepository.UpdateAsync(entity, cancellationToken);
             return Result<ApplicationUserModel>.Success("Update user success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(entity));

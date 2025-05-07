@@ -26,9 +26,6 @@ namespace Application.Validators
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            if (Guid.Equals(model.Id, Guid.Empty))
-                throw new UserValidateFailedException("User Id is required");
-
             if (string.IsNullOrWhiteSpace(model.Name))
                 throw new UserValidateFailedException("Name is required");
 

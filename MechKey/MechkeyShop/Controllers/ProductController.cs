@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.IServices;
+using Domain.Common;
 using MechkeyShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -72,24 +73,33 @@ namespace MechkeyShop.Controllers
         [Authorize(Roles = "2")]
         public async Task<IActionResult> SubmitRating(Guid id, int score, string comment)
         {
-
-            var user = HttpContext.User;
-            var userId = user.FindFirst("Id")?.Value;
-
-            var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(userId));
-
-            var model = new ProductRatingModel
+            try
             {
-                Stars = score,
-                Comment = comment ?? "",
-                UserId = Guid.Parse(userId),
-                ProductId = id,
-                RatedAt = DateTime.UtcNow,
-            };
 
-            var result = await ratingService.AddAsync(model);
 
-            return Redirect($"/Product/Detail/{id}");
+                var user = HttpContext.User;
+                var userId = user.FindFirst("Id")?.Value;
+
+                var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(userId));
+
+                var model = new ProductRatingModel
+                {
+                    Stars = score,
+                    Comment = comment ?? "",
+                    UserId = Guid.Parse(userId),
+                    ProductId = id,
+                    RatedAt = DateTime.UtcNow,
+                    Name = infoUser.Data.Name,
+                };
+
+                var result = await ratingService.AddAsync(model);
+
+                return Redirect($"/Product/Detail/{id}");
+            }
+            catch (BaseException ex)
+            {
+                return Redirect($"/Error");
+            }
         }
     }
 }

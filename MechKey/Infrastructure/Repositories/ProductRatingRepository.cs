@@ -16,8 +16,9 @@ namespace Infrastructure.Repositories
 
         public async Task<ProductRating> CreateAsync(ProductRating entity, CancellationToken cancellationToken)
         {
-            await _context.ProductRatings.AddAsync(entity, cancellationToken);
+            _context.ProductRatings.Add(entity);
             await _context.SaveChangesAsync(cancellationToken);
+
             return entity;
         }
 

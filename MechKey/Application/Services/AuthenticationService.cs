@@ -9,7 +9,6 @@ using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Shared.ViewModels.Auth;
-
 namespace Application.Services
 {
     public class AuthenticationService : IAuthenticationService
@@ -30,11 +29,11 @@ namespace Application.Services
         public async Task<Result<ApplicationUserModel>> Login(LoginModel model, CancellationToken cancellationToken = default)
         {
             AuthValidator.ValidateLogin(model);
-            // Tìm user theo email hoặc username
+
             var user = await applicationUserRepository.GetByEmailAsync(model.Email, cancellationToken);
             if (user == null)
             {
-                throw new InvalidDataException("Invalid email or password");
+                throw new UserInvalidLoginException();
             }
 
             // Lấy salt từ DB và hash lại password nhập vào
@@ -43,16 +42,14 @@ namespace Application.Services
 
             // So sánh password
             if (!hashedInputPassword)
-            {
-                throw new InvalidDataException("Invalid email or password");
-            }
+                throw new UserInvalidLoginException();
 
             if (!user.IsEmailConfirmed)
-            {
-                throw new InvalidDataException("Please confirm email to active your account");
-            }
+                throw new UserNotConfirmEmailException();
 
-            // Nếu đúng thì trả về success (có thể kèm token hoặc thông tin user nếu cần)
+            if (user.IsDeleted)
+                throw new UserIsDeletedException();
+
             return Result<ApplicationUserModel>.Success(
                 "Login success",
                 mapper.Map<ApplicationUser, ApplicationUserModel>(user)

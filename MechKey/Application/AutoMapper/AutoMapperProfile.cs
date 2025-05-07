@@ -36,11 +36,6 @@ namespace Infrastructure.Helpers
                 .ForMember(pr => pr.Product, opt => opt.Ignore())
                 .ReverseMap();
 
-            // Map Entity to VM to show
-            CreateMap<ProductRating, ProductRatingModel>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
-                .ReverseMap();
-
             CreateMap<Order, OrderModel>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))

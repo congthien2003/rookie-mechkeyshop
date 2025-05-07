@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces.IServices;
-using Domain.Exceptions;
+using Domain.Common;
 using MechkeyShop.Constant;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ViewModels.Auth;
@@ -42,11 +42,6 @@ namespace MechkeyShop.Controllers
         public async Task<IActionResult> LoginAsync(LoginModel model, string returnUrl)
         {
             returnUrl = returnUrl ?? "/";
-            if (!ModelState.IsValid)
-            {
-                ViewBag.returnUrl = returnUrl;
-                return View(model);
-            }
             try
             {
                 var result = await _authenticationService.Login(model);
@@ -81,16 +76,7 @@ namespace MechkeyShop.Controllers
                 return RedirectToAction("Index", "Home");
 
             }
-            catch (UserNotConfirmEmailException ex)
-            {
-                ViewBag.Error = ex.Message;
-                TempData[Toast.KEY] = "Login failed";
-                TempData[Toast.MESSAGE] = ex.Message;
-                TempData[Toast.TYPE] = Toast.ERROR_TYPE;
-                ViewBag.returnUrl = returnUrl;
-                return View(model);
-            }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
                 //_logger.LogError(ex.Message);
                 ViewBag.Error = ex.Message;
@@ -124,9 +110,9 @@ namespace MechkeyShop.Controllers
             try
             {
                 var result = await _authenticationService.Register(model);
-                return View("Login");
+                return View("RegisterSuccess");
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
                 ViewBag.Error = "Register failed";
                 TempData[Toast.KEY] = "Failed";

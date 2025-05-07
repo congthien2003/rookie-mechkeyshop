@@ -30,6 +30,7 @@ namespace Application.Services
         private readonly IEventBus _eventBus;
         private readonly IRedisService _redisService;
         private readonly string patternCache = "product";
+        private readonly IProductRatingRepository<ProductRating> _ratingRepository;
 
         public ProductService(
             IProductRepository<Product> repository,
@@ -38,7 +39,8 @@ namespace Application.Services
             IProductUnitOfWork unitOfWork,
             ISupabaseService supabaseService,
             IEventBus eventBus,
-            IRedisService redisService)
+            IRedisService redisService,
+            IProductRatingRepository<ProductRating> ratingRepository)
         {
             _repository = repository;
             _mapper = mapper;
@@ -47,6 +49,7 @@ namespace Application.Services
             _supabaseService = supabaseService;
             _eventBus = eventBus;
             _redisService = redisService;
+            _ratingRepository = ratingRepository;
         }
 
         public async Task<Result<ProductModel>> AddAsync(CreateProductModel model, CancellationToken cancellationToken = default)
@@ -114,13 +117,13 @@ namespace Application.Services
             await _redisService.RemoveByPrefixAsync(patternCache, cancellationToken);
 
             // Send event to remove image on cloud
-            await _eventBus.PublishAsync(new DeleteImageEvent
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                Url = entity.ImageUrl
-            }, cancellationToken);
-
+            /*            await _eventBus.PublishAsync(new DeleteImageEvent
+                        {
+                            Id = Guid.NewGuid(),
+                            CreatedAt = DateTime.UtcNow,
+                            Url = entity.ImageUrl
+                        }, cancellationToken);
+            */
             return Result.Success("Delete product success");
         }
 
@@ -174,7 +177,13 @@ namespace Application.Services
                 {
                     Id = p.Id,
                     Name = p.Name,
+                    Description = p.Description,
+                    CategoryId = p.CategoryId,
                     CategoryName = p.Category.Name ?? null,
+                    ImageUrl = p.ImageUrl,
+                    Price = p.Price,
+                    SellCount = p.SellCount,
+                    IsDeleted = p.IsDeleted,
                     TotalRating = p.ProductRatings.Count > 0
                         ? p.ProductRatings.Average(r => r.Stars)
                         : 0,
@@ -229,7 +238,47 @@ namespace Application.Services
                 throw new ProductNotFoundException();
             }
 
-            return Result<ProductModel>.Success("Get product by id success", _mapper.Map<ProductModel>(entity));
+            var listRating = await _ratingRepository.GetListByProduct(entity.Id).Select(p => new ProductRatingModel
+            {
+                Id = p.Id,
+                ProductId = p.ProductId,
+                UserId = p.UserId,
+                Name = p.User.Name,
+                RatedAt = p.RatedAt,
+                Comment = p.Comment,
+                Stars = p.Stars
+            }).ToListAsync();
+
+            ProductModel result = new ProductModel
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                CategoryId = entity.CategoryId,
+                CategoryName = entity.Category.Name ?? null,
+                ImageUrl = entity.ImageUrl,
+                Price = entity.Price,
+                SellCount = entity.SellCount,
+                IsDeleted = entity.IsDeleted,
+                Rating = entity.ProductRatings.Select(p => new ProductRatingModel
+                {
+                    Id = p.Id,
+                    ProductId = p.ProductId,
+                    UserId = p.UserId,
+                    Name = p.User.Name,
+                    RatedAt = p.RatedAt,
+                    Comment = p.Comment,
+                    Stars = p.Stars
+                }).ToList(),
+                TotalRating = entity.ProductRatings.Count > 0
+                        ? entity.ProductRatings.Average(r => r.Stars)
+                        : 0,
+                Variants = string.IsNullOrEmpty(entity.Variants)
+                    ? new List<VariantAttribute>()
+                    : JsonConvert.DeserializeObject<List<VariantAttribute>>(entity.Variants)
+            };
+
+            return Result<ProductModel>.Success("Get product by id success", result);
         }
 
         public async Task<Result<ProductModel>> UpdateAsync(UpdateProductModel model, CancellationToken cancellationToken = default)

@@ -70,4 +70,22 @@ namespace Domain.Exceptions
         }
 
     }
+
+    public class UserInvalidLoginException : UserException
+    {
+        public UserInvalidLoginException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Invalid username or password";
+        }
+    }
+
+    public class UserIsDeletedException : UserException
+    {
+        public UserIsDeletedException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "Account is deleted, please contact to admin";
+        }
+    }
 }

@@ -35,7 +35,14 @@ namespace Application.Services
         {
             ProductValidator.ProductRatingModelValidate(model);
 
-            ProductRating entity = mapper.Map<ProductRating>(model);
+            ProductRating entity = new ProductRating
+            {
+                ProductId = model.ProductId,
+                Stars = model.Stars,
+                Comment = model.Comment,
+                RatedAt = model.RatedAt,
+                UserId = model.UserId,
+            };
 
             Product product = await productRepository.GetByIdAsync(entity.ProductId, cancellationToken);
 
@@ -44,7 +51,7 @@ namespace Application.Services
 
             product.AddRating(entity);
 
-            await productRepository.UpdateAsync(product, cancellationToken);
+            await productRatingRepository.CreateAsync(entity, cancellationToken);
             return Result.Success("Add rating success");
         }
 

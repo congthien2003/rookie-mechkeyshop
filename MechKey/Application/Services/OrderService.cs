@@ -20,6 +20,7 @@ namespace Application.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IApplicationUserRepository<ApplicationUser> applicationUserRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
         private readonly IOrderUnitOfWork _unitOfWork;
@@ -31,7 +32,8 @@ namespace Application.Services
             IMapper mapper,
             ILogger<OrderService> logger,
             IProductSalesTracker productSalesTracker,
-            IEventBus eventBus)
+            IEventBus eventBus,
+            IApplicationUserRepository<ApplicationUser> applicationUserRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -39,44 +41,59 @@ namespace Application.Services
             _unitOfWork = unitOfWork;
             _productSalesTracker = productSalesTracker;
             _eventBus = eventBus;
+            this.applicationUserRepository = applicationUserRepository;
         }
 
         public async Task<Result<OrderModel>> CreateOrder(CreateOrderModel model, CancellationToken cancellationToken)
         {
-
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            var order = new Order
+            try
             {
-                Id = Guid.NewGuid(),
-                UserId = model.UserId,
-                Status = Domain.Enum.OrderStatus.Pending,
-                TotalAmount = model.TotalAmount,
-                OrderDate = model.OrderDate,
-                Phone = model.Phone,
-                Address = model.Address,
-            };
 
-            await _unitOfWork.Orders.CreateAsync(order, cancellationToken);
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                var order = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = model.UserId,
+                    Status = Domain.Enum.OrderStatus.Pending,
+                    TotalAmount = model.TotalAmount,
+                    OrderDate = model.OrderDate,
+                    Phone = model.Phone,
+                    Address = model.Address,
 
-            foreach (var item in model.OrderItems)
-            {
-                var orderItem = _mapper.Map<OrderItem>(item);
-                orderItem.OrderId = order.Id;
-                await _unitOfWork.OrderItems.CreateAsync(orderItem);
+                };
+
+                var orderCreated = await _unitOfWork.Orders.CreateAsync(order, cancellationToken);
+
+                foreach (var item in model.OrderItems)
+                {
+                    var orderItem = _mapper.Map<OrderItem>(item);
+                    orderItem.OrderId = order.Id;
+                    await _unitOfWork.OrderItems.CreateAsync(orderItem);
+                }
+
+                var user = await applicationUserRepository.GetByIdAsync(model.UserId);
+
+                var result = _mapper.Map<OrderModel>(orderCreated);
+
+                result.Email = user.Email;
+                result.Name = user.Name;
+
+                await _eventBus.PublishAsync(new OrderCreatedEvent
+                {
+                    Id = Guid.NewGuid(),
+                    OrderModel = result,
+                    CreatedAt = DateTime.UtcNow
+                }, cancellationToken);
+
+                await _unitOfWork.CommitAsync(cancellationToken);
+
+                return Result<OrderModel>.Success("Create order success", result);
             }
-
-            var result = _mapper.Map<OrderModel>(order);
-
-            await _eventBus.PublishAsync(new OrderCreatedEvent
+            catch (Exception ex)
             {
-                Id = Guid.NewGuid(),
-                OrderModel = result,
-                CreatedAt = DateTime.UtcNow
-            }, cancellationToken);
-
-            await _unitOfWork.CommitAsync(cancellationToken);
-
-            return Result<OrderModel>.Success("Create order success", result);
+                await _unitOfWork.RollbackAsync(cancellationToken);
+                throw ex;
+            }
         }
 
         public async Task<Result<PagedResult<OrderModel>>> GetAllOrders(PaginationReqModel pagiModel,
@@ -122,7 +139,7 @@ namespace Application.Services
                 }
             }
             var totalCount = query.Count();
-            query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
+            query = query.OrderBy(x => x.Id).Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
             var list = await query.Select(o => new OrderModel
             {
                 Id = o.Id,
@@ -141,6 +158,7 @@ namespace Application.Services
                     ProductId = oi.ProductId,
                     ProductName = oi.Product.Name,
                     Price = oi.Product.Price * oi.Quantity,
+                    Quantity = oi.Quantity,
                     ImageUrl = oi.Product.ImageUrl,
                     Option = oi.Option.Length > 0 ? JsonConvert.DeserializeObject<OrderItemVariant>(oi.Option) : null,
                 })

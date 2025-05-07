@@ -25,8 +25,8 @@ namespace MechkeyShop.Controllers
             model.UserId = Guid.Parse(id);
             model.OrderDate = DateTime.UtcNow;
 
-            await orderService.CreateOrder(model);
-            return Ok(model);
+            var result = await orderService.CreateOrder(model);
+            return Ok(result);
         }
 
         [HttpGet("/Order/Detail/{id:Guid}")]
@@ -52,9 +52,9 @@ namespace MechkeyShop.Controllers
                 SearchTerm = ""
             };
 
-            var listOrder = await orderService.GetAllOrdersByIdUser(Guid.Parse(userId), pagiModel, "createdAt", false);
+            var result = await orderService.GetAllOrdersByIdUser(Guid.Parse(userId), pagiModel, "createdAt", false);
 
-            return View(listOrder);
+            return View(result.Data);
         }
     }
 }
