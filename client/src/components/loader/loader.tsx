@@ -10,7 +10,7 @@ const Loader = () => {
 			<div className="absolute inset-0 bg-black bg-opacity-60"></div>
 
 			{/* Nội dung loader */}
-			<div className="relative z-10">
+			<div className="relative z-50">
 				<div id="box-outer">
 					<div id="box-inner">
 						<div id="box"></div>

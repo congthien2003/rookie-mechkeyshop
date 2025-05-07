@@ -16,17 +16,18 @@ const UserBlock = () => {
 			toast.success("Logged out successfully");
 			navigate("/auth/login");
 		} catch (error) {
+			console.error(error);
 			toast.error("Failed to logout");
 		}
 	};
 
 	return (
 		<div className="flex flex-col gap-2 border-t py-4 px-2">
-			<span className="text-sm text-muted-foreground">{user?.email}</span>
+			{/* <span className="text-sm text-muted-foreground">{user?.email}</span> */}
 			<Button
 				variant="outline"
 				size="sm"
-				className=" gap-2"
+				className="gap-2"
 				onClick={handleLogout}>
 				<LogOut className="h-4 w-4" />
 				Logout
