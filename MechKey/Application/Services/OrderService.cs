@@ -11,6 +11,7 @@ using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Shared.Common;
 using Shared.ViewModels.Order;
 
@@ -122,7 +123,28 @@ namespace Application.Services
             }
             var totalCount = query.Count();
             query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
-            var list = await query.ProjectTo<OrderModel>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
+            var list = await query.Select(o => new OrderModel
+            {
+                Id = o.Id,
+                UserId = o.UserId,
+                Name = o.User.Name,
+                OrderDate = o.CreatedAt,
+                Email = o.User.Email,
+                Phone = o.Phone,
+                Address = o.Address,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status,
+                OrderItems = o.OrderItems.Select(oi => new OrderItemModel
+                {
+                    Id = oi.Id,
+                    OrderId = oi.OrderId,
+                    ProductId = oi.ProductId,
+                    ProductName = oi.Product.Name,
+                    Price = oi.Product.Price * oi.Quantity,
+                    ImageUrl = oi.Product.ImageUrl,
+                    Option = oi.Option.Length > 0 ? JsonConvert.DeserializeObject<OrderItemVariant>(oi.Option) : null,
+                })
+            }).ToListAsync(cancellationToken);
 
             return Result<PagedResult<OrderModel>>.Success("Get list order success", new PagedResult<OrderModel>
             {

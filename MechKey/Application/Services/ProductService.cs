@@ -167,9 +167,21 @@ namespace Application.Services
 
             var totalCount = await query.CountAsync(cancellationToken);
             var items = await query
+                .OrderBy(i => i.Id)
                 .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                 .Take(pagiModel.PageSize)
-                .ProjectTo<ProductModel>(_mapper.ConfigurationProvider)
+                .Select(p => new ProductModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    CategoryName = p.Category.Name ?? null,
+                    TotalRating = p.ProductRatings.Count > 0
+                        ? p.ProductRatings.Average(r => r.Stars)
+                        : 0,
+                    Variants = string.IsNullOrEmpty(p.Variants)
+                    ? new List<VariantAttribute>()
+                    : JsonConvert.DeserializeObject<List<VariantAttribute>>(p.Variants)
+                })
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
