@@ -78,7 +78,7 @@ function AdminProduct() {
 	const [listProduct, setListProduct] = useState<Product[]>([]);
 	const [listCategory, setListCategory] = useState<Category[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
-	const pageSize = 5;
+	const pageSize = 8;
 	const [totalPage, setTotalPage] = useState(0);
 	const [isOpenEditForm, setIsOpenEditForm] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState<Product>();

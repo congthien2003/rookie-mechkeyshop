@@ -77,8 +77,10 @@ function AdminCategory() {
 	const addCategory = async (data: Category) => {
 		const response = await categoryService.create(data);
 		if (response?.isSuccess) {
-			console.log("Updated success");
+			ToastSuccess("Updated success");
 			await fetch();
+		} else {
+			ToastError("Updated failed");
 		}
 	};
 
