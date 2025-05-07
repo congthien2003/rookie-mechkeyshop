@@ -16,9 +16,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReverseProxyCors", policy =>
     {
-        policy.WithOrigins("*")
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 

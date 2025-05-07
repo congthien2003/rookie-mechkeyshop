@@ -28,7 +28,7 @@ builder.Services.AddApplication()
 builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
     policy =>
     {
-        policy.WithOrigins("http://localhost:5000")
+        policy.WithOrigins("https://localhost:5000")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
