@@ -19,6 +19,7 @@ namespace Domain.Entity
         public Category Category { get; set; }
         public ICollection<ProductRating> ProductRatings { get; set; } = new List<ProductRating>();
         public string Variants { get; set; } = string.Empty;
+        public int Stock { get; set; } = 0;
         public long SellCount { get; set; } = 0;
 
 
@@ -33,7 +34,7 @@ namespace Domain.Entity
             // Optional: prevent user from rating multiple times
             var existing = ProductRatings.FirstOrDefault(r => r.UserId == rating.UserId);
             if (existing != null)
-                throw new InvalidOperationException("User has already rated this product.");
+                throw new ProductRatingUserRatedException();
 
             // Add rating to collection
             ProductRatings.Add(rating);
@@ -45,8 +46,9 @@ namespace Domain.Entity
 
         public void IncreaseSellCount(int quantity)
         {
-            if (quantity < 1) throw new ProductValidateFailedException();
+            if (quantity < 1) throw new ProductValidateFailedException("Quantity is not valid");
             SellCount += quantity;
+            Stock -= quantity;
         }
     }
 }

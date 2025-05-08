@@ -46,4 +46,13 @@ namespace Domain.Exceptions
             Message = message;
         }
     }
+
+    public class ProductRatingUserRatedException : ProductRatingException
+    {
+        public ProductRatingUserRatedException()
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = "User has already rated this product.";
+        }
+    }
 }

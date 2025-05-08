@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IServices;
 using Domain.Common;
+using MechkeyShop.Constant;
 using MechkeyShop.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +77,6 @@ namespace MechkeyShop.Controllers
             try
             {
 
-
                 var user = HttpContext.User;
                 var userId = user.FindFirst("Id")?.Value;
 
@@ -98,7 +98,11 @@ namespace MechkeyShop.Controllers
             }
             catch (BaseException ex)
             {
-                return Redirect($"/Error");
+                // show toast
+                TempData[Toast.KEY] = "Rating failed";
+                TempData[Toast.MESSAGE] = ex.Message;
+                TempData[Toast.TYPE] = Toast.ERROR_TYPE;
+                return Redirect($"/Product/Detail/{id}");
             }
         }
     }

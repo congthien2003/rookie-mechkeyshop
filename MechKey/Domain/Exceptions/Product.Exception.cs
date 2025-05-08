@@ -34,6 +34,12 @@ namespace Domain.Exceptions
             Message = "Validate Product failed";
         }
 
+        public ProductValidateFailedException(string message)
+        {
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = message;
+        }
+
     }
 
     public class ProductDuplicateNameFailedException : ProductException

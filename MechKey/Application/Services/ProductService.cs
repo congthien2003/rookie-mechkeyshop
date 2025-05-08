@@ -164,13 +164,13 @@ namespace Application.Services
                         query = ascOrder ? query.OrderBy(p => p.CreatedAt) : query.OrderByDescending(p => p.CreatedAt);
                         break;
                     default:
+                        query = query.OrderBy(p => p.Id);
                         break;
                 }
             }
 
             var totalCount = await query.CountAsync(cancellationToken);
             var items = await query
-                .OrderBy(i => i.Id)
                 .Skip((pagiModel.Page - 1) * pagiModel.PageSize)
                 .Take(pagiModel.PageSize)
                 .Select(p => new ProductModel
