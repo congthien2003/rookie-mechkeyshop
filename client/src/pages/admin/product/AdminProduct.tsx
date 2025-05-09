@@ -125,6 +125,7 @@ function AdminProduct() {
 
 	const updateProduct = async (data: EditProduct) => {
 		console.log("Update product:", data);
+		showLoading();
 		const response = await productService.edit(data);
 		if (response.isSuccess) {
 			await fetch();
@@ -132,10 +133,12 @@ function AdminProduct() {
 		} else {
 			ToastError("Failed");
 		}
+		hideLoading();
 	};
 
 	const addProduct = async (data: CreateProduct) => {
 		console.log("Add product:", data);
+		showLoading();
 		const response = await productService.create(data);
 		if (response.isSuccess) {
 			await fetch();
@@ -143,9 +146,11 @@ function AdminProduct() {
 		} else {
 			ToastError("Failed");
 		}
+		hideLoading();
 	};
 
 	const deleteProduct = async (id: string) => {
+		showLoading();
 		const response = await productService.deleteById(id);
 		if (response.isSuccess) {
 			await fetch();
@@ -153,6 +158,7 @@ function AdminProduct() {
 		} else {
 			ToastError("Failed");
 		}
+		hideLoading();
 	};
 
 	useEffect(() => {
