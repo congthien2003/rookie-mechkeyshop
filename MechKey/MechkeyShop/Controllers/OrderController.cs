@@ -26,6 +26,7 @@ namespace MechkeyShop.Controllers
             model.OrderDate = DateTime.UtcNow;
 
             var result = await orderService.CreateOrder(model);
+            return BadRequest("Loi");
             return Ok(result);
         }
 

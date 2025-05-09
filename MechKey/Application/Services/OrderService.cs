@@ -132,14 +132,16 @@ namespace Application.Services
                     case "date":
                         query = ascending ? query.OrderBy(o => o.CreatedAt) : query.OrderByDescending(o => o.CreatedAt);
                         break;
-                    case "totalAmount":
+                    case "amount":
                         query = ascending ? query.OrderBy(o => o.TotalAmount) : query.OrderByDescending(o => o.TotalAmount);
                         break;
-                    default: break;
+                    default:
+                        query = query.OrderBy(x => x.Id);
+                        break;
                 }
             }
             var totalCount = query.Count();
-            query = query.OrderBy(x => x.Id).Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
+            query = query.Skip((pagiModel.Page - 1) * pagiModel.PageSize).Take(pagiModel.PageSize);
             var list = await query.Select(o => new OrderModel
             {
                 Id = o.Id,

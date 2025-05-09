@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces.IServices;
 using MechkeyShop.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shared.ViewModels.Order;
 
 namespace MechkeyShop.Controllers
 {
@@ -42,17 +40,24 @@ namespace MechkeyShop.Controllers
         }
 
 
-        [HttpPost]
-        [Authorize(Roles = "2")]
-        public async Task<IActionResult> SubmitOrder(CreateOrderModel model)
-        {
-            var user = HttpContext.User;
-            var id = user.FindFirst("Id")?.Value;
-            var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(id));
+        //[HttpPost]
+        //[Authorize(Roles = "2")]
+        //public async Task<IActionResult> SubmitOrder(CreateOrderModel model)
+        //{
+        //    try
+        //    {
+        //        var user = HttpContext.User;
+        //        var id = user.FindFirst("Id")?.Value;
+        //        var infoUser = await applicaionUserService.GetByIdAsync(Guid.Parse(id));
 
-            model.UserId = Guid.Parse(id);
+        //        model.UserId = Guid.Parse(id);
 
-            return Ok();
-        }
+        //        return Ok();
+        //    }
+        //    catch (BaseException ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
     }
 }
