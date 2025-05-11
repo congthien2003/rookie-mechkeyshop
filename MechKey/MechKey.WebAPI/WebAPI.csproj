@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\EventBus\EventBus.csproj" />
     <ProjectReference Include="..\MechKey.Application\MechKey.Application.csproj" />
     <ProjectReference Include="..\MechKey.Domain\MechKey.Domain.csproj" />

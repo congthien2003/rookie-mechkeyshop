@@ -2,6 +2,8 @@
 using Application.Interfaces.IApiClient.Smtp;
 using Application.Interfaces.IServices;
 using Asp.Versioning;
+using Constracts.Events;
+using EventBus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ViewModels.Order;
@@ -17,12 +19,14 @@ namespace WebAPI.Controllers
         private readonly IOrderService orderService;
         private readonly IEmailService emailService;
         private readonly IRedisService redisService;
+        private readonly IEventBus eventBus;
 
-        public TestController(IOrderService orderService, IEmailService emailService, IRedisService redisService)
+        public TestController(IOrderService orderService, IEmailService emailService, IRedisService redisService, IEventBus eventBus)
         {
             this.orderService = orderService;
             this.emailService = emailService;
             this.redisService = redisService;
+            this.eventBus = eventBus;
         }
 
         [MapToApiVersion(1)]
@@ -78,6 +82,20 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Clear(string key, CancellationToken token = default)
         {
             await redisService.RemoveByPrefixAsync(key, token);
+            return Ok();
+        }
+
+        [HttpGet("test-event")]
+        public async Task<IActionResult> TestEmailRegister(CancellationToken token)
+        {
+            await eventBus.Publish(new RegisterSuccessEvent
+            {
+                CreatedAt = DateTime.Now,
+                Email = "nhoccuthien0538@gmail.com",
+                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid()
+            }, token);
+
             return Ok();
         }
     }

@@ -26,15 +26,15 @@ namespace Infrastructure.ApiClient.MassTransit
                         h.Password("guest");
                     });
 
-                    config.ReceiveEndpoint("email", e =>
-                    {
-                        e.ConfigureConsumer<RegisterSuccessConsumer>(context);
-                    });
+                    //config.ReceiveEndpoint("email", e =>
+                    //{
+                    //    e.ConfigureConsumer<RegisterSuccessConsumer>(context);
+                    //});
 
-                    config.ReceiveEndpoint("order", e =>
-                    {
-                        e.ConfigureConsumer<OrderCreatedConsumer>(context);
-                    });
+                    //config.ReceiveEndpoint("order", e =>
+                    //{
+                    //    e.ConfigureConsumer<OrderCreatedConsumer>(context);
+                    //});
 
                     config.ReceiveEndpoint("delete-image", e =>
                     {

@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 
-namespace EventBus
+namespace EventBus.Implementation
 {
     public class EventBus : IEventBus
     {

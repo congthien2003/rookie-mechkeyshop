@@ -1,5 +1,6 @@
 using Application;
 using Asp.Versioning;
+using EventBus;
 using Infrastructure;
 using Infrastructure.ApiClient.MassTransit;
 using Infrastructure.ApiClient.Redis;
@@ -10,7 +11,7 @@ using WebAPI.Extensions.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-/*builder.AddServiceDefaults();*/
+builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
 
@@ -22,6 +23,8 @@ builder.Services.AddLogging();*/
 
 builder.Services.AddApplication()
                 .AddInfrastructure(builder.Configuration);
+
+builder.Services.AddScoped<IEventBus, EventBus.Implementation.EventBus>();
 
 
 // Config CORS
