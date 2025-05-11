@@ -1,78 +1,88 @@
 using Application.Services;
-using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.Extensions.Logging;
-using MockQueryable;
 using Moq;
+using Shared.Mapping.Interfaces;
 using Shared.ViewModels.Product;
 
 namespace Application.Test
 {
     public class ProductRatingServiceTest
     {
-        private readonly Mock<IProductRepository<Product>> _mockProductRepository;
-        private readonly Mock<IProductRatingRepository<ProductRating>> _mockProductRatingRepository;
-        private readonly Mock<IApplicationUserRepository<ApplicationUser>> _mockApplicationUserRepository;
-        private readonly Mock<ILogger<ProductRatingService>> _mockLogger;
-        private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<IProductRepository<Product>> _productRepositoryMock;
+        private readonly Mock<IProductRatingRepository<ProductRating>> _productRatingRepositoryMock;
+        private readonly Mock<IApplicationUserRepository<ApplicationUser>> _applicationUserRepositoryMock;
+        private readonly Mock<ILogger<ProductRatingService>> _loggerMock;
+        private readonly Mock<IProductRatingMapping> _productRatingMappingMock;
         private readonly ProductRatingService _productRatingService;
         private readonly CancellationToken _cancellationToken;
 
         public ProductRatingServiceTest()
         {
-            _mockProductRepository = new Mock<IProductRepository<Product>>();
-            _mockProductRatingRepository = new Mock<IProductRatingRepository<ProductRating>>();
-            _mockApplicationUserRepository = new Mock<IApplicationUserRepository<ApplicationUser>>();
-            _mockLogger = new Mock<ILogger<ProductRatingService>>();
-            _mockMapper = new Mock<IMapper>();
+            _productRepositoryMock = new Mock<IProductRepository<Product>>();
+            _productRatingRepositoryMock = new Mock<IProductRatingRepository<ProductRating>>();
+            _applicationUserRepositoryMock = new Mock<IApplicationUserRepository<ApplicationUser>>();
+            _loggerMock = new Mock<ILogger<ProductRatingService>>();
+            _productRatingMappingMock = new Mock<IProductRatingMapping>();
 
             _productRatingService = new ProductRatingService(
-                _mockProductRatingRepository.Object,
-                _mockLogger.Object,
-                _mockMapper.Object,
-                _mockApplicationUserRepository.Object,
-                _mockProductRepository.Object
+                _productRatingRepositoryMock.Object,
+                _loggerMock.Object,
+                _applicationUserRepositoryMock.Object,
+                _productRepositoryMock.Object,
+                _productRatingMappingMock.Object
             );
             _cancellationToken = new CancellationToken();
         }
 
         [Fact]
-        public async Task AddAsync_ShouldAddRatingSuccessfully()
+        public async Task AddAsync_ValidRating_ReturnsSuccess()
         {
             // Arrange
-            var productId = Guid.NewGuid();
-            var product = new Product { Id = productId, Name = "Test Product" };
             var ratingModel = new ProductRatingModel
             {
-                ProductId = productId,
-                UserId = Guid.NewGuid(),
+                Id = 1,
                 Stars = 5,
                 Comment = "Great product!",
-                Name = "Test name",
-            };
-            var productRating = new ProductRating
-            {
-                Id = 1,
-                ProductId = productId,
-                UserId = ratingModel.UserId,
-                Stars = ratingModel.Stars,
-                Comment = ratingModel.Comment,
-                RatedAt = DateTime.UtcNow
+                RatedAt = DateTime.UtcNow,
+                ProductId = Guid.NewGuid(),
+                UserId = Guid.NewGuid()
             };
 
-            _mockMapper.Setup(m => m.Map<ProductRating>(ratingModel)).Returns(productRating);
-            _mockProductRepository.Setup(r => r.GetByIdAsync(productId, _cancellationToken)).ReturnsAsync(product);
-            _mockProductRatingRepository.Setup(r => r.CreateAsync(It.IsAny<ProductRating>(), _cancellationToken)).ReturnsAsync(productRating);
+            var rating = new ProductRating
+            {
+                Id = ratingModel.Id,
+                Stars = ratingModel.Stars,
+                Comment = ratingModel.Comment,
+                RatedAt = ratingModel.RatedAt,
+                ProductId = ratingModel.ProductId,
+                UserId = ratingModel.UserId
+            };
+
+            var product = new Product
+            {
+                Id = ratingModel.ProductId,
+                Name = "Test Product",
+                Price = 100
+            };
+
+            _productRatingMappingMock.Setup(x => x.ToProductRating(It.IsAny<ProductRatingModel>()))
+                .Returns(rating);
+
+            _productRepositoryMock.Setup(x => x.GetByIdAsync(ratingModel.ProductId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(product);
+
+            _productRatingRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<ProductRating>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(rating);
 
             // Act
             var result = await _productRatingService.AddAsync(ratingModel);
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("Add rating success", result.Message);
-            _mockProductRatingRepository.Verify(r => r.CreateAsync(It.IsAny<ProductRating>(), _cancellationToken), Times.Once);
+            _productRatingRepositoryMock.Verify(x => x.CreateAsync(It.IsAny<ProductRating>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -98,16 +108,14 @@ namespace Application.Test
                 RatedAt = DateTime.UtcNow
             };
 
-            _mockMapper.Setup(m => m.Map<ProductRating>(ratingModel)).Returns(productRating);
-            _mockProductRepository.Setup(r => r.GetByIdAsync(productId, _cancellationToken)).ReturnsAsync((Product)null);
+            _productRepositoryMock.Setup(r => r.GetByIdAsync(productId, _cancellationToken)).ReturnsAsync((Product)null);
 
             // Act
             var exception = await Assert.ThrowsAsync<ProductNotFoundException>(() => _productRatingService.AddAsync(ratingModel));
 
             // Assert
             Assert.Equal("Product not found", exception.Message);
-            _mockProductRepository.Verify(r => r.UpdateAsync(It.IsAny<Product>(), _cancellationToken), Times.Never);
-
+            _productRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Product>(), _cancellationToken), Times.Never);
         }
 
         [Fact]
@@ -129,58 +137,66 @@ namespace Application.Test
                 Stars = ratingModel.Stars,
                 Comment = ratingModel.Comment,
                 RatedAt = DateTime.UtcNow
-
             };
 
-            _mockMapper.Setup(m => m.Map<ProductRating>(ratingModel)).Returns(productRating);
-            _mockProductRepository.Setup(r => r.GetByIdAsync(productId, _cancellationToken)).ReturnsAsync(product);
+            _productRepositoryMock.Setup(r => r.GetByIdAsync(productId, _cancellationToken)).ReturnsAsync(product);
 
             // Act
             var exception = await Assert.ThrowsAsync<ProductRatingInvalidDataException>(() => _productRatingService.AddAsync(ratingModel));
 
             // Assert
             Assert.Equal("Stars must be between 1 and 5", exception.Message);
-            _mockProductRepository.Verify(r => r.UpdateAsync(It.IsAny<Product>(), _cancellationToken), Times.Never);
-
+            _productRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Product>(), _cancellationToken), Times.Never);
         }
 
         [Fact]
-        public async Task GetAllByIdProductAsync_ShouldReturnPaginatedRatings()
+        public async Task GetAllByIdProductAsync_ReturnsPagedRatings()
         {
             // Arrange
             var productId = Guid.NewGuid();
+            var pageSize = 4;
             var ratings = new List<ProductRating>
             {
-                new ProductRating { Id = 1, ProductId = productId, Stars = 5, Comment = "Excellent!" },
-                new ProductRating { Id = 2, ProductId = productId, Stars = 4, Comment = "Good!" }
-            };
-            var ratingModels = ratings.Select(r => new ProductRatingModel
-            {
-                ProductId = r.ProductId,
-                Stars = r.Stars,
-                Comment = r.Comment
-            }).ToList();
-
-            var queryable = ratings.AsQueryable().BuildMock();
-
-            _mockProductRatingRepository.Setup(r => r.GetListByProduct(productId)).Returns(queryable);
-
-            _mockMapper.Setup(m => m.Map<ProductRatingModel>(It.IsAny<ProductRating>()))
-                .Returns((ProductRating r) => new ProductRatingModel
+                new ProductRating
                 {
-                    ProductId = r.ProductId,
-                    Stars = r.Stars,
-                    Comment = r.Comment
-                });
+                    Id = 1,
+                    Stars = 5,
+                    Comment = "Great product!",
+                    RatedAt = DateTime.UtcNow,
+                    ProductId = productId,
+                    UserId = Guid.NewGuid(),
+                    User = new ApplicationUser { Name = "Test User" }
+                }
+            };
+
+            var ratingModels = new List<ProductRatingModel>
+            {
+                new ProductRatingModel
+                {
+                    Id = ratings[0].Id,
+                    Stars = ratings[0].Stars,
+                    Comment = ratings[0].Comment,
+                    RatedAt = ratings[0].RatedAt,
+                    ProductId = ratings[0].ProductId,
+                    UserId = ratings[0].UserId,
+                    Name = ratings[0].User.Name
+                }
+            };
+
+            _productRatingRepositoryMock.Setup(x => x.GetListByProduct(productId))
+                .Returns(ratings.AsQueryable());
+
+            _productRatingMappingMock.Setup(x => x.ToProductRatingModel(It.IsAny<ProductRating>()))
+                .Returns((ProductRating r) => ratingModels.First(m => m.Id == r.Id));
 
             // Act
-            var result = await _productRatingService.GetAllByIdProductAsync(productId, pageSize: 2, false, _cancellationToken);
+            var result = await _productRatingService.GetAllByIdProductAsync(productId, pageSize);
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("Get rating success", result.Message);
-            Assert.Equal(2, result.Data.Items.Count());
-            Assert.Equal(2, result.Data.TotalItems);
+            Assert.Equal(ratingModels, result.Data.Items);
+            _productRatingRepositoryMock.Verify(x => x.GetListByProduct(productId), Times.Once);
+            _productRatingMappingMock.Verify(x => x.ToProductRatingModel(It.IsAny<ProductRating>()), Times.Once);
         }
     }
 }

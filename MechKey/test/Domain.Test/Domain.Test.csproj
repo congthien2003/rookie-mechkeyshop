@@ -17,7 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Domain.csproj" />
+	  <ProjectReference Include="..\..\MechKey.Domain\MechKey.Domain.csproj" />
+
   </ItemGroup>
 
   <ItemGroup>

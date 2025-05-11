@@ -1,6 +1,8 @@
-﻿namespace Shared.ViewModels.Auth
+﻿using Shared.ViewModels.Abstractions;
+
+namespace Shared.ViewModels.Auth
 {
-    public class ApplicationUserModel
+    public class ApplicationUserModel : BaseViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -9,7 +11,6 @@
         public string Address { get; set; }
         public int RoleId { get; set; }
         public bool IsEmailConfirmed { get; set; }
-        public bool IsDeleted { get; set; }
 
     }
 }

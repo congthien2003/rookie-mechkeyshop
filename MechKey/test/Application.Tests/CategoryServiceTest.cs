@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces.IApiClient.Redis;
 using Application.Services;
-using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
@@ -8,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
 using Shared.Common;
+using Shared.Mapping;
+using Shared.Mapping.Interfaces;
 using Shared.ViewModels.Category;
 
 namespace Application.Test
@@ -15,28 +16,23 @@ namespace Application.Test
     public class CategoryServiceTest
     {
         private readonly Mock<ICategoryRepository<Category>> _categoryRepoMock;
-        private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ILogger<CategoryService>> _loggerMock;
         private readonly Mock<IRedisService> _redisServiceMock;
+        private readonly Mock<ICategoryMapping> _categoryMappingMock;
         private readonly CategoryService _categoryService;
         private readonly CancellationToken _cancellationToken;
 
         public CategoryServiceTest()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Category, CategoryModel>().ReverseMap();
-            });
             _categoryRepoMock = new Mock<ICategoryRepository<Category>>();
-            _mapperMock = new Mock<IMapper>();
-            _mapperMock.Setup((x) => x.ConfigurationProvider).Returns(config);
             _loggerMock = new Mock<ILogger<CategoryService>>();
             _redisServiceMock = new Mock<IRedisService>();
-            _categoryService = new CategoryService(_categoryRepoMock.Object, _mapperMock.Object, _loggerMock.Object, _redisServiceMock.Object);
+            _categoryMappingMock = new Mock<ICategoryMapping>();
+            _categoryService = new CategoryService(_categoryRepoMock.Object, _loggerMock.Object, _redisServiceMock.Object, _categoryMappingMock.Object);
             _cancellationToken = new CancellationToken();
         }
 
-        private static Category CreateCategoryEntity() => new Category(Guid.NewGuid(), "Category Name");
+        private static Category CreateCategoryEntity() => new Category() { Id = Guid.NewGuid(), Name = "Test category" };
 
         [Fact]
         public async Task Add_Category_Async_With_Valid_Data()
@@ -47,7 +43,10 @@ namespace Application.Test
             {
                 Name = name,
             };
+            var category = CreateCategoryEntity();
 
+            _categoryMappingMock.Setup(r => r.ToCategoryByCreatedCategoryModel(model)).Returns(category);
+            _categoryRepoMock.Setup(r => r.CreateAsync(category, _cancellationToken)).ReturnsAsync(category);
             // Act
             var result = await _categoryService.AddAsync(model, _cancellationToken);
 
@@ -188,7 +187,7 @@ namespace Application.Test
             const int pageSize = 10;
 
             var allData = Enumerable.Range(1, 20)
-                .Select(i => new Category(Guid.NewGuid(), $"Category {i}"))
+                .Select(i => new Category { Id = Guid.NewGuid(), Name = $"Category {i}" })
                 .ToList();
 
             var mockQueryable = allData.AsQueryable().BuildMock();

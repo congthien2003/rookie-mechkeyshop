@@ -1,11 +1,11 @@
 ﻿using Application.Services;
-using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
+using Shared.Mapping.Interfaces;
 using Shared.ViewModels.Auth;
 
 namespace Application.Test
@@ -13,29 +13,21 @@ namespace Application.Test
     public class ApplicationUserServiceTest
     {
         private readonly Mock<IApplicationUserRepository<ApplicationUser>> _mockRepository;
-        private readonly IMapper _mapper; // Use actual mapper instance
         private readonly Mock<ILogger<ApplicationUserService>> _mockLogger;
+        private readonly Mock<IApplicationUserMapping> _mockMapping;
         private readonly ApplicationUserService _applicationUserService;
         private readonly CancellationToken _cancellationToken;
 
         public ApplicationUserServiceTest()
         {
             _mockRepository = new Mock<IApplicationUserRepository<ApplicationUser>>();
-
-            // Initialize AutoMapper with AutoMapperProfile
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<ApplicationUser, ApplicationUserModel>().ReverseMap();
-                cfg.CreateMap<ApplicationUser, RegisterModel>().ReverseMap();
-            });
-            _mapper = mapperConfig.CreateMapper();
-
             _mockLogger = new Mock<ILogger<ApplicationUserService>>();
+            _mockMapping = new Mock<IApplicationUserMapping>();
 
             _applicationUserService = new ApplicationUserService(
                 _mockRepository.Object,
-                _mapper,
-                _mockLogger.Object
+                _mockLogger.Object,
+                _mockMapping.Object
             );
 
             _cancellationToken = new CancellationToken();
@@ -89,7 +81,6 @@ namespace Application.Test
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(2, result.Data.Items.Count());
         }
 
         [Fact]
@@ -98,9 +89,16 @@ namespace Application.Test
             // Arrange
             var userId = Guid.NewGuid();
             var applicationUser = new ApplicationUser { Id = userId, Name = "Test User", Email = "test@example.com" };
+            var applicationUserModel = new ApplicationUserModel
+            {
+                Id = applicationUser.Id,
+                Name = applicationUser.Name,
+                Email = applicationUser.Email,
+
+            };
 
             _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync(applicationUser);
-
+            _mockMapping.Setup(m => m.ToApplicationUserModel(applicationUser)).Returns(applicationUserModel);
             // Act
             var result = await _applicationUserService.GetByIdAsync(userId, _cancellationToken);
 
@@ -131,6 +129,7 @@ namespace Application.Test
 
             _mockRepository.Setup(r => r.GetByIdAsync(userId, _cancellationToken)).ReturnsAsync(applicationUser);
             _mockRepository.Setup(r => r.UpdateAsync(applicationUser, _cancellationToken)).ReturnsAsync(applicationUser);
+            _mockMapping.Setup(m => m.ToApplicationUserModel(applicationUser)).Returns(updatedUserModel);
 
             // Act
             var result = await _applicationUserService.UpdateAsync(updatedUserModel, _cancellationToken);

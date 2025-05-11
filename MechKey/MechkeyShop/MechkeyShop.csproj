@@ -23,9 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\EventBus\EventBus.csproj" />
+    <ProjectReference Include="..\MechKey.Application\MechKey.Application.csproj" />
+    <ProjectReference Include="..\MechKey.Domain\MechKey.Domain.csproj" />
+    <ProjectReference Include="..\MechKey.Infrastructure\MechKey.Infrastructure.csproj" />
     <ProjectReference Include="..\MechKey.ServiceDefaults\MechKey.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>

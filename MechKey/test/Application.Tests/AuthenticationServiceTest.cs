@@ -2,11 +2,11 @@
 using Application.Interfaces.IApiClient.MassTransit;
 using Application.Services;
 using Application.Services.Common;
-using AutoMapper;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
 using Moq;
+using Shared.Mapping.Interfaces;
 using Shared.ViewModels.Auth;
 
 namespace Application.Test
@@ -15,9 +15,9 @@ namespace Application.Test
     {
         private readonly Mock<IApplicationUserRepository<ApplicationUser>> _mockUserRepository;
         private readonly Mock<IEventBus> _mockEventBus;
-        private readonly IMapper _mapper;
         private readonly AuthenticationService _authenticationService;
         private readonly CancellationToken _cancellationToken;
+        private readonly Mock<IApplicationUserMapping> _mockUserMapping;
         private static RegisterModel CreateRegisterModel() => new RegisterModel
         {
             Id = Guid.NewGuid(),
@@ -32,21 +32,12 @@ namespace Application.Test
         public AuthenticationServiceTest()
         {
             _mockUserRepository = new Mock<IApplicationUserRepository<ApplicationUser>>();
-
-            // Initialize AutoMapper with AutoMapperProfile
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<ApplicationUser, ApplicationUserModel>().ReverseMap();
-                cfg.CreateMap<ApplicationUser, RegisterModel>().ReverseMap();
-            });
-            _mapper = mapperConfig.CreateMapper();
-
             _mockEventBus = new Mock<IEventBus>();
-
+            _mockUserMapping = new Mock<IApplicationUserMapping>();
             _authenticationService = new AuthenticationService(
                 _mockUserRepository.Object,
-                _mapper,
-                _mockEventBus.Object
+                _mockEventBus.Object,
+                _mockUserMapping.Object
             );
 
             _cancellationToken = new CancellationToken();

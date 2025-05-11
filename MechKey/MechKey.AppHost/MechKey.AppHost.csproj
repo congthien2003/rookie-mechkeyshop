@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MechKey.WebAPI\WebAPI.csproj" />
     <ProjectReference Include="..\MechkeyShop\MechkeyShop.csproj" />
-    <ProjectReference Include="..\WebAPI\WebAPI.csproj" />
     <ProjectReference Include="..\Yarp\Mechkey.Yarp\Mechkey.Yarp.csproj" />
   </ItemGroup>
 

@@ -1,8 +1,9 @@
 ﻿using Domain.Enum;
+using Shared.ViewModels.Abstractions;
 
 namespace Shared.ViewModels.Order
 {
-    public class OrderModel
+    public class OrderModel : BaseViewModel
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
