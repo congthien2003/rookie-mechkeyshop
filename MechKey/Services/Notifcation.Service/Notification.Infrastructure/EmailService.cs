@@ -1,4 +1,4 @@
-﻿using Notification.Application;
+﻿using Notification.Application.Interfaces;
 using Shared.ViewModels.Order;
 using System.Net;
 using System.Net.Mail;

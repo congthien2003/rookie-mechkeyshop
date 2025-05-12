@@ -1,16 +1,28 @@
-using Constracts.Events;
 using EventBus;
 using MassTransit;
+using Notifcation.Api;
 using Notifcation.Infrastructure;
-using Notification.Application;
+using Notification.Application.Common;
+using Notification.Application.Interfaces;
+using Notification.Application.Services;
 using Notification.Consumer;
+using Notification.Domain.IRepository;
+using Notification.Infrastructure.Mappers;
+using Notification.Infrastructure.MongoDb.DataContext;
+using Notification.Infrastructure.MongoDb.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
+
 builder.Services.AddScoped<IEventBus, EventBus.Implementation.EventBus>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationMapper, NotificationMapper>();
 
 builder.Services.AddMassTransit(busConfigurator =>
 {
@@ -47,16 +59,6 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-app.MapGet("/health-check", (IEventBus eventBus, CancellationToken token) =>
-{
-    eventBus.Publish(new RegisterSuccessEvent
-    {
-        CreatedAt = DateTime.Now,
-        Email = "nhoccuthien0538@gmail.com",
-        Id = Guid.NewGuid(),
-        UserId = Guid.NewGuid()
-    }, token);
-    return Results.Ok("Health");
-});
+app.MapNotificationApi();
 
 app.Run();

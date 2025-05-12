@@ -1,6 +1,6 @@
 ﻿using Shared.ViewModels.Order;
 
-namespace Notification.Application
+namespace Notification.Application.Interfaces
 {
     public interface IEmailService
     {

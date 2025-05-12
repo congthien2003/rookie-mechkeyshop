@@ -49,7 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notification.Consumer", "Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notifcation.Api", "Services\Notifcation.Service\Notifcation.Api\Notifcation.Api.csproj", "{8108DBBE-B091-4FDC-8168-DB31CB6DA60F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{302A2F4C-5DE5-4B10-8A3D-80712FB6A7A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{302A2F4C-5DE5-4B10-8A3D-80712FB6A7A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Domain", "Services\Notifcation.Service\Notification.Domain\Notification.Domain.csproj", "{8211531F-75BA-43FE-A900-548110259E19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{302A2F4C-5DE5-4B10-8A3D-80712FB6A7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{302A2F4C-5DE5-4B10-8A3D-80712FB6A7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{302A2F4C-5DE5-4B10-8A3D-80712FB6A7A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8211531F-75BA-43FE-A900-548110259E19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8211531F-75BA-43FE-A900-548110259E19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8211531F-75BA-43FE-A900-548110259E19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8211531F-75BA-43FE-A900-548110259E19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,6 +162,7 @@ Global
 		{DBF99EB0-A286-4C85-9EA7-870D7B604EF6} = {B3F13809-5801-4F7C-8BD1-9C57C1C8BD47}
 		{8108DBBE-B091-4FDC-8168-DB31CB6DA60F} = {B3F13809-5801-4F7C-8BD1-9C57C1C8BD47}
 		{302A2F4C-5DE5-4B10-8A3D-80712FB6A7A6} = {3AF588D8-86BD-49F4-A6EE-855CD54B4DE2}
+		{8211531F-75BA-43FE-A900-548110259E19} = {B3F13809-5801-4F7C-8BD1-9C57C1C8BD47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1D23C3DD-5D38-4C14-97F6-8C50D23BC48A}

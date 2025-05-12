@@ -1,7 +1,7 @@
 ﻿using Constracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Notification.Application;
+using Notification.Application.Interfaces;
 
 namespace Notification.Consumer
 {
