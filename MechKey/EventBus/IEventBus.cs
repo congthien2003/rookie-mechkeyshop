@@ -2,6 +2,6 @@
 {
     public interface IEventBus
     {
-        Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class;
+        Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class;
     }
 }

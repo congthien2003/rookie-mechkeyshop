@@ -11,10 +11,9 @@ namespace EventBus.Implementation
             _publisher = publisher;
         }
 
-        public Task Publish<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class
+        public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : class
         {
-            _publisher.Publish(@event, cancellationToken);
-            return Task.CompletedTask;
+            await _publisher.Publish(@event, cancellationToken);
         }
     }
 }
