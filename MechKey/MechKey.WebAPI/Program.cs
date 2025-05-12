@@ -24,8 +24,7 @@ builder.Services.AddLogging();*/
 builder.Services.AddApplication()
                 .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddScoped<IEventBus, EventBus.Implementation.EventBus>();
-
+builder.Services.AddEventBus();
 
 // Config CORS
 builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",

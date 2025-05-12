@@ -17,7 +17,8 @@ builder.AddServiceDefaults();
 
 builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
 
-builder.Services.AddScoped<IEventBus, EventBus.Implementation.EventBus>();
+builder.Services.AddEventBus();
+
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();

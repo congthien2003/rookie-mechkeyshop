@@ -1,6 +1,5 @@
 ﻿using Application.Comoon;
 using Application.Events;
-using Application.Interfaces.IApiClient.MassTransit;
 using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IServices;
@@ -9,6 +8,7 @@ using Application.Validators;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using EventBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

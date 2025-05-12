@@ -12,8 +12,6 @@ namespace Infrastructure.ApiClient.MassTransit
             {
                 busConfigurator.SetKebabCaseEndpointNameFormatter();
 
-                busConfigurator.AddConsumer<RegisterSuccessConsumer>();
-                busConfigurator.AddConsumer<OrderCreatedConsumer>();
                 busConfigurator.AddConsumer<DeleteImageConsumer>();
 
 
@@ -25,16 +23,6 @@ namespace Infrastructure.ApiClient.MassTransit
                         h.Username("guest");
                         h.Password("guest");
                     });
-
-                    //config.ReceiveEndpoint("email", e =>
-                    //{
-                    //    e.ConfigureConsumer<RegisterSuccessConsumer>(context);
-                    //});
-
-                    //config.ReceiveEndpoint("order", e =>
-                    //{
-                    //    e.ConfigureConsumer<OrderCreatedConsumer>(context);
-                    //});
 
                     config.ReceiveEndpoint("delete-image", e =>
                     {

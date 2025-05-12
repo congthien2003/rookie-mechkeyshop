@@ -1,4 +1,5 @@
 ﻿using Application;
+using EventBus;
 using Infrastructure;
 using Infrastructure.ApiClient.MassTransit;
 using Infrastructure.ApiClient.Redis;
@@ -15,6 +16,8 @@ builder.AddServiceDefaults();
 
 builder.Services.AddApplication()
                 .AddInfrastructure(builder.Configuration);
+
+builder.Services.AddEventBus();
 
 builder.Services.AddControllersWithViews();
 

@@ -1,11 +1,9 @@
-﻿using Application.Interfaces.IApiClient.MassTransit;
-using Application.Interfaces.IApiClient.Redis;
+﻿using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IApiClient.Smtp;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
-using Infrastructure.ApiClient.MassTransit;
 using Infrastructure.ApiClient.Redis;
 using Infrastructure.ApiClient.Smtp;
 using Infrastructure.ApiClient.SupabaseCloud;
@@ -38,8 +36,8 @@ namespace Infrastructure
             services.AddScoped<ISupabaseService, SupabaseService>();
             services.AddScoped<IEmailService, EmailService>();
 
-            services.AddScoped<IEventBus, MassTransitService>();
             services.AddScoped<IRedisService, RedisService>();
+
             return services;
         }
     }

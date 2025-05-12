@@ -6,7 +6,7 @@ namespace Notifcation.Api
     {
         public static IEndpointRouteBuilder MapNotificationApi(this IEndpointRouteBuilder builder)
         {
-            builder.MapGroup("/api/v1/")
+            builder.MapGroup("/api/v1")
                   .MapNotificationApi();
 
             return builder;
@@ -14,7 +14,7 @@ namespace Notifcation.Api
 
         public static RouteGroupBuilder MapNotificationApi(this RouteGroupBuilder group)
         {
-            group.MapGet("health-check", () =>
+            group.MapGet("notification/health", () =>
             {
                 return Results.Ok("Health-check called");
             });

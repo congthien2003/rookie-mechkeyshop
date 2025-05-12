@@ -1,12 +1,12 @@
 ﻿using Application.Comoon;
 using Application.Events;
-using Application.Interfaces.IApiClient.MassTransit;
 using Application.Interfaces.IServices;
 using Application.Services.Common;
 using Application.Validators;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using EventBus;
 using Shared.Mapping.Interfaces;
 using Shared.ViewModels.Auth;
 namespace Application.Services

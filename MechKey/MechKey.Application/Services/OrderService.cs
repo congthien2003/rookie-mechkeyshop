@@ -1,12 +1,12 @@
 ﻿using Application.Comoon;
 using Application.Events;
-using Application.Interfaces.IApiClient.MassTransit;
 using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.Enum;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using EventBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

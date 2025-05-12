@@ -88,7 +88,7 @@ namespace WebAPI.Controllers
         [HttpGet("test-event")]
         public async Task<IActionResult> TestEmailRegister(CancellationToken token)
         {
-            await eventBus.Publish(new RegisterSuccessEvent
+            await eventBus.PublishAsync(new RegisterSuccessEvent
             {
                 CreatedAt = DateTime.Now,
                 Email = "nhoccuthien0538@gmail.com",
