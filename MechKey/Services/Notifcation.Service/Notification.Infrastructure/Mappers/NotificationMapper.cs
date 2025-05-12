@@ -1,4 +1,5 @@
-﻿using Notification.Infrastructure.MongoDb.Documents;
+﻿using Notification.Domain.Enum;
+using Notification.Infrastructure.MongoDb.Documents;
 
 namespace Notification.Infrastructure.Mappers
 {
@@ -9,12 +10,12 @@ namespace Notification.Infrastructure.Mappers
             return new NotificationDocument
             {
                 Id = notification.Id,
-                Type = notification.Type,
+                Type = (int)notification.Type,
                 Description = notification.Description,
                 EventId = notification.EventId,
                 UserId = notification.UserId,
                 Recipient = notification.Recipient,
-                Status = notification.Status,
+                Status = (int)notification.Status,
                 SendAt = notification.SendAt
             };
         }
@@ -24,12 +25,12 @@ namespace Notification.Infrastructure.Mappers
             return new Domain.Entities.Notification
             {
                 Id = document.Id,
-                Type = document.Type,
+                Type = document.Type == (int)NotificationType.Email ? NotificationType.Email : NotificationType.SMS,
                 Description = document.Description,
                 EventId = document.EventId,
                 UserId = document.UserId,
                 Recipient = document.Recipient,
-                Status = document.Status,
+                Status = document.Status == (int)NotificationStatus.Failed ? NotificationStatus.Failed : NotificationStatus.Success,
                 SendAt = document.SendAt
             };
         }

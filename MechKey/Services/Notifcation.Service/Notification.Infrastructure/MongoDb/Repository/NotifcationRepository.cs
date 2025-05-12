@@ -27,7 +27,7 @@ namespace Notification.Infrastructure.MongoDb.Repository
 
         public async Task<IEnumerable<Domain.Entities.Notification>> GetByUserIdAsync(string userId)
         {
-            var docs = await _collection.Find(x => x.UserId == userId).ToListAsync();
+            var docs = await _collection.Find(x => x.UserId == "6821707e55a7835ec5a12d70").ToListAsync();
             return docs.Select(_mapper.ToEntity);
         }
 

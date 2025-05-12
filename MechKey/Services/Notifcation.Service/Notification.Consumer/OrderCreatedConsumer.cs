@@ -2,6 +2,7 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Notification.Application.Interfaces;
+using Notification.Domain.Enum;
 
 namespace Notification.Consumer
 {
@@ -9,27 +10,56 @@ namespace Notification.Consumer
     {
         private readonly IEmailService emailService;
         private readonly ILogger<OrderCreatedConsumer> logger;
+        private readonly INotificationService notificationService;
 
-        public OrderCreatedConsumer(IEmailService emailService, ILogger<OrderCreatedConsumer> logger)
+        public OrderCreatedConsumer(IEmailService emailService,
+                                    ILogger<OrderCreatedConsumer> logger,
+                                    INotificationService notificationService)
         {
             this.emailService = emailService;
             this.logger = logger;
+            this.notificationService = notificationService;
         }
 
-        public Task Consume(ConsumeContext<OrderCreatedEvent> context)
+        public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
         {
-            // Call email sender
-            var result = emailService.SendEmailOrder(context.Message.OrderModel.Email, context.Message.OrderModel);
-            if (!result)
+            var email = context.Message.OrderModel.Email;
+            var userId = context.Message.OrderModel.UserId.ToString();
+            var eventId = context.Message.Id.ToString();
+
+            var notification = new Domain.Entities.Notification
             {
-                logger.LogError($"Failed to send confirmation email to {context.Message.OrderModel.Email}");
-                throw new InvalidOperationException($"Failed to send confirmation email to {context.Message.OrderModel.Email}");
+                Type = NotificationType.Email,
+                Description = $"Send order confirmation email to {email}",
+                EventId = eventId,
+                UserId = userId,
+                Recipient = email,
+                SendAt = DateTime.UtcNow
+            };
+
+            try
+            {
+                var result = emailService.SendEmailOrder(email, context.Message.OrderModel);
+
+                if (!result)
+                {
+                    notification.ChangeStatus(NotificationStatus.Failed);
+                    logger.LogError("Failed to send order confirmation email to {Email}", email);
+                }
+                else
+                {
+                    notification.ChangeStatus(NotificationStatus.Success);
+                    logger.LogInformation("Order confirmation email sent successfully to {Email}", email);
+                }
+            }
+            catch (Exception ex)
+            {
+                notification.ChangeStatus(NotificationStatus.Failed);
+                logger.LogError(ex, "Exception while sending order confirmation email to {Email}", email);
             }
 
-            logger.LogInformation($"Confirmation email sent successfully to {context.Message.OrderModel.Email}");
-
-
-            return Task.CompletedTask;
+            await notificationService.LogNotificationAsync(notification);
         }
+
     }
 }

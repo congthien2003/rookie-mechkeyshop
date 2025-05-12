@@ -2,6 +2,7 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Notification.Application.Interfaces;
+using Notification.Domain.Enum;
 
 namespace Notification.Consumer
 {
@@ -9,27 +10,55 @@ namespace Notification.Consumer
     {
         private readonly IEmailService emailService;
         private readonly ILogger<RegisterSuccessConsumer> logger;
+        private readonly INotificationService notificationService;
 
-        public RegisterSuccessConsumer(IEmailService emailService, ILogger<RegisterSuccessConsumer> logger)
+
+        public RegisterSuccessConsumer(IEmailService emailService, ILogger<RegisterSuccessConsumer> logger, INotificationService notificationService)
         {
             this.emailService = emailService;
             this.logger = logger;
+            this.notificationService = notificationService;
         }
 
-        public Task Consume(ConsumeContext<RegisterSuccessEvent> context)
+        public async Task Consume(ConsumeContext<RegisterSuccessEvent> context)
         {
-            // Call email sender
-            var result = emailService.SendEmailConfirm(context.Message.Email, context.Message.UserId.ToString());
-            if (!result)
+            var email = context.Message.Email;
+            var userId = context.Message.UserId.ToString();
+            var eventId = context.Message.Id.ToString();
+
+            var notification = new Domain.Entities.Notification
             {
-                logger.LogError($"Failed to send confirmation email to {context.Message.Email}");
-                throw new InvalidOperationException($"Failed to send confirmation email to {context.Message.Email}");
+                Type = NotificationType.Email,
+                Description = $"Send confirmation email to {email}",
+                EventId = eventId,
+                UserId = userId,
+                Recipient = email,
+                SendAt = DateTime.UtcNow
+            };
+
+            try
+            {
+                var result = emailService.SendEmailConfirm(email, userId);
+
+                if (!result)
+                {
+                    notification.ChangeStatus(NotificationStatus.Failed);
+                    logger.LogError("Failed to send confirmation email to {Email}", email);
+                }
+                else
+                {
+                    notification.ChangeStatus(NotificationStatus.Success);
+                    logger.LogInformation("Confirmation email sent successfully to {Email}", email);
+                }
+            }
+            catch (Exception ex)
+            {
+                notification.ChangeStatus(NotificationStatus.Failed);
+                logger.LogError(ex, "Exception while sending confirmation email to {Email}", email);
             }
 
-            logger.LogInformation("Consume event success !!");
-
-
-            return Task.CompletedTask;
+            await notificationService.LogNotificationAsync(notification);
         }
+
     }
 }
