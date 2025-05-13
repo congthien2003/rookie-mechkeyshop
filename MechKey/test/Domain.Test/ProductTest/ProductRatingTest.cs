@@ -15,7 +15,7 @@ namespace Domain.Test.ProductTest
         public void Add_Rating_Product(int rating, double avg_rating)
         {
             // arrange
-            var category = new Category(Guid.NewGuid(), "Category");
+            var category = new Category { Id = Guid.NewGuid(), Name = "Category" };
             var product = new Entity.Product
             {
                 Id = Guid.NewGuid(),
@@ -54,7 +54,7 @@ namespace Domain.Test.ProductTest
         public void Add_Multiple_Ratings_Product()
         {
             // arrange
-            var category = new Category(Guid.NewGuid(), "Category");
+            var category = new Category { Id = Guid.NewGuid(), Name = "Category" };
             var product = new Entity.Product
             {
                 Id = Guid.NewGuid(),

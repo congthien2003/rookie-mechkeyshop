@@ -102,7 +102,7 @@ app.UseStatusCodePages(async context =>
     }
 });
 
-app.UseExceptionHandler("/Error");
+//app.UseExceptionHandler("/Error");
 
 app.MapControllerRoute(
     name: "Auth",

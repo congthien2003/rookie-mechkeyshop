@@ -1,10 +1,10 @@
 ﻿using Application.Events;
-using Application.Interfaces.IApiClient.MassTransit;
 using Application.Services;
 using Application.Services.Common;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using EventBus;
 using Moq;
 using Shared.Mapping.Interfaces;
 using Shared.ViewModels.Auth;

@@ -1,4 +1,5 @@
 ﻿using Domain.Entity;
+using MechKey.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MechkeyShop.Data
@@ -18,6 +19,7 @@ namespace MechkeyShop.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<ProductRating> ProductRatings { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<RegisterAccountToken> RegisterAccountTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,11 +1,9 @@
 ﻿using Application.Interfaces.IApiClient.Redis;
-using Application.Interfaces.IApiClient.Smtp;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
 using Domain.IRepositories;
 using Infrastructure.ApiClient.Redis;
-using Infrastructure.ApiClient.Smtp;
 using Infrastructure.ApiClient.SupabaseCloud;
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;
@@ -34,7 +32,6 @@ namespace Infrastructure
             services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
             services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
             services.AddScoped<ISupabaseService, SupabaseService>();
-            services.AddScoped<IEmailService, EmailService>();
 
             services.AddScoped<IRedisService, RedisService>();
 

@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.IServices;
+using Domain.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
@@ -19,14 +20,24 @@ namespace MechkeyShop.Controllers
         [Authorize(Roles = "2")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderModel model)
         {
-            var user = HttpContext.User;
-            var id = user.FindFirst("Id")?.Value;
+            try
+            {
 
-            model.UserId = Guid.Parse(id);
-            model.OrderDate = DateTime.UtcNow;
 
-            var result = await orderService.CreateOrder(model);
-            return Ok(result);
+                var user = HttpContext.User;
+                var id = user.FindFirst("Id")?.Value;
+
+                model.UserId = Guid.Parse(id);
+                model.OrderDate = DateTime.UtcNow;
+
+                var result = await orderService.CreateOrder(model);
+                return Ok(result);
+            }
+            catch (BaseException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpGet("/Order/Detail/{id:Guid}")]

@@ -76,4 +76,16 @@ namespace Domain.Exceptions
         }
     }
 
+    public class InsufficientStockException : ProductException
+    {
+        public string ProductId { get; }
+
+        public InsufficientStockException(string productId, int requestedQuantity, int availableQuantity)
+        {
+            ProductId = productId;
+            Type = Enum.ExceptionType.VALIDATION_FAILED;
+            Message = $"Insufficient stock for product '{productId}'. Requested: {requestedQuantity}, Available: {availableQuantity}.";
+        }
+    }
+
 }

@@ -1,10 +1,10 @@
-﻿using Application.Interfaces.IApiClient.MassTransit;
-using Application.Interfaces.IServices;
+﻿using Application.Interfaces.IServices;
 using Application.Interfaces.IUnitOfWork;
 using Application.Services;
 using Domain.Entity;
 using Domain.Exceptions;
 using Domain.IRepositories;
+using EventBus;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Shared.Mapping.Interfaces;
@@ -19,6 +19,7 @@ namespace Application.Test
         private readonly Mock<IOrderUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IProductSalesTracker> _mockProductSalesTracker;
         private readonly Mock<IApplicationUserRepository<ApplicationUser>> _mockApplicationUserRepository;
+        private readonly Mock<IProductRepository<Product>> _mockProductRepository;
         private readonly Mock<IEventBus> _mockEventBus;
         private readonly Mock<IOrderMapping> _mockMapping;
         private readonly Mock<IOrderItemMapping> _mockItemMapping;
@@ -34,7 +35,7 @@ namespace Application.Test
             _mockEventBus = new Mock<IEventBus>();
             _mockMapping = new Mock<IOrderMapping>();
             _mockItemMapping = new Mock<IOrderItemMapping>();
-
+            _mockProductRepository = new Mock<IProductRepository<Product>>();
             _cancellationToken = new CancellationToken();
             _mockApplicationUserRepository = new Mock<IApplicationUserRepository<ApplicationUser>>();
             _orderService = new OrderService(
@@ -45,7 +46,8 @@ namespace Application.Test
                 _mockEventBus.Object,
                 _mockApplicationUserRepository.Object,
                 _mockMapping.Object,
-                _mockItemMapping.Object
+                _mockItemMapping.Object,
+                _mockProductRepository.Object
             );
         }
 

@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MechKey.Domain\MechKey.Domain.csproj" />
+    <ProjectReference Include="..\..\MechKey.Infrastructure\MechKey.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

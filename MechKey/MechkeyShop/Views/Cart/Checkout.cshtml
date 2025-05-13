@@ -46,8 +46,8 @@
                 window.location.href = '/Order';
             })
             .catch((error) => {
-                console.error('Error:', error);
-                showNoti('error', 'Error', 'Create order failed. Please retry !!');
+                console.log(error);
+                    showNoti('error', 'Error', error.Message);
 
             });
         });

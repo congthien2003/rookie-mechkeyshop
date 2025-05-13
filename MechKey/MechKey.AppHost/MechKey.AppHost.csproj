@@ -11,12 +11,14 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MechKey.WebAPI\WebAPI.csproj" />
     <ProjectReference Include="..\MechkeyShop\MechkeyShop.csproj" />
     <ProjectReference Include="..\Services\Notifcation.Service\Notifcation.Api\Notifcation.Api.csproj" />
+    <ProjectReference Include="..\Services\Order.Service\Order.Api\Order.Api.csproj" />
     <ProjectReference Include="..\Yarp\Mechkey.Yarp\Mechkey.Yarp.csproj" />
   </ItemGroup>
 

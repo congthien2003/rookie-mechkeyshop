@@ -26,6 +26,7 @@ namespace Application.Services
         private readonly IEventBus _eventBus;
         private readonly IOrderMapping _orderMapping;
         private readonly IOrderItemMapping _orderItemMapping;
+        private readonly IProductRepository<Product> _productRepository;
         public OrderService(
             IOrderUnitOfWork unitOfWork,
             IOrderRepository orderRepository,
@@ -34,7 +35,8 @@ namespace Application.Services
             IEventBus eventBus,
             IApplicationUserRepository<ApplicationUser> applicationUserRepository,
             IOrderMapping orderMapping,
-            IOrderItemMapping orderItemMapping)
+            IOrderItemMapping orderItemMapping,
+            IProductRepository<Product> productRepository)
         {
             _orderRepository = orderRepository;
             _logger = logger;
@@ -44,10 +46,23 @@ namespace Application.Services
             this.applicationUserRepository = applicationUserRepository;
             _orderMapping = orderMapping;
             _orderItemMapping = orderItemMapping;
+            _productRepository = productRepository;
         }
 
         public async Task<Result<OrderModel>> CreateOrder(CreateOrderModel model, CancellationToken cancellationToken)
         {
+
+            // Validate product stock in order
+
+            foreach (var item in model.OrderItems)
+            {
+                var product = await _productRepository.GetByIdAsync(item.ProductId);
+                if (product.Stock - item.Quantity < 0)
+                {
+                    throw new InsufficientStockException(product.Name, item.Quantity, product.Stock);
+                }
+            }
+
             try
             {
 

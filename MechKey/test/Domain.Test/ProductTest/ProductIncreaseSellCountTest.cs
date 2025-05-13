@@ -16,7 +16,7 @@ namespace Domain.Test.ProductTest
         public void Add_Increase_Sell_Count_Product(int quantity, int total)
         {
             // arrange
-            var category = new Category(Guid.NewGuid(), "Category");
+            var category = new Category { Id = Guid.NewGuid(), Name = "Category" };
             var product = new Entity.Product
             {
                 Id = Guid.NewGuid(),
@@ -45,7 +45,7 @@ namespace Domain.Test.ProductTest
         public void Add_Increase_Sell_Count_Product_With_Negative_Number_Should_Throw_Exception()
         {
             // arrange
-            var category = new Category(Guid.NewGuid(), "Category");
+            var category = new Category { Id = Guid.NewGuid(), Name = "Category" };
             var product = new Entity.Product
             {
                 Id = Guid.NewGuid(),
