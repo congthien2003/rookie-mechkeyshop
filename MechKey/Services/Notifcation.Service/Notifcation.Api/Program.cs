@@ -32,7 +32,6 @@ builder.Services.AddMassTransit(busConfigurator =>
     busConfigurator.AddConsumer<RegisterSuccessConsumer>();
     busConfigurator.AddConsumer<OrderCreatedConsumer>();
 
-
     busConfigurator.UsingRabbitMq((context, config) =>
     {
 
