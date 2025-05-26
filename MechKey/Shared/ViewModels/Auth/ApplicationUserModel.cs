@@ -1,8 +1,7 @@
-﻿using Shared.ViewModels.Abstractions;
-
+﻿
 namespace Shared.ViewModels.Auth
 {
-    public class ApplicationUserModel : BaseViewModel
+    public class ApplicationUserModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

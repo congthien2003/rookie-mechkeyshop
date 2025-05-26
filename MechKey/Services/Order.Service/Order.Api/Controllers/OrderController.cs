@@ -5,6 +5,7 @@ using Order.Application.Interfaces;
 using Order.Domain.Agreegates;
 using Order.Domain.Events.Domain;
 using Order.Domain.ValueObjects;
+using Order.Shared.DTOs.Requests;
 
 namespace Order.Api.Controllers
 {
@@ -24,7 +25,7 @@ namespace Order.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateOrder(CancellationToken token)
+        public async Task<IActionResult> CreateOrder(CreateOrderReq req, CancellationToken token)
         {
             var items = new List<OrderItem>
                 {
