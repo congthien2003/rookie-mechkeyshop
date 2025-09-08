@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Notification.Application\Notification.Application.csproj" />
-    <ProjectReference Include="..\Notification.Domain\Notification.Domain.csproj" />
+    <ProjectReference Include="..\Notification.Domain\Notification.Core.csproj" />
   </ItemGroup>
 
 </Project>

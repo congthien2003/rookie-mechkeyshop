@@ -1,4 +1,4 @@
-﻿namespace Notification.Application.Interfaces
+﻿namespace Notification.Core.Interfaces
 {
     public interface INotificationService
     {

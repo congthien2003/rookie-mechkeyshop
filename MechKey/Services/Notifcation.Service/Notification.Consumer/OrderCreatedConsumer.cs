@@ -1,7 +1,7 @@
 ﻿using Constracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Notification.Application.Interfaces;
+using Notification.Core.Interfaces;
 using Notification.Domain.Enum;
 
 namespace Notification.Consumer

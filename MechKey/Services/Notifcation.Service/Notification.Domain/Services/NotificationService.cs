@@ -1,7 +1,7 @@
-﻿using Notification.Application.Interfaces;
+﻿using Notification.Core.Interfaces;
 using Notification.Domain.IRepository;
 
-namespace Notification.Application.Services
+namespace Notification.Core.Services
 {
     public class NotificationService : INotificationService
     {

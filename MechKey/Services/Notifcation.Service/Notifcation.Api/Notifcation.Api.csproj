@@ -13,8 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\EventBus\EventBus.csproj" />
     <ProjectReference Include="..\..\..\MechKey.ServiceDefaults\MechKey.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\Notification.Application\Notification.Application.csproj" />
     <ProjectReference Include="..\Notification.Consumer\Notification.Consumer.csproj" />
+    <ProjectReference Include="..\Notification.Domain\Notification.Core.csproj" />
     <ProjectReference Include="..\Notification.Infrastructure\Notification.Infrastructure.csproj" />
   </ItemGroup>
 
