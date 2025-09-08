@@ -11,7 +11,7 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection service)
         {
-            service.AddAutoMapper(typeof(AutoMapperProfile));
+            //service.AddAutoMapper(typeof(AutoMapperProfile));
 
             // Register mapping services
             service.AddScoped<IApplicationUserMapping, ApplicationUserMapping>();

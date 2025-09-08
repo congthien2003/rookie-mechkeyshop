@@ -1,6 +1,6 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Mechkey_Yarp>("ReverseProxy");
+builder.AddProject<Projects.Mechkey_Gateway>("ReverseProxy");
 
 builder.AddProject<Projects.MechkeyShop>("App");
 
