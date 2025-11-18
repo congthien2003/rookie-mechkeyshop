@@ -1,4 +1,4 @@
-﻿using Notification.Application.Interfaces;
+﻿using Notification.Core.Interfaces;
 
 namespace Notifcation.Api
 {
