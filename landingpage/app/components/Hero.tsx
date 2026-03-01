@@ -55,7 +55,7 @@ export default function Hero() {
 				{/* Architecture image */}
 				<div className="mt-16 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-indigo-900/40 relative w-full aspect-video">
 					<Image
-						src="https://ouwojlzirbbnufebtkgy.supabase.co/storage/v1/object/public/assets/MechKeyShop-Architecture.png"
+						src="/MechKeyShop-Architecture.png"
 						alt="MechKeyShop System Architecture"
 						fill
 						className="object-cover"
