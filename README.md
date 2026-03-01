@@ -7,7 +7,7 @@
 
 ## System Architecture
 <div>
-  <img src="https://bsnnwuphmgsqfpvlqdwn.supabase.co/storage/v1/object/public/assets//MechKeyShop-Architecture.png" />
+  <img src="https://ouwojlzirbbnufebtkgy.supabase.co/storage/v1/object/public/assets/MechKeyShop-Architecture.png" />
 </div>
 
 ## Architecture Highlights ⚙️
