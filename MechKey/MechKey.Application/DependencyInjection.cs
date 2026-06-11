@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces.IServices;
 using Application.Services;
-using Infrastructure.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Mapping.Implementations;
 using Shared.Mapping.Interfaces;
@@ -11,8 +10,6 @@ namespace Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection service)
         {
-            //service.AddAutoMapper(typeof(AutoMapperProfile));
-
             // Register mapping services
             service.AddScoped<IApplicationUserMapping, ApplicationUserMapping>();
             service.AddScoped<IProductMapping, ProductMapping>();
