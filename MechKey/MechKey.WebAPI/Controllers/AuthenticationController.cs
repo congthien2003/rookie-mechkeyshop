@@ -1,7 +1,6 @@
 using Application.Comoon;
 using Application.Interfaces.IServices;
 using Asp.Versioning;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ViewModels.Auth;
 namespace WebAPI.Controllers
@@ -15,16 +14,14 @@ namespace WebAPI.Controllers
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IJwtManager _jwtManager;
         private readonly IAuthenticationService _authenticationService;
-        private readonly IMapper _mapper;
         public AuthenticationController(IJwtManager jwtManager,
             ILogger<AuthenticationController> logger,
-            IAuthenticationService authenticationService,
-            IMapper mapper)
+            IAuthenticationService authenticationService
+            )
         {
             _jwtManager = jwtManager;
             _logger = logger;
             _authenticationService = authenticationService;
-            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -57,7 +54,15 @@ namespace WebAPI.Controllers
                     Secure = true,    // Only send over HTTPS
                     Expires = DateTime.UtcNow.AddMinutes(15) // Expiration time
                 });
-                return Ok(Result<ApplicationUserModel>.Success("Login Success", _mapper.Map<ApplicationUserModel>(result.Data)));
+                return Ok(Result<ApplicationUserModel>.Success("Login Success", new ApplicationUserModel()
+                {
+                    Id = result.Data.Id,
+                    Email = result.Data.Email,
+                    Name = result.Data.Name,
+                    Phones = result.Data.Phones,
+                    Address = result.Data.Address,
+                    RoleId = result.Data.RoleId,
+                }));
             }
             catch (Exception ex)
             {
