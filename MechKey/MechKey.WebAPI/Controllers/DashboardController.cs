@@ -1,6 +1,7 @@
+using Application.Catalog.Queries;
 using Application.Comoon;
-using Application.Interfaces.IServices;
 using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
 using Shared.ViewModels.Dashboard;
@@ -12,17 +13,17 @@ namespace WebAPI.Controllers
     [ApiController]
     public class DashboardController : ControllerBase
     {
-        private readonly IDashboardService _dashboardService;
+        private readonly ISender _sender;
 
-        public DashboardController(IDashboardService dashboardService)
+        public DashboardController(ISender sender)
         {
-            _dashboardService = dashboardService;
+            _sender = sender;
         }
 
         [HttpGet]
         public async Task<Result<DashboardData>> GetDashboardData(CancellationToken cancellationToken = default)
         {
-            return await _dashboardService.GetDashboardDataAsync(cancellationToken);
+            return await _sender.Send(new GetDashboardQuery(), cancellationToken);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IServices;
 using Application.Services;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Mapping.Implementations;
 using Shared.Mapping.Interfaces;
@@ -28,6 +29,9 @@ namespace Application
             service.AddScoped<IJwtManager, JwtManager>();
             service.AddScoped<IOrderService, OrderService>();
             service.AddScoped<IDashboardService, DashboardService>();
+
+            // Register MediatR from this assembly
+            service.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
 
             return service;
         }
