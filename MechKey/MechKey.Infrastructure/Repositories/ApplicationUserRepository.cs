@@ -5,54 +5,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class ApplicationUserRepository : IApplicationUserRepository<ApplicationUser>
+    public class ApplicationUserRepository : RepositoryBase<ApplicationUser>, IApplicationUserRepository<ApplicationUser>
     {
-        private readonly ApplicationDbContext context;
-
-        public ApplicationUserRepository(ApplicationDbContext context)
+        public ApplicationUserRepository(ApplicationDbContext context) : base(context)
         {
-            this.context = context;
         }
+
         public bool CheckPhoneExists(string phone)
         {
-            return context.ApplicationUsers.FirstOrDefault(x => x.Phones == phone) != null ? true : false;
+            return _dbSet.Any(x => x.Phones == phone);
         }
 
-        public async Task<ApplicationUser> CreateAsync(ApplicationUser entity, CancellationToken cancellationToken = default)
+        public new IQueryable<ApplicationUser> GetAllAsync()
         {
-            var newUser = context.ApplicationUsers.Add(entity);
-            await context.SaveChangesAsync(cancellationToken);
-            return newUser.Entity;
-        }
-
-        public async Task DeleteAsync(ApplicationUser entity, CancellationToken cancellationToken = default)
-        {
-            entity.IsDeleted = true;
-            context.ApplicationUsers.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-
-        public IQueryable<ApplicationUser> GetAllAsync()
-        {
-            return context.ApplicationUsers.AsQueryable();
+            return _dbSet.Where(e => !e.IsDeleted).AsNoTracking();
         }
 
         public async Task<ApplicationUser?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var user = await context.ApplicationUsers.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
-            return user;
+            return await _dbSet
+                .Where(e => !e.IsDeleted)
+                .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
         }
 
-        public async Task<ApplicationUser?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public new async Task<ApplicationUser?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await context.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        }
-
-        public async Task<ApplicationUser> UpdateAsync(ApplicationUser entity, CancellationToken cancellationToken = default)
-        {
-            context.ApplicationUsers.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-            return entity;
+            return await _dbSet
+                .Where(e => !e.IsDeleted)
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
     }
 }

@@ -48,6 +48,25 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("best-seller")]
+        public async Task<IActionResult> GetBestSeller(CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetBestSellerProductsQuery(), cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("{id:guid}/ratings")]
+        public async Task<IActionResult> GetRatings(Guid id, int pageSize = 4, bool ascOrder = false, CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetProductRatingsQuery
+            {
+                ProductId = id,
+                PageSize = pageSize,
+                AscOrder = ascOrder
+            }, cancellationToken);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductModel model, CancellationToken cancellationToken = default)
         {
