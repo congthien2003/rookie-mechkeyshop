@@ -5,51 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class ProductRepository : IProductRepository<Product>
+    public class ProductRepository : RepositoryBase<Product>, IProductRepository<Product>
     {
-        private readonly ApplicationDbContext context;
-
-        public ProductRepository(ApplicationDbContext context)
+        public ProductRepository(ApplicationDbContext context) : base(context)
         {
-            this.context = context;
         }
 
-        public async Task<Product> CreateAsync(Product entity, CancellationToken cancellationToken = default)
+        public new IQueryable<Product> GetAllAsync()
         {
-            var result = await context.Products.AddAsync(entity, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            return result.Entity;
-        }
-
-        public async Task DeleteAsync(Product entity, CancellationToken cancellationToken = default)
-        {
-            entity.IsDeleted = true;
-            context.Products.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-
-        public IQueryable<Product> GetAllAsync()
-        {
-            return context.Products
+            return _dbSet.Where(e => !e.IsDeleted)
                 .Include(p => p.Category)
                 .Include(p => p.ProductRatings)
-                .AsQueryable();
+                .AsNoTracking();
         }
 
-        public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public new async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await context.Products
+            return await _dbSet
                 .Include(p => p.Category)
                 .Include(p => p.ProductRatings)
                 .ThenInclude(pr => pr.User)
-                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-        }
-
-        public async Task<Product> UpdateAsync(Product entity, CancellationToken cancellationToken = default)
-        {
-            context.Products.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-            return entity;
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted, cancellationToken);
         }
     }
 }

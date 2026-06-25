@@ -1,6 +1,8 @@
-﻿using Application.Comoon;
-using Application.Interfaces.IServices;
+﻿using Application.Catalog.Categories.Commands;
+using Application.Catalog.Categories.Queries;
+using Application.Comoon;
 using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Common;
 using Shared.ViewModels.Category;
@@ -12,39 +14,36 @@ namespace WebAPI.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ICategoryService categoryService;
+        private readonly ISender _sender;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(ISender sender)
         {
-            this.categoryService = categoryService;
+            _sender = sender;
         }
 
         [HttpGet("list")]
         public async Task<Result<PagedResult<CategoryModel>>> GetList(int page = 1, int pageSize = 10, string searchTerm = "", CancellationToken cancellationToken = default)
         {
-            PaginationReqModel paginationReqModel = new PaginationReqModel()
+            return await _sender.Send(new GetCategoryListQuery
             {
                 Page = page,
                 PageSize = pageSize,
                 SearchTerm = searchTerm
-            };
-            Result<PagedResult<CategoryModel>> result = await categoryService.GetAllAsync(paginationReqModel, cancellationToken);
-            return result;
+            }, cancellationToken);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateCategoryModel model, CancellationToken cancellationToken = default)
         {
-            var entity = await categoryService.AddAsync(model, cancellationToken);
-
-            return CreatedAtAction(nameof(GetById), new { id = entity.Data.Id }, entity);
+            var result = await _sender.Send(new CreateCategoryCommand { Name = model.Name }, cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
         {
-            var entity = await categoryService.GetByIdAsync(id, cancellationToken);
-            return Ok(entity);
+            var result = await _sender.Send(new GetCategoryByIdQuery { Id = id }, cancellationToken);
+            return Ok(result);
         }
 
         [HttpPut("{id:guid}")]
@@ -52,14 +51,14 @@ namespace WebAPI.Controllers
         {
             if (id != model.Id)
                 return BadRequest("ID mismatch");
-            var entity = await categoryService.UpdateAsync(model, cancellationToken);
-            return Ok(entity);
+            var result = await _sender.Send(new UpdateCategoryCommand { Id = model.Id, Name = model.Name }, cancellationToken);
+            return Ok(result);
         }
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await categoryService.DeleteAsync(id, cancellationToken);
+            var result = await _sender.Send(new DeleteCategoryCommand { Id = id }, cancellationToken);
             return Ok(result);
         }
     }

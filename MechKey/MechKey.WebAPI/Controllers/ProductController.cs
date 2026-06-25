@@ -1,7 +1,8 @@
-﻿using Application.Interfaces.IServices;
+﻿using Application.Catalog.Products.Commands;
 using Asp.Versioning;
+using MechKey.Application.Catalog.Products.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Common;
 using Shared.ViewModels.Product;
 
 namespace WebAPI.Controllers
@@ -11,11 +12,11 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IProductService productService;
+        private readonly ISender _sender;
 
-        public ProductController(IProductService productService)
+        public ProductController(ISender sender)
         {
-            this.productService = productService;
+            _sender = sender;
         }
 
         [HttpGet("list")]
@@ -28,42 +29,81 @@ namespace WebAPI.Controllers
             bool asc = true,
             CancellationToken cancellationToken = default)
         {
-            PaginationReqModel pagination = new PaginationReqModel()
+            var result = await _sender.Send(new GetProductListQuery
             {
                 Page = page,
                 PageSize = pageSize,
                 SearchTerm = searchTerm,
-            };
-
-            var result = await productService.GetAllAsync(pagination, categoryId, sortCol, asc, cancellationToken);
+                CategoryId = categoryId,
+                SortCol = sortCol,
+                Asc = asc
+            }, cancellationToken);
             return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await productService.GetByIdAsync(id, cancellationToken);
+            var result = await _sender.Send(new GetProductByIdQuery { Id = id }, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("best-seller")]
+        public async Task<IActionResult> GetBestSeller(CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetBestSellerProductsQuery(), cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("{id:guid}/ratings")]
+        public async Task<IActionResult> GetRatings(Guid id, int pageSize = 4, bool ascOrder = false, CancellationToken cancellationToken = default)
+        {
+            var result = await _sender.Send(new GetProductRatingsQuery
+            {
+                ProductId = id,
+                PageSize = pageSize,
+                AscOrder = ascOrder
+            }, cancellationToken);
             return Ok(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductModel model, CancellationToken cancellationToken = default)
         {
-            var result = await productService.AddAsync(model, cancellationToken);
+            var result = await _sender.Send(new CreateProductCommand
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                CategoryId = model.CategoryId,
+                Variants = model.Variants ?? new(),
+                ImageData = model.ImageData
+            }, cancellationToken);
             return Ok(result);
         }
 
         [HttpPut]
         public async Task<IActionResult> Update(UpdateProductModel model, CancellationToken cancellationToken = default)
         {
-            var result = await productService.UpdateAsync(model, cancellationToken);
+            var result = await _sender.Send(new UpdateProductCommand
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                ImageUrl = model.ImageUrl,
+                ImageData = model.ImageData,
+                CategoryId = model.CategoryId,
+                Variants = model.Variants ?? new(),
+                IsDeleted = model.IsDeleted
+            }, cancellationToken);
             return Ok(result);
         }
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = await productService.DeleteAsync(id, cancellationToken);
+            var result = await _sender.Send(new DeleteProductCommand { Id = id }, cancellationToken);
             return Ok(result);
         }
     }

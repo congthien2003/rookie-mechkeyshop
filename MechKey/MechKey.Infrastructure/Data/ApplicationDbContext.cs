@@ -1,10 +1,11 @@
-﻿using Domain.Entity;
+﻿using Application.Interfaces;
+using Domain.Entity;
 using MechKey.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MechkeyShop.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

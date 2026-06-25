@@ -5,50 +5,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class ProductRatingRepository : IProductRatingRepository<ProductRating>
+    public class ProductRatingRepository : RepositoryBase<ProductRating>, IProductRatingRepository<ProductRating>
     {
-        private readonly ApplicationDbContext _context;
-
-        public ProductRatingRepository(ApplicationDbContext context)
+        public ProductRatingRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<ProductRating> CreateAsync(ProductRating entity, CancellationToken cancellationToken)
+        // ProductRating uses int Id, not Guid, so this is the only override needed
+        public new async Task<ProductRating> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            _context.ProductRatings.Add(entity);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+                ?? throw new InvalidOperationException($"ProductRating with id {id} not found.");
+        }
+
+        public new IQueryable<ProductRating> GetAllAsync()
+        {
+            return _dbSet.AsQueryable();
+        }
+
+        // ProductRating does hard delete, not soft delete
+        public new async Task DeleteAsync(ProductRating entity, CancellationToken cancellationToken)
+        {
+            _dbSet.Remove(entity);
             await _context.SaveChangesAsync(cancellationToken);
-
-            return entity;
-        }
-
-        public async Task<ProductRating> UpdateAsync(ProductRating entity, CancellationToken cancellationToken)
-        {
-            _context.ProductRatings.Update(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-            return entity;
-        }
-
-        public async Task DeleteAsync(ProductRating entity, CancellationToken cancellationToken)
-        {
-            _context.ProductRatings.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task<ProductRating> GetByIdAsync(int id, CancellationToken cancellationToken)
-        {
-            return await _context.ProductRatings.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        }
-
-        public IQueryable<ProductRating> GetAllAsync()
-        {
-            // Không await vì IQueryable là deferred execution
-            return _context.ProductRatings.AsQueryable();
         }
 
         public IQueryable<ProductRating> GetListByProduct(Guid idProduct)
         {
-            return _context.ProductRatings.Where(pr => pr.ProductId == idProduct).AsQueryable();
+            return _dbSet.Where(pr => pr.ProductId == idProduct).AsQueryable();
         }
     }
 }

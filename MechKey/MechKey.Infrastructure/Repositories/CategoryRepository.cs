@@ -6,50 +6,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class CategoryRepository : ICategoryRepository<Category>
+    public class CategoryRepository : RepositoryBase<Category>, ICategoryRepository<Category>
     {
-        private readonly ApplicationDbContext context;
-
-        public CategoryRepository(ApplicationDbContext context)
+        public CategoryRepository(ApplicationDbContext context) : base(context)
         {
-            this.context = context;
         }
 
         public async Task<Category> CreateAsync(Category entity, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(entity.Name))
                 throw new CategoryValidateFailedException();
-            var result = await context.Categories.AddAsync(entity, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            return result.Entity;
+            return await base.CreateAsync(entity, cancellationToken);
         }
 
-        public async Task DeleteAsync(Category entity, CancellationToken cancellationToken = default)
+        public new IQueryable<Category> GetAllAsync()
         {
-            entity.IsDeleted = true;
-            context.Categories.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
+            return _dbSet.Where(e => !e.IsDeleted).Include(c => c.Products).AsNoTracking();
         }
 
-        public IQueryable<Category> GetAllAsync()
+        public new async Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return context.Categories
+            return await _dbSet
                 .Include(c => c.Products)
-                .AsQueryable();
-        }
-
-        public async Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            return await context.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
-        }
-
-        public async Task<Category> UpdateAsync(Category entity, CancellationToken cancellationToken = default)
-        {
-            context.Categories.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-            return entity;
+                .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
         }
     }
 }

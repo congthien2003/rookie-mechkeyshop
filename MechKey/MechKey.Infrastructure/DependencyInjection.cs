@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.IApiClient.Redis;
+﻿using Application.Interfaces;
+using Application.Interfaces.IApiClient.Redis;
 using Application.Interfaces.IApiClient.Supabase;
 using Application.Interfaces.IUnitOfWork;
 using Domain.Entity;
@@ -34,6 +35,8 @@ namespace Infrastructure
             services.AddScoped<ISupabaseService, SupabaseService>();
 
             services.AddScoped<IRedisService, RedisService>();
+
+            services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
             return services;
         }

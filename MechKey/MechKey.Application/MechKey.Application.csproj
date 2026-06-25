@@ -8,10 +8,16 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EventBus\EventBus.csproj" />
     <ProjectReference Include="..\MechKey.Domain\MechKey.Domain.csproj" />
+
     <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Catalog\Commands\" />
   </ItemGroup>
 </Project>

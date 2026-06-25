@@ -5,69 +5,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : RepositoryBase<Order>, IOrderRepository
     {
-        private readonly ApplicationDbContext context;
-
-        public OrderRepository(ApplicationDbContext context)
+        public OrderRepository(ApplicationDbContext context) : base(context)
         {
-            this.context = context;
         }
 
-        public async Task<Order> CreateAsync(Order entity, CancellationToken cancellationToken = default)
+        public new IQueryable<Order> GetAllAsync()
         {
-            var result = await context.Orders.AddAsync(entity, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            return result.Entity;
-        }
-
-        public async Task DeleteAsync(Order entity, CancellationToken cancellationToken = default)
-        {
-            entity.IsDeleted = true;
-            context.Orders.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-
-        public IQueryable<Order> GetAllAsync()
-        {
-            return context.Orders
+            return _dbSet.Where(e => !e.IsDeleted)
                 .Include(o => o.User)
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-                .AsQueryable();
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                .AsNoTracking();
         }
 
-        public async Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public new async Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await context.Orders
+            return await _dbSet
                 .Include(o => o.User)
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, cancellationToken);
         }
 
         public IQueryable<Order> GetOrdersByUserIdAsync(Guid userId)
         {
-            return context.Orders
+            return _dbSet.Where(e => !e.IsDeleted)
                 .Where(o => o.UserId == userId)
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .AsQueryable();
         }
 
         public async Task<Order?> GetOrderWithDetailsAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await context.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
-        }
-
-        public async Task<Order> UpdateAsync(Order entity, CancellationToken cancellationToken = default)
-        {
-            context.Orders.Update(entity);
-            await context.SaveChangesAsync(cancellationToken);
-            return entity;
+            return await _dbSet
+                .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId && !o.IsDeleted, cancellationToken);
         }
     }
 }
